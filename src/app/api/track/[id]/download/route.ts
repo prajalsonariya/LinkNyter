@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 
-export async function POST(req: Request, props: { params: Promise<{ trackId: string }> }) {
+export async function POST(req: Request, props: { params: Promise<{ id: string }> }) {
   const params = await props.params;
-  const trackId = params.trackId;
+  const trackId = params.id;
   const userAgent = req.headers.get('user-agent') || 'unknown';
 
   try {

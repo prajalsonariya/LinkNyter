@@ -161,7 +161,7 @@ export function AnalyticsView({ tracks }: { tracks: any[] }) {
                   dataKey="date" 
                   axisLine={false} 
                   tickLine={false} 
-                  tick={{ fill: '#958ea0', fontSize: 10, fontFamily: 'Geist', textTransform: 'uppercase', letterSpacing: '0.1em' }}
+                  tick={{ fill: '#958ea0', fontSize: 10, fontFamily: 'Geist' }}
                   dy={10}
                 />
                 <Tooltip content={<CustomTooltip />} />

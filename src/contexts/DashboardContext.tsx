@@ -15,7 +15,7 @@ interface DashboardContextType {
   dragActive: boolean;
   setDragActive: (active: boolean) => void;
   reachedLimit: boolean;
-  inputRef: React.RefObject<HTMLInputElement>;
+  inputRef: React.RefObject<HTMLInputElement | null>;
   handleGlobalDrag: (e: React.DragEvent) => void;
   handleGlobalDrop: (e: React.DragEvent) => void;
   handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;

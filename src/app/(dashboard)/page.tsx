@@ -348,7 +348,7 @@ export default function DashboardPage() {
                           Discard
                         </button>
                       </div>
-                      <button onClick={handleDeleteTrack} disabled={isDeleting} className="p-2 text-on-surface-variant hover:text-error transition-colors flex items-center justify-center" title="Delete Track">
+                      <button onClick={() => handleDeleteTrack()} disabled={isDeleting} className="p-2 text-on-surface-variant hover:text-error transition-colors flex items-center justify-center" title="Delete Track">
                         {isDeleting ? <Hourglass className="w-6 h-6" /> : <Trash2 className="w-6 h-6" />}
                       </button>
                     </div>
