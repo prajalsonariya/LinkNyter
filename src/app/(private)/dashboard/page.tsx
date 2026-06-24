@@ -10,7 +10,7 @@ import { TrackItem } from "@/components/TrackItem";
 
 export default function DashboardPage() {
   const { data: session } = useSession();
-  const { tracks, setTracks, selectedTrack, setSelectedTrack, isUploading, reachedLimit, inputRef, setDragActive } = useDashboard();
+  const { tracks, setTracks, selectedTrack, setSelectedTrack, isUploading, inputRef, setDragActive } = useDashboard();
   
   const [playingTrackId, setPlayingTrackId] = useState<string | null>(null);
   const [audioPlayer, setAudioPlayer] = useState<HTMLAudioElement | null>(null);
@@ -360,18 +360,6 @@ export default function DashboardPage() {
                   {Array.from({ length: 60 }).map((_, i) => (
                     <div key={i} className="w-1 bg-primary-container" style={{ height: `${Math.floor(Math.random() * 80) + 10}%` }}></div>
                   ))}
-                </div>
-              </div>
-            ) : reachedLimit && !isUploading ? (
-              <div className="border-2 border-dashed border-error hover:border-error transition-colors rounded-xl p-12 text-center bg-surface-container-low">
-                <div className="flex flex-col items-center gap-4">
-                  <div className="w-16 h-16 rounded-full bg-error-container flex items-center justify-center text-on-error-container">
-                    <Lock className="w-9 h-9" />
-                  </div>
-                  <div className="space-y-1">
-                    <h3 className="font-headline-md text-headline-md text-on-surface">Demo Limit Reached</h3>
-                    <p className="text-on-surface-variant font-body-sm">Upgrade to Pro to upload unlimited tracks</p>
-                  </div>
                 </div>
               </div>
             ) : isUploading ? (

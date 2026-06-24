@@ -14,7 +14,6 @@ interface DashboardContextType {
   uploadProgress: number;
   dragActive: boolean;
   setDragActive: (active: boolean) => void;
-  reachedLimit: boolean;
   inputRef: React.RefObject<HTMLInputElement | null>;
   handleGlobalDrag: (e: React.DragEvent) => void;
   handleGlobalDrop: (e: React.DragEvent) => void;
@@ -34,9 +33,6 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
   const [dragActive, setDragActive] = useState(false);
   
   const inputRef = useRef<HTMLInputElement>(null);
-
-  const isPro = session?.user?.role === 'pro' || session?.user?.role === 'admin';
-  const reachedLimit = !isPro && tracks.length >= 3;
 
   const fetchTracks = async () => {
     if (!session?.user?.email) return;
@@ -71,11 +67,6 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
     e.stopPropagation();
     setDragActive(false);
 
-    if (reachedLimit) {
-      toast.error("Free tier limit reached (3 tracks). Upgrade to Pro.");
-      return;
-    }
-
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       const file = e.dataTransfer.files[0];
       if (file.type.startsWith("audio/")) {
@@ -88,10 +79,6 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
 
   const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
-    if (reachedLimit) {
-      toast.error("Free tier limit reached (3 tracks). Upgrade to Pro.");
-      return;
-    }
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       await handleUpload(file);
@@ -103,11 +90,36 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
     setUploadProgress(0);
 
     try {
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("title", file.name.replace(/\.[^/.]+$/, "")); // remove extension
+      const title = file.name.replace(/\.[^/.]+$/, ""); // remove extension
 
-      const data = await new Promise<any>((resolve, reject) => {
+      // 1. Get folder ID and Access Token from backend
+      const initRes = await fetch('/api/upload/init', { method: 'POST' });
+      const initData = await initRes.json();
+      if (!initRes.ok) throw new Error(initData.error || 'Failed to initialize upload');
+      
+      const { folderId, accessToken } = initData;
+
+      // 2. Start Google Drive Resumable Upload Session
+      const driveInitRes = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+          'X-Upload-Content-Type': file.type,
+          'X-Upload-Content-Length': file.size.toString()
+        },
+        body: JSON.stringify({
+          name: file.name,
+          parents: [folderId]
+        })
+      });
+
+      if (!driveInitRes.ok) throw new Error('Failed to start Google Drive upload');
+      const uploadUrl = driveInitRes.headers.get('Location');
+      if (!uploadUrl) throw new Error('Google Drive did not return an upload URL');
+
+      // 3. Upload File Data to Google Drive via XHR (for progress tracking)
+      const driveFileId = await new Promise<string>((resolve, reject) => {
         const xhr = new XMLHttpRequest();
         
         xhr.upload.onprogress = (event) => {
@@ -119,25 +131,30 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
 
         xhr.onload = () => {
           if (xhr.status >= 200 && xhr.status < 300) {
-            resolve(JSON.parse(xhr.responseText));
+            resolve(JSON.parse(xhr.responseText).id);
           } else {
-            try {
-              const err = JSON.parse(xhr.responseText);
-              reject(new Error(err.error || 'Upload failed'));
-            } catch (e) {
-              reject(new Error('Upload failed with status ' + xhr.status));
-            }
+            reject(new Error('Google Drive upload failed with status ' + xhr.status));
           }
         };
 
-        xhr.onerror = () => reject(new Error('Network error occurred while uploading. Is the server running?'));
+        xhr.onerror = () => reject(new Error('Network error occurred while uploading directly to Google Drive.'));
 
-        xhr.open('POST', '/api/upload', true);
-        xhr.send(formData);
+        xhr.open('PUT', uploadUrl, true);
+        xhr.send(file);
       });
 
-      setTracks((prev) => [data.track, ...prev]);
-      setSelectedTrack(data.track);
+      // 4. Finalize with our backend (Set permissions & save to DB)
+      const completeRes = await fetch('/api/upload/complete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ driveFileId, title })
+      });
+      
+      const completeData = await completeRes.json();
+      if (!completeRes.ok) throw new Error(completeData.error || 'Failed to finalize upload');
+
+      setTracks((prev) => [completeData.track, ...prev]);
+      setSelectedTrack(completeData.track);
       
     } catch (error: any) {
       console.error(error);
@@ -150,7 +167,7 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
   return (
     <DashboardContext.Provider value={{ 
         tracks, setTracks, selectedTrack, setSelectedTrack, 
-        isUploading, uploadProgress, dragActive, setDragActive, reachedLimit, 
+        isUploading, uploadProgress, dragActive, setDragActive, 
         inputRef, handleGlobalDrag, handleGlobalDrop, handleChange, fetchTracks 
       }}>
       {children}

@@ -23,18 +23,16 @@ export const authOptions: NextAuthOptions = {
         // Find existing profile
         const { data: profile } = await supabase
           .from('profiles')
-          .select('role, plan')
+          .select('id')
           .eq('email', user.email)
           .single();
 
         if (!profile) {
-          // Create new free user
+          // Create new user record
           await supabase.from('profiles').insert({
             email: user.email,
             name: user.name || '',
-            image: user.image || '',
-            role: 'user',
-            plan: 'free'
+            image: user.image || ''
           });
         }
       }
@@ -46,19 +44,6 @@ export const authOptions: NextAuthOptions = {
         token.accessToken = account.access_token;
         token.refreshToken = account.refresh_token;
         token.expiresAt = account.expires_at ? account.expires_at * 1000 : 0;
-      }
-      
-      // Always fetch role/plan if it's missing from the token, or on initial sign in
-      const userEmail = user?.email || token.email;
-      if (userEmail && (!token.role || account)) {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('role, plan')
-          .eq('email', userEmail)
-          .single();
-          
-        token.role = profile?.role || 'user';
-        token.plan = profile?.plan || 'free';
       }
       
       // Return previous token if the access token has not expired yet
@@ -97,10 +82,6 @@ export const authOptions: NextAuthOptions = {
     async session({ session, token }) {
       session.accessToken = token.accessToken as string;
       session.error = token.error as string | undefined;
-      if (session.user) {
-        session.user.role = (token.role as string) || 'user';
-        session.user.plan = (token.plan as string) || 'free';
-      }
       return session;
     }
   },

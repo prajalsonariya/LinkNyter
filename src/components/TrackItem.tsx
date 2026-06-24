@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Link as LinkIcon, Trash2, Play, Pause, BarChart2 } from "lucide-react";
+import { Link as LinkIcon, Trash2, Play, Pause, BarChart2, Check } from "lucide-react";
 import { extractDominantColor } from "@/lib/color";
 
 interface TrackItemProps {
@@ -26,6 +26,13 @@ export function TrackItem({
   onToggleDownload
 }: TrackItemProps) {
   const [accent, setAccent] = useState("139, 92, 246"); // Default primary color
+  const [isCopied, setIsCopied] = useState(false);
+
+  const handleCopy = (e: React.MouseEvent) => {
+    onCopyLink(e);
+    setIsCopied(true);
+    setTimeout(() => setIsCopied(false), 2000);
+  };
 
   useEffect(() => {
     const img = new Image();
@@ -84,9 +91,9 @@ export function TrackItem({
           <button 
             className="p-1.5 rounded-md text-on-surface-variant hover:text-primary hover:bg-primary/10 transition-colors" 
             title="Copy Share Link"
-            onClick={onCopyLink}
+            onClick={handleCopy}
           >
-            <LinkIcon className="w-[18px] h-[18px]" />
+            {isCopied ? <Check className="w-[18px] h-[18px] text-green-500" /> : <LinkIcon className="w-[18px] h-[18px]" />}
           </button>
           
           <div className="flex items-center gap-3">

@@ -10,7 +10,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { data: session } = useSession();
   const { 
-    dragActive, isUploading, uploadProgress, reachedLimit, 
+    dragActive, isUploading, uploadProgress, 
     inputRef, handleGlobalDrag, handleGlobalDrop, handleChange 
   } = useDashboard();
 
@@ -63,7 +63,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
         </div>
         
         <nav className="flex-1 space-y-2">
-          <Link href="/" className={`flex items-center gap-3 py-3 px-4 rounded transition-all w-full ${pathname === '/' ? 'text-primary font-bold border-r-2 border-primary bg-surface-container-high active:scale-95 duration-100' : 'text-on-surface-variant font-body-sm hover:bg-surface-container-high'}`}>
+          <Link href="/dashboard" className={`flex items-center gap-3 py-3 px-4 rounded transition-all w-full ${pathname === '/dashboard' ? 'text-primary font-bold border-r-2 border-primary bg-surface-container-high active:scale-95 duration-100' : 'text-on-surface-variant font-body-sm hover:bg-surface-container-high'}`}>
             <LayoutGrid className="w-5 h-5" />
             <span className="font-label-caps text-label-caps">Dashboard</span>
           </Link>
@@ -99,7 +99,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
 
           <button 
             onClick={() => {
-              if(!reachedLimit && !isUploading) inputRef.current?.click();
+              if(!isUploading) inputRef.current?.click();
             }}
             className="w-full bg-primary text-on-primary font-label-caps text-label-caps py-4 px-6 rounded-full hover:opacity-90 transition-all flex items-center justify-center gap-2"
           >
