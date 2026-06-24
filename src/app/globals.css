@@ -1,0 +1,227 @@
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200');
+@import "tailwindcss";
+
+@theme {
+  --color-on-tertiary-container: #2a292c;
+  --color-primary-fixed-dim: #d0bcff;
+  --color-surface-variant: #343539;
+  --color-on-primary: #3c0091;
+  --color-primary-container: #a078ff;
+  --color-surface: #121317;
+  --color-background: #0D0D0E;
+  --color-secondary-fixed-dim: #c8c6c7;
+  --color-tertiary-fixed: #e5e1e4;
+  --color-surface-container: #1e1f23;
+  --color-on-surface-variant: #cbc3d7;
+  --color-inverse-surface: #e3e2e7;
+  --color-tertiary-fixed-dim: #c8c6c8;
+  --color-on-secondary-fixed: #1c1b1c;
+  --color-on-secondary-container: #bab8b9;
+  --color-on-primary-container: #340080;
+  --color-inverse-on-surface: #2f3034;
+  --color-error-container: #93000a;
+  --color-surface-dim: #121317;
+  --color-on-error: #690005;
+  --color-surface-tint: #d0bcff;
+  --color-on-surface: #e3e2e7;
+  --color-secondary: #c8c6c7;
+  --color-outline: #958ea0;
+  --color-surface-bright: #38393d;
+  --color-on-secondary-fixed-variant: #474647;
+  --color-primary-fixed: #e9ddff;
+  --color-on-tertiary-fixed: #1b1b1d;
+  --color-surface-container-highest: #343539;
+  --color-on-secondary: #313031;
+  --color-on-error-container: #ffdad6;
+  --color-primary: #d0bcff;
+  --color-surface-container-high: #292a2e;
+  --color-on-primary-fixed: #23005c;
+  --color-on-tertiary: #303032;
+  --color-tertiary: #c8c6c8;
+  --color-error: #ffb4ab;
+  --color-secondary-fixed: #e5e2e3;
+  --color-surface-container-low: #1a1b1f;
+  --color-surface-container-lowest: #0d0e12;
+  --color-on-background: #e3e2e7;
+  --color-secondary-container: #4a494a;
+  --color-tertiary-container: #929093;
+  --color-on-primary-fixed-variant: #5516be;
+  --color-inverse-primary: #6d3bd7;
+  --color-on-tertiary-fixed-variant: #474649;
+  --color-outline-variant: #494454;
+
+  --spacing-margin-desktop: 48px;
+  --spacing-container-max: 1280px;
+  --spacing-gutter: 24px;
+  --spacing-margin-mobile: 16px;
+  --spacing-unit: 4px;
+
+  --radius-sm: 0.125rem;
+  --radius-md: 0.375rem;
+  --radius-lg: 0.25rem;
+  --radius-xl: 0.5rem;
+  --radius-full: 0.75rem;
+
+  --font-body-lg: "Geist", sans-serif;
+  --font-headline-lg-mobile: "Geist", sans-serif;
+  --font-label-caps: "Geist", sans-serif;
+  --font-body-sm: "Geist", sans-serif;
+  --font-display-lg: "Geist", sans-serif;
+  --font-headline-lg: "Geist", sans-serif;
+  --font-headline-md: "Geist", sans-serif;
+}
+
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-on-surface);
+  overflow-x: hidden;
+}
+
+.material-symbols-outlined {
+  font-family: 'Material Symbols Outlined';
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+.glass-panel {
+  background: rgba(26, 26, 29, 0.4);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-player {
+  background: rgba(18, 19, 23, 0.4);
+  backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.ambient-glow {
+  position: absolute;
+  width: 60vw;
+  height: 60vw;
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.15) 0%, rgba(139, 92, 246, 0) 70%);
+  filter: blur(80px);
+  z-index: -1;
+  pointer-events: none;
+}
+
+.playback-thumb {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.play-button:hover .playback-glow {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+.playback-glow {
+  position: absolute;
+  inset: -10px;
+  background: rgba(139, 92, 246, 0.3);
+  filter: blur(15px);
+  border-radius: 50%;
+  opacity: 0;
+  transition: all 0.3s ease;
+  z-index: -1;
+}
+
+.glow-projection {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 120%;
+  height: 120%;
+  background: radial-gradient(circle, rgba(208, 188, 255, 0.15) 0%, rgba(13, 13, 14, 0) 70%);
+  filter: blur(60px);
+  z-index: -1;
+  animation: pulse-glow 8s infinite alternate ease-in-out;
+}
+
+@keyframes pulse-glow {
+  0% { opacity: 0.4; transform: translate(-50%, -50%) scale(1); }
+  100% { opacity: 0.7; transform: translate(-50%, -50%) scale(1.1); }
+}
+
+.playhead-glow {
+  box-shadow: 0 0 15px rgba(208, 188, 255, 0.6);
+}
+
+.active-glow {
+  box-shadow: 0 0 20px 2px rgba(139, 92, 246, 0.15);
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #0d0e12;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #494454;
+  border-radius: 10px;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.5s ease forwards;
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* Typography styles based on Stitch design */
+.text-body-lg {
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 400;
+}
+.text-headline-lg-mobile {
+  font-size: 24px;
+  line-height: 32px;
+  letter-spacing: -0.02em;
+  font-weight: 600;
+}
+.text-label-caps {
+  font-size: 12px;
+  line-height: 16px;
+  letter-spacing: 0.1em;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+.text-body-sm {
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 400;
+}
+.text-display-lg {
+  font-size: 48px;
+  line-height: 56px;
+  letter-spacing: -0.04em;
+  font-weight: 700;
+}
+.text-headline-lg {
+  font-size: 32px;
+  line-height: 40px;
+  letter-spacing: -0.02em;
+  font-weight: 600;
+}
+.text-headline-md {
+  font-size: 20px;
+  line-height: 28px;
+  letter-spacing: -0.01em;
+  font-weight: 500;
+}
