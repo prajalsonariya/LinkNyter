@@ -76,16 +76,13 @@ export function TrackAnalyticsClient({ track, sessions }: { track: any, sessions
   };
 
   const getFeedText = (ev: any) => {
-    const loc = ev.session.city && ev.session.city !== 'Unknown' 
-      ? `${decodeURIComponent(ev.session.city)}, ${ev.session.country}`
-      : 'Unknown Location';
     switch (ev.action) {
-      case 'play': return <p className="font-body-sm text-on-surface">Listener in <span className="text-primary">{loc}</span> played the track</p>;
-      case 'pause': return <p className="font-body-sm text-on-surface">Listener paused in <span className="text-primary">{loc}</span></p>;
+      case 'play': return <p className="font-body-sm text-on-surface">Listener played the track</p>;
+      case 'pause': return <p className="font-body-sm text-on-surface">Listener paused the track</p>;
       case 'seeked': return <p className="font-body-sm text-on-surface">Listener scrubbed to <span className="text-primary">{formatTime(ev.timestamp)}</span></p>;
-      case 'download': return <p className="font-body-sm text-on-surface">Track downloaded in <span className="text-primary">{loc}</span></p>;
-      case 'share': return <p className="font-body-sm text-on-surface">Social link clicked in <span className="text-primary">{loc}</span></p>;
-      default: return <p className="font-body-sm text-on-surface">Activity in <span className="text-primary">{loc}</span></p>;
+      case 'download': return <p className="font-body-sm text-on-surface">Track was downloaded</p>;
+      case 'share': return <p className="font-body-sm text-on-surface">Social link was clicked</p>;
+      default: return <p className="font-body-sm text-on-surface">Activity detected</p>;
     }
   };
 
@@ -266,7 +263,6 @@ export function TrackAnalyticsClient({ track, sessions }: { track: any, sessions
         <div className={`${glassCardClass} rounded-2xl p-6 h-[450px] flex flex-col`}>
           <div className="flex items-center justify-between mb-6">
             <h4 className="font-headline-md text-headline-md">Listener Sessions</h4>
-            <span className="flex h-2 w-2 rounded-full bg-green-500 animate-ping"></span>
           </div>
           <div className="flex-1 space-y-6 overflow-y-auto custom-scrollbar pr-2">
             {feed.length === 0 ? (
