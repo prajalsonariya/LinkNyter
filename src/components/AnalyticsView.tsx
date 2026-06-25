@@ -7,7 +7,12 @@ import { TrendingUp, Loader2, Smartphone, Monitor } from "lucide-react";
 export function AnalyticsView({ tracks }: { tracks: any[] }) {
   const [timeframe, setTimeframe] = useState<'7D' | '30D' | 'ALL'>('30D');
   const [totalStreams, setTotalStreams] = useState(0);
-  const [analyticsData, setAnalyticsData] = useState<{ timeline: any[], devices: { mobile: number, desktop: number } }>({ 
+  const [analyticsData, setAnalyticsData] = useState<{ 
+    timeline: any[], 
+    devices: { mobile: number, desktop: number },
+    sessions?: any[],
+    metrics?: { totalOpens: number, avgListenTime: number, downloads: number, socialClicks: number }
+  }>({ 
     timeline: [], 
     devices: { mobile: 0, desktop: 0 } 
   });
@@ -61,6 +66,15 @@ export function AnalyticsView({ tracks }: { tracks: any[] }) {
     return null;
   };
 
+  const formatTime = (t: number) => {
+    const m = Math.floor(t / 60);
+    const s = Math.floor(t % 60);
+    return `${m}:${s < 10 ? '0' : ''}${s}`;
+  };
+
+  const metrics = analyticsData.metrics || { totalOpens: 0, avgListenTime: 0, downloads: 0, socialClicks: 0 };
+  const sessions = analyticsData.sessions || [];
+
   return (
     <div className="relative w-full h-full overflow-y-auto custom-scrollbar p-12 pr-16 z-10">
       {/* Top Glow Decoration */}
@@ -75,7 +89,7 @@ export function AnalyticsView({ tracks }: { tracks: any[] }) {
       </header>
 
       {/* Overview Cards (Top Row) */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
         {/* Total Streams */}
         <div className="bg-surface-container-low/50 backdrop-blur-xl border border-outline-variant/50 rounded-xl p-6 flex flex-col justify-between h-40 transition-all hover:border-outline-variant hover:-translate-y-0.5">
           <div className="flex justify-between items-start">
@@ -85,6 +99,18 @@ export function AnalyticsView({ tracks }: { tracks: any[] }) {
             </div>
           </div>
           <div className="text-4xl font-headline-lg font-black text-on-surface">{totalStreams.toLocaleString()}</div>
+        </div>
+
+        {/* Total Unique Opens */}
+        <div className="bg-surface-container-low/50 backdrop-blur-xl border border-outline-variant/50 rounded-xl p-6 flex flex-col justify-between h-40 transition-all hover:border-outline-variant hover:-translate-y-0.5">
+          <span className="font-label-caps text-label-caps text-on-surface-variant uppercase">Tracked Opens</span>
+          <div className="text-4xl font-headline-lg font-black text-on-surface">{metrics.totalOpens.toLocaleString()}</div>
+        </div>
+
+        {/* Avg Listen Time */}
+        <div className="bg-surface-container-low/50 backdrop-blur-xl border border-outline-variant/50 rounded-xl p-6 flex flex-col justify-between h-40 transition-all hover:border-outline-variant hover:-translate-y-0.5">
+          <span className="font-label-caps text-label-caps text-on-surface-variant uppercase">Avg. Listen Time</span>
+          <div className="text-4xl font-headline-lg font-black text-on-surface">{formatTime(metrics.avgListenTime)}</div>
         </div>
 
         {/* Top Track */}
@@ -204,58 +230,45 @@ export function AnalyticsView({ tracks }: { tracks: any[] }) {
           </div>
         </section>
 
-        {/* Device Breakdown Column */}
-        <section className="bg-surface-container-low/50 backdrop-blur-xl border border-outline-variant/50 rounded-2xl p-6 flex flex-col">
-          <h3 className="font-label-caps text-label-caps text-on-surface-variant uppercase mb-6 tracking-wider">Device Breakdown</h3>
-          <div className="flex-grow flex items-center justify-center relative min-h-[200px]">
-            {isLoading ? (
-              <Loader2 className="animate-spin text-primary w-8 h-8" />
-            ) : totalDevices === 0 ? (
-               <span className="text-on-surface-variant font-label-caps">No Data</span>
-            ) : (
-              <>
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={pieData}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={60}
-                      outerRadius={80}
-                      stroke="none"
-                      paddingAngle={2}
-                      dataKey="value"
-                    >
-                      {pieData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
-                      ))}
-                    </Pie>
-                  </PieChart>
-                </ResponsiveContainer>
-                {/* Inner Label */}
-                <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                  <span className="text-3xl font-black text-on-surface">{mobilePercent}%</span>
-                  <span className="text-[10px] font-label-caps text-outline uppercase">Mobile</span>
-                </div>
-              </>
-            )}
+        {/* Device Breakdown Column -> Now Recent Sessions */}
+        <section className="bg-surface-container-low/50 backdrop-blur-xl border border-outline-variant/50 rounded-2xl p-6 flex flex-col max-h-[500px]">
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider">Recent Sessions</h3>
+            <span className="text-xs text-on-surface-variant">{sessions.length} sessions</span>
           </div>
-          {/* Legend */}
-          <div className="grid grid-cols-2 gap-4 mt-8">
-            <div className="flex items-center gap-3 p-4 rounded-xl border border-outline-variant/30">
-              <Smartphone className="w-6 h-6 text-primary" />
-              <div>
-                <div className="text-xs font-label-caps text-on-surface-variant uppercase">Mobile</div>
-                <div className="font-headline-md text-on-surface">{mobilePercent}%</div>
+          
+          <div className="flex-grow overflow-y-auto custom-scrollbar pr-2 space-y-3">
+            {isLoading ? (
+              <div className="w-full h-[200px] flex items-center justify-center">
+                <Loader2 className="animate-spin text-primary w-8 h-8" />
               </div>
-            </div>
-            <div className="flex items-center gap-3 p-4 rounded-xl border border-outline-variant/30">
-              <Monitor className="w-6 h-6 text-outline" />
-              <div>
-                <div className="text-xs font-label-caps text-on-surface-variant uppercase">Desktop</div>
-                <div className="font-headline-md text-on-surface">{desktopPercent}%</div>
+            ) : sessions.length === 0 ? (
+              <div className="w-full h-[200px] flex items-center justify-center text-on-surface-variant font-label-caps">
+                No telemetry yet
               </div>
-            </div>
+            ) : (
+              sessions.map((session) => (
+                <div key={session.id} className="flex flex-col gap-2 p-4 rounded-xl bg-surface-container-high/50 border border-outline-variant/20 hover:border-primary/50 transition-colors">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <div className="font-body-md text-on-surface font-semibold flex items-center gap-2">
+                        {session.tracking_links?.reference_name || 'Direct Link'}
+                        {session.download_clicked && (
+                          <span className="bg-primary/20 text-primary text-[10px] px-2 py-0.5 rounded-sm font-label-caps uppercase">Downloaded</span>
+                        )}
+                      </div>
+                      <div className="text-xs text-on-surface-variant mt-1">
+                        {new Date(session.started_at).toLocaleDateString()} at {new Date(session.started_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="font-body-lg text-primary">{formatTime(session.total_listen_time_seconds || 0)}</div>
+                      <div className="text-[10px] text-on-surface-variant uppercase mt-1 tracking-wider">Listen Time</div>
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </section>
       </div>

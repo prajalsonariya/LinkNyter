@@ -26,12 +26,12 @@ export async function GET(req: Request) {
 
     const trackIds = tracks.map(t => t.id);
 
-    // 2. Fetch analytics
+    // 2. Fetch new analytics (playback_sessions)
     let query = supabase
-      .from('analytics')
-      .select('timestamp, user_agent')
+      .from('playback_sessions')
+      .select('*, tracking_links(reference_name, custom_slug)')
       .in('track_id', trackIds)
-      .eq('event_type', 'play');
+      .order('started_at', { ascending: false });
 
     let startDate: Date | null = null;
     if (timeframe === '7D') {
@@ -41,13 +41,13 @@ export async function GET(req: Request) {
     }
 
     if (startDate) {
-      query = query.gte('timestamp', startDate.toISOString());
+      query = query.gte('started_at', startDate.toISOString());
     }
 
-    const { data: analytics, error: analyticsError } = await query;
+    const { data: sessions, error: sessionsError } = await query.limit(50);
 
-    if (analyticsError) {
-      console.error(analyticsError);
+    if (sessionsError) {
+      console.error(sessionsError);
       return NextResponse.json({ error: 'Failed to fetch analytics' }, { status: 500 });
     }
 
@@ -55,7 +55,11 @@ export async function GET(req: Request) {
     let mobileCount = 0;
     let desktopCount = 0;
     
-    // Create empty timeline buckets
+    // We no longer have user_agent logged in playback_sessions by default in the SQL schema provided,
+    // so we'll just mock it or skip it, but let's keep the API structure same to not break frontend pie chart immediately.
+    // Actually, we can just return devices: { desktop: 0, mobile: 0 } or base it on something else,
+    // or remove it. Let's just return 0 for now.
+
     const timelineMap = new Map<string, number>();
     if (timeframe !== 'ALL' && startDate) {
       const days = timeframe === '7D' ? 7 : 30;
@@ -65,23 +69,13 @@ export async function GET(req: Request) {
       }
     }
 
-    (analytics || []).forEach(record => {
-      // Device breakdown
-      const ua = record.user_agent || '';
-      if (/Mobile|Android|iPhone|iPad/i.test(ua)) {
-        mobileCount++;
-      } else {
-        desktopCount++;
-      }
-
+    (sessions || []).forEach(session => {
       // Timeline aggregation
-      if (record.timestamp) {
-        const dateKey = format(parseISO(record.timestamp), 'MMM dd');
+      if (session.started_at) {
+        const dateKey = format(parseISO(session.started_at), 'MMM dd');
         if (timeframe === 'ALL') {
-          // If ALL, just add the key dynamically
           timelineMap.set(dateKey, (timelineMap.get(dateKey) || 0) + 1);
         } else if (timelineMap.has(dateKey)) {
-          // If 7D or 30D, only increment if it's within our pre-filled buckets
           timelineMap.set(dateKey, timelineMap.get(dateKey)! + 1);
         }
       }
@@ -92,16 +86,25 @@ export async function GET(req: Request) {
       streams
     }));
 
-    // If ALL time, sort the dynamically created keys chronologically
     if (timeframe === 'ALL') {
       timeline.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
     }
 
+    // Calculate advanced metrics
+    const totalOpens = sessions?.length || 0;
+    const avgListenTime = totalOpens > 0 ? Math.round((sessions?.reduce((acc, s) => acc + (s.total_listen_time_seconds || 0), 0) || 0) / totalOpens) : 0;
+    const downloads = sessions?.filter(s => s.download_clicked).length || 0;
+    const socialClicks = sessions?.filter(s => s.social_links_clicked).length || 0;
+
     return NextResponse.json({
       timeline,
-      devices: {
-        mobile: mobileCount,
-        desktop: desktopCount
+      devices: { mobile: 0, desktop: 0 },
+      sessions: sessions || [],
+      metrics: {
+        totalOpens,
+        avgListenTime,
+        downloads,
+        socialClicks
       }
     });
 

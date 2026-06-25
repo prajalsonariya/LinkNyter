@@ -38,6 +38,17 @@ export default function PlayerPage({ params }: { params: Promise<{ slug: string 
   const imgRef = useRef<HTMLImageElement>(null);
   const hasTrackedPlay = useRef(false);
 
+  // Advanced Telemetry Engine State
+  const telemetry = useRef({
+    events: [] as { action: string; timestamp: number; time: string }[],
+    downloads: 0,
+    social_clicks: 0
+  });
+
+  const onPlay = () => telemetry.current.events.push({ action: 'play', timestamp: audioRef.current?.currentTime || 0, time: new Date().toISOString() });
+  const onPause = () => telemetry.current.events.push({ action: 'pause', timestamp: audioRef.current?.currentTime || 0, time: new Date().toISOString() });
+  const onSeeked = () => telemetry.current.events.push({ action: 'seeked', timestamp: audioRef.current?.currentTime || 0, time: new Date().toISOString() });
+
   useEffect(() => {
     async function loadTrack() {
       const resolvedParams = await params;
@@ -78,7 +89,43 @@ export default function PlayerPage({ params }: { params: Promise<{ slug: string 
     }
   }, [isPlaying, track]);
 
+  // Batch Telemetry Dispatch Engine
+  useEffect(() => {
+    if (!track) return;
 
+    const sendBeacon = () => {
+      const searchParams = new URLSearchParams(window.location.search);
+      const trackingRef = searchParams.get('ref');
+
+      const payload = {
+        track_id: track.id,
+        tracking_ref: trackingRef,
+        events: telemetry.current.events,
+        downloads: telemetry.current.downloads,
+        social_clicks: telemetry.current.social_clicks
+      };
+
+      if (telemetry.current.events.length > 0 || telemetry.current.downloads > 0 || telemetry.current.social_clicks > 0) {
+        navigator.sendBeacon('/api/analytics/ingest', JSON.stringify(payload));
+        telemetry.current.events = [];
+        telemetry.current.downloads = 0;
+        telemetry.current.social_clicks = 0;
+      }
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'hidden') sendBeacon();
+    };
+
+    window.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('beforeunload', sendBeacon);
+
+    return () => {
+      sendBeacon();
+      window.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('beforeunload', sendBeacon);
+    };
+  }, [track]);
 
   if (loading) return (
     <div className="flex h-screen items-center justify-center" style={{ backgroundColor: '#060607' }}>
@@ -105,6 +152,7 @@ export default function PlayerPage({ params }: { params: Promise<{ slug: string 
   const handleDownload = async () => {
     if (!track || !track.allow_downloads) return;
     setIsDownloading(true);
+    telemetry.current.downloads += 1;
     try {
       const response = await fetch(`/api/stream/${track.id}`);
       const blob = await response.blob();
@@ -322,7 +370,7 @@ export default function PlayerPage({ params }: { params: Promise<{ slug: string 
                   if (!rawUrl || !rawUrl.trim()) return null;
                   const url = rawUrl.trim().startsWith('http') ? rawUrl.trim() : `https://${rawUrl.trim()}`;
                   return (
-                    <a key={key} href={url} target="_blank" rel="noopener noreferrer" className="group flex items-center justify-center text-white/40 hover:text-white transition-all">
+                    <a key={key} href={url} target="_blank" rel="noopener noreferrer" onClick={() => telemetry.current.social_clicks += 1} className="group flex items-center justify-center text-white/40 hover:text-white transition-all">
                       <span className="group-hover:scale-110 transition-transform">{icon}</span>
                     </a>
                   );
@@ -339,6 +387,9 @@ export default function PlayerPage({ params }: { params: Promise<{ slug: string 
         onTimeUpdate={handleTimeUpdate}
         onEnded={() => setIsPlaying(false)}
         onLoadedMetadata={handleTimeUpdate}
+        onPlay={onPlay}
+        onPause={onPause}
+        onSeeked={onSeeked}
         className="hidden"
       />
     </div>
