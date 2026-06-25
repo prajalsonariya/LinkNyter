@@ -224,7 +224,10 @@ export function AnalyticsView({ tracks }: { tracks: any[] }) {
                   </div>
                   <span className="font-body-lg text-on-surface group-hover:text-primary transition-colors truncate max-w-[200px]">{track.title}</span>
                 </div>
-                <span className="font-body-sm text-on-surface-variant shrink-0">{track.play_count || 0}</span>
+                <div className="flex items-center gap-4">
+                  <span className="font-body-sm text-on-surface-variant shrink-0">{track.play_count || 0}</span>
+                  <a href={`/analytics/${track.id}`} className="bg-surface-container border border-outline-variant/30 hover:border-primary text-primary px-3 py-1 rounded-md font-label-caps text-[10px] uppercase transition-all opacity-0 group-hover:opacity-100">Analyze</a>
+                </div>
               </div>
             ))}
           </div>
@@ -252,7 +255,7 @@ export function AnalyticsView({ tracks }: { tracks: any[] }) {
                   <div className="flex justify-between items-start">
                     <div>
                       <div className="font-body-md text-on-surface font-semibold flex items-center gap-2">
-                        {session.tracking_links?.reference_name || 'Direct Link'}
+                        {session.tracking_links?.reference_name || 'Open Link'}
                         {session.download_clicked && (
                           <span className="bg-primary/20 text-primary text-[10px] px-2 py-0.5 rounded-sm font-label-caps uppercase">Downloaded</span>
                         )}

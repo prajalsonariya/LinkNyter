@@ -28,9 +28,6 @@ export function TrackItem({
 }: TrackItemProps) {
   const [accent, setAccent] = useState("139, 92, 246"); // Default primary color
   const [isCopied, setIsCopied] = useState(false);
-  const [showLinkModal, setShowLinkModal] = useState(false);
-  const [linkRecipient, setLinkRecipient] = useState('');
-  const [generatedLink, setGeneratedLink] = useState('');
 
   const handleCopy = (e: React.MouseEvent) => {
     onCopyLink(e);
@@ -100,13 +97,14 @@ export function TrackItem({
             >
               {isCopied ? <Check className="w-[28px] h-[28px] text-green-500" /> : <img src="/logo.svg" alt="Copy Link" className="w-[28px] h-[28px] object-contain opacity-70 hover:opacity-100 transition-opacity" />}
             </button>
-            <button 
+            <a 
+              href="/manage-links"
               className="p-1.5 rounded-md text-on-surface-variant hover:text-primary hover:bg-primary/10 transition-colors flex items-center gap-1 font-label-caps text-[10px] uppercase"
-              title="Create Tracking Link"
-              onClick={() => setShowLinkModal(true)}
+              title="Manage Tracking Links"
+              onClick={(e) => e.stopPropagation()}
             >
-              <BarChart2 className="w-4 h-4" /> Tracking Link
-            </button>
+              <BarChart2 className="w-4 h-4" /> Manage Links
+            </a>
           </div>
           
           <div className="flex items-center gap-3">
@@ -123,55 +121,6 @@ export function TrackItem({
           </div>
         </div>
       </div>
-
-      {showLinkModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={(e) => { e.stopPropagation(); setShowLinkModal(false); }}>
-          <div className="bg-surface border border-outline-variant/30 p-6 rounded-2xl w-full max-w-sm shadow-2xl relative" onClick={e => e.stopPropagation()}>
-            <h3 className="font-headline-md text-on-surface mb-2">Create Tracking Link</h3>
-            <p className="text-body-sm text-on-surface-variant mb-4">Who are you sending this to?</p>
-            
-            {!generatedLink ? (
-              <>
-                <input 
-                  type="text" 
-                  placeholder="e.g. Warner Bros Pitch" 
-                  className="w-full bg-surface-container-low border border-outline-variant/30 rounded-lg px-4 py-2 text-on-surface mb-4 focus:border-primary outline-none"
-                  value={linkRecipient}
-                  onChange={(e) => setLinkRecipient(e.target.value)}
-                  autoFocus
-                />
-                <div className="flex justify-end gap-2">
-                  <button className="px-4 py-2 text-on-surface-variant font-label-caps uppercase text-[11px]" onClick={() => setShowLinkModal(false)}>Cancel</button>
-                  <button className="px-4 py-2 bg-primary text-on-primary rounded-lg font-label-caps uppercase text-[11px]" onClick={async () => {
-                    if(!linkRecipient.trim()) return;
-                    const slug = linkRecipient.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-') + '-' + Math.random().toString(36).substring(2, 6);
-                    const { error } = await supabase.from('tracking_links').insert({
-                      track_id: track.id,
-                      reference_name: linkRecipient.trim(),
-                      custom_slug: slug
-                    });
-                    if(!error) {
-                      setGeneratedLink(`${window.location.origin}/t/${track.slug}?ref=${slug}`);
-                    }
-                  }}>Generate</button>
-                </div>
-              </>
-            ) : (
-              <>
-                <div className="bg-surface-container-low border border-outline-variant/30 rounded-lg p-3 text-[12px] font-mono text-on-surface break-all mb-4">
-                  {generatedLink}
-                </div>
-                <button className="w-full py-2 bg-primary text-on-primary rounded-lg font-label-caps uppercase text-[11px]" onClick={() => {
-                  navigator.clipboard.writeText(generatedLink);
-                  setShowLinkModal(false);
-                  setGeneratedLink('');
-                  setLinkRecipient('');
-                }}>Copy Link & Close</button>
-              </>
-            )}
-          </div>
-        </div>
-      )}
     </div>
   );
 }

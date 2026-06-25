@@ -39,11 +39,16 @@ export default function PlayerPage({ params }: { params: Promise<{ slug: string 
   const hasTrackedPlay = useRef(false);
 
   // Advanced Telemetry Engine State
+  const sessionId = useRef<string>('');
   const telemetry = useRef({
     events: [] as { action: string; timestamp: number; time: string }[],
     downloads: 0,
     social_clicks: 0
   });
+
+  useEffect(() => {
+    sessionId.current = crypto.randomUUID();
+  }, []);
 
   const onPlay = () => telemetry.current.events.push({ action: 'play', timestamp: audioRef.current?.currentTime || 0, time: new Date().toISOString() });
   const onPause = () => telemetry.current.events.push({ action: 'pause', timestamp: audioRef.current?.currentTime || 0, time: new Date().toISOString() });
@@ -98,6 +103,7 @@ export default function PlayerPage({ params }: { params: Promise<{ slug: string 
       const trackingRef = searchParams.get('ref');
 
       const payload = {
+        session_id: sessionId.current,
         track_id: track.id,
         tracking_ref: trackingRef,
         events: telemetry.current.events,
@@ -107,14 +113,15 @@ export default function PlayerPage({ params }: { params: Promise<{ slug: string 
 
       if (telemetry.current.events.length > 0 || telemetry.current.downloads > 0 || telemetry.current.social_clicks > 0) {
         navigator.sendBeacon('/api/analytics/ingest', JSON.stringify(payload));
-        telemetry.current.events = [];
-        telemetry.current.downloads = 0;
-        telemetry.current.social_clicks = 0;
       }
     };
 
     const handleVisibilityChange = () => {
-      if (document.visibilityState === 'hidden') sendBeacon();
+      // Send beacon periodically to ensure backend has the latest state, 
+      // but don't wipe the local state since we are upserting on the backend.
+      if (document.visibilityState === 'hidden') {
+        sendBeacon();
+      }
     };
 
     window.addEventListener('visibilitychange', handleVisibilityChange);
@@ -370,7 +377,7 @@ export default function PlayerPage({ params }: { params: Promise<{ slug: string 
                   if (!rawUrl || !rawUrl.trim()) return null;
                   const url = rawUrl.trim().startsWith('http') ? rawUrl.trim() : `https://${rawUrl.trim()}`;
                   return (
-                    <a key={key} href={url} target="_blank" rel="noopener noreferrer" onClick={() => telemetry.current.social_clicks += 1} className="group flex items-center justify-center text-white/40 hover:text-white transition-all">
+                    <a key={key} href={url} target="_blank" rel="noopener noreferrer" onMouseDown={() => telemetry.current.social_clicks += 1} className="group flex items-center justify-center text-white/40 hover:text-white transition-all">
                       <span className="group-hover:scale-110 transition-transform">{icon}</span>
                     </a>
                   );

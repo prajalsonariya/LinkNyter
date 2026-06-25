@@ -7,10 +7,10 @@ export async function POST(req: Request) {
     if (!text) return NextResponse.json({ success: true });
 
     const payload = JSON.parse(text);
-    const { track_id, tracking_ref, events, downloads, social_clicks } = payload;
+    const { session_id, track_id, tracking_ref, events, downloads, social_clicks } = payload;
 
-    if (!track_id) {
-      return NextResponse.json({ error: 'Missing track_id' }, { status: 400 });
+    if (!track_id || !session_id) {
+      return NextResponse.json({ error: 'Missing track_id or session_id' }, { status: 400 });
     }
 
     // 1. Resolve tracking_link_id if tracking_ref is provided
@@ -59,12 +59,13 @@ export async function POST(req: Request) {
     // Since we don't have absolute track duration in the DB, we can't reliably compute a true completion %.
     // We will store 0, and the dashboard can use maxAudioTimestamp or totalListenTime to gauge engagement.
     
-    // 3. Insert into playback_sessions
+    // 3. Upsert into playback_sessions
     // We use the Supabase Service Role key if RLS blocks anonymous inserts, 
-    // but the SQL policy "Allow public telemetry ingest" allows public inserts.
+    // but the SQL policy "Allow public telemetry ingest" allows public inserts/updates.
     const { error: insertError } = await supabase
       .from('playback_sessions')
-      .insert({
+      .upsert({
+        id: session_id,
         track_id,
         tracking_link_id,
         total_listen_time_seconds: Math.round(totalListenTimeSeconds),
@@ -72,7 +73,7 @@ export async function POST(req: Request) {
         event_log: events,
         download_clicked: downloads > 0,
         social_links_clicked: social_clicks > 0
-      });
+      }, { onConflict: 'id' });
 
     if (insertError) {
       console.error('Ingest insert error:', insertError);
