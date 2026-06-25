@@ -80,29 +80,39 @@ export default function DashboardPage() {
       if (!initRes.ok) throw new Error('Failed to initialize upload');
       const { folderId, accessToken } = await initRes.json();
 
-      // 2. Upload directly to Google Drive
-      const metadata = {
-        name: file.name,
-        parents: [folderId]
-      };
-      
-      const form = new FormData();
-      form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
-      form.append('file', file);
-
-      const driveRes = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
+      // 2. Start Google Drive Resumable Upload Session
+      const driveInitRes = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${accessToken}`
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+          'X-Upload-Content-Type': file.type,
+          'X-Upload-Content-Length': file.size.toString()
         },
-        body: form
+        body: JSON.stringify({
+          name: file.name,
+          parents: [folderId]
+        })
       });
 
-      if (!driveRes.ok) throw new Error('Failed to upload to Google Drive');
+      if (!driveInitRes.ok) throw new Error('Failed to start Google Drive upload');
+      const uploadUrl = driveInitRes.headers.get('Location');
+      if (!uploadUrl) throw new Error('Google Drive did not return an upload URL');
+
+      // 3. Upload File Data
+      const driveRes = await fetch(uploadUrl, {
+        method: 'PUT',
+        headers: {
+          'Content-Length': file.size.toString()
+        },
+        body: file
+      });
+
+      if (!driveRes.ok) throw new Error('Failed to upload bytes to Google Drive');
       const driveData = await driveRes.json();
       const driveFileId = driveData.id;
 
-      // 3. Make public and get url
+      // 4. Make public and get url
       const res = await fetch("/api/upload-image", {
         method: "POST",
         headers: { 'Content-Type': 'application/json' },
