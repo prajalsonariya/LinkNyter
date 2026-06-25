@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import { supabase } from "@/lib/supabase";
 import { Download } from "lucide-react";
 import { InstagramIcon, TwitterIcon, YouTubeIcon, SpotifyIcon, AppleMusicIcon, GlobeIcon } from "@/components/SocialIcons";
+import Link from "next/link";
 
 function extractDominantColor(imgElement: HTMLImageElement): Promise<[number, number, number]> {
   return new Promise((resolve) => {
@@ -179,10 +180,10 @@ export default function PlayerPage({ params }: { params: Promise<{ slug: string 
 
       {/* Header */}
       <nav className="fixed top-0 left-0 w-full h-20 flex items-center justify-between px-4 md:px-12 z-50">
-        <div className="flex items-center gap-1.5 md:gap-2">
+        <Link href="/" className="flex items-center gap-1.5 md:gap-2 hover:opacity-80 transition-opacity">
           <img src="/logo.svg" alt="LinkNyter Logo" className="h-8 md:h-10 w-auto" />
           <span className="text-headline-md font-bold tracking-tight text-white/90">LinkNyter</span>
-        </div>
+        </Link>
       </nav>
 
       {/* Main Content */}

@@ -1,11 +1,24 @@
 "use client";
 
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useSession, signIn } from "next-auth/react";
 import Link from "next/link";
 
 export default function Homepage() {
   const { data: session } = useSession();
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  const images = [
+    '/homepage-demo-image-desktop.jpg',
+    '/homepage-demo-image-mobile.jpg'
+  ];
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentImageIndex((prev) => (prev + 1) % images.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     const observerOptions = {
@@ -97,12 +110,14 @@ export default function Homepage() {
           )}
 
           {/* Decorative element */}
-          <div className="mt-24 w-full max-w-5xl aspect-[16/9] bg-surface/80 backdrop-blur-[20px] border border-[#222226] rounded-xl overflow-hidden relative group">
-            <div 
-              className="w-full h-full bg-cover bg-center transition-transform duration-700 group-hover:scale-105" 
-              style={{ backgroundImage: "url('/Homepage-demo-image.jpg')" }}
-            ></div>
-            <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent"></div>
+          <div className="mt-24 w-full max-w-5xl aspect-[4/5] md:aspect-video relative group">
+            {images.map((src, index) => (
+              <div 
+                key={src}
+                className={`absolute inset-0 w-full h-full bg-contain bg-no-repeat bg-center transition-all duration-2000 ease-in-out ${index === currentImageIndex ? 'opacity-100 scale-100' : 'opacity-0 scale-105'}`} 
+                style={{ backgroundImage: `url('${src}')` }}
+              ></div>
+            ))}
           </div>
         </section>
 
