@@ -225,3 +225,7 @@ body {
   letter-spacing: -0.01em;
   font-weight: 500;
 }
+
+html {
+  scroll-behavior: smooth;
+}

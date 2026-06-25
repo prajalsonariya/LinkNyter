@@ -53,10 +53,10 @@ export default function Homepage() {
           </div>
           
           <div className="hidden md:flex items-center gap-8">
-            <Link className="text-primary font-bold border-b border-primary py-1" href="/">The App</Link>
-            <Link className="text-on-surface-variant hover:text-on-surface transition-colors font-body-lg text-body-lg" href="/">Why it&apos;s $0</Link>
-            <Link className="text-on-surface-variant hover:text-on-surface transition-colors font-body-lg text-body-lg" href="/">Anti-Theft</Link>
-            <Link className="text-on-surface-variant hover:text-on-surface transition-colors font-body-lg text-body-lg" href="/">No Nerdy Stuff</Link>
+            <Link className="text-primary font-bold border-b border-primary py-1" href="#hero">The App</Link>
+            <Link className="text-on-surface-variant hover:text-on-surface transition-colors font-body-lg text-body-lg" href="#storage">Why it&apos;s $0</Link>
+            <Link className="text-on-surface-variant hover:text-on-surface transition-colors font-body-lg text-body-lg" href="#anti-theft">Anti-Theft</Link>
+            <Link className="text-on-surface-variant hover:text-on-surface transition-colors font-body-lg text-body-lg" href="#features">No Nerdy Stuff</Link>
           </div>
           
           <div className="flex items-center gap-4">
@@ -86,7 +86,7 @@ export default function Homepage() {
 
       <main className="pt-20">
         {/* Section 1: Hero */}
-        <section className="relative min-h-[870px] flex flex-col items-center justify-center text-center px-margin-mobile md:px-margin-desktop py-24">
+        <section id="hero" className="relative min-h-[870px] flex flex-col items-center justify-center text-center px-margin-mobile md:px-margin-desktop py-24">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[radial-gradient(circle,rgba(139,92,246,0.15)_0%,rgba(13,14,18,0)_70%)] -z-10 pointer-events-none"></div>
           
           <h1 className="font-display-lg text-[48px] md:text-[84px] leading-tight font-extrabold tracking-tighter max-w-4xl text-on-surface mb-8">
@@ -128,14 +128,14 @@ export default function Homepage() {
             <div className="max-w-3xl">
               <span className="font-label-caps text-label-caps text-primary tracking-widest uppercase mb-4 block">THE MANIFESTO</span>
               <p className="font-headline-lg text-headline-lg md:text-[40px] leading-tight text-on-surface font-medium">
-                Built by the student, for the student, of the student.
+                Built by a musician who hates subscription fees as much as you do.
               </p>
             </div>
           </div>
         </section>
 
         {/* Section 3: 4-Column Feature Grid */}
-        <section className="px-margin-mobile md:px-margin-desktop py-24 max-w-container-max mx-auto">
+        <section id="features" className="px-margin-mobile md:px-margin-desktop py-24 max-w-container-max mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-gutter">
             <div className="p-8 border border-outline-variant/20 flex flex-col gap-6 hover:bg-surface-container-low transition-colors duration-300 group">
               <span className="material-symbols-outlined text-primary text-4xl group-hover:scale-110 transition-transform">graphic_eq</span>
@@ -145,7 +145,7 @@ export default function Homepage() {
               </div>
             </div>
 
-            <div className="p-8 border border-outline-variant/20 flex flex-col gap-6 hover:bg-surface-container-low transition-colors duration-300 group">
+            <div id="anti-theft" className="p-8 border border-outline-variant/20 flex flex-col gap-6 hover:bg-surface-container-low transition-colors duration-300 group">
               <span className="material-symbols-outlined text-primary text-4xl group-hover:scale-110 transition-transform">encrypted</span>
               <div>
                 <h3 className="font-headline-md text-headline-md text-on-surface mb-3">The &quot;Don&apos;t Steal My Music&quot; Switch</h3>
@@ -172,7 +172,7 @@ export default function Homepage() {
         </section>
 
         {/* Section 4: Architecture Transparency Block */}
-        <section className="px-margin-mobile md:px-margin-desktop py-32 max-w-container-max mx-auto border-t border-outline-variant/20">
+        <section id="storage" className="px-margin-mobile md:px-margin-desktop py-32 max-w-container-max mx-auto border-t border-outline-variant/20">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
             <div className="order-2 lg:order-1 relative">
               <div className="w-full aspect-square bg-surface/80 backdrop-blur-[20px] border border-[#222226] rounded-2xl overflow-hidden relative">
@@ -228,15 +228,12 @@ export default function Homepage() {
             <p className="font-body-sm text-body-sm text-on-surface-variant">© 2026 Solnyter Ecosystem. No corporate suits allowed.</p>
           </div>
           <div className="flex flex-col md:items-end justify-between gap-6">
-            <div className="flex flex-wrap gap-x-8 gap-y-2">
+            <div className="flex flex-wrap justify-end gap-x-8 gap-y-2">
               <Link className="text-on-surface-variant hover:text-primary transition-colors font-body-sm text-body-sm hover:underline" href="/terms">Terms</Link>
               <Link className="text-on-surface-variant hover:text-primary transition-colors font-body-sm text-body-sm hover:underline" href="/privacy">Privacy</Link>
-              <Link className="text-on-surface-variant hover:text-primary transition-colors font-body-sm text-body-sm hover:underline" href="/">Twitter</Link>
-              <Link className="text-on-surface-variant hover:text-primary transition-colors font-body-sm text-body-sm hover:underline" href="/">GitHub</Link>
-              <Link className="text-on-surface-variant hover:text-primary transition-colors font-body-sm text-body-sm hover:underline" href="/">Status</Link>
             </div>
             <div className="text-on-surface-variant font-label-caps text-xs tracking-widest uppercase">
-              MADE BY STUDENT. FOR STUDENTS.
+              LET THE WORLD HEAR YOUR ART
             </div>
           </div>
         </div>
