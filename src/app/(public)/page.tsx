@@ -8,6 +8,14 @@ export default function Homepage() {
   const { data: session } = useSession();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
+  const scrollToSection = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
+    e.preventDefault();
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   const images = [
     '/homepage-demo-image-desktop.jpg',
     '/homepage-demo-image-mobile.jpg'
@@ -53,10 +61,10 @@ export default function Homepage() {
           </div>
           
           <div className="hidden md:flex items-center gap-8">
-            <Link className="text-primary font-bold border-b border-primary py-1" href="#hero">The App</Link>
-            <Link className="text-on-surface-variant hover:text-on-surface transition-colors font-body-lg text-body-lg" href="#storage">Why it&apos;s $0</Link>
-            <Link className="text-on-surface-variant hover:text-on-surface transition-colors font-body-lg text-body-lg" href="#features">Anti-Theft</Link>
-            <Link className="text-on-surface-variant hover:text-on-surface transition-colors font-body-lg text-body-lg" href="#manifesto">No Nerdy Stuff</Link>
+            <a onClick={(e) => scrollToSection(e, 'hero')} className="text-primary font-bold border-b border-primary py-1 cursor-pointer">The App</a>
+            <a onClick={(e) => scrollToSection(e, 'storage')} className="text-on-surface-variant hover:text-on-surface transition-colors font-body-lg text-body-lg cursor-pointer">Why it&apos;s $0</a>
+            <a onClick={(e) => scrollToSection(e, 'features')} className="text-on-surface-variant hover:text-on-surface transition-colors font-body-lg text-body-lg cursor-pointer">Anti-Theft</a>
+            <a onClick={(e) => scrollToSection(e, 'manifesto')} className="text-on-surface-variant hover:text-on-surface transition-colors font-body-lg text-body-lg cursor-pointer">No Nerdy Stuff</a>
           </div>
           
           <div className="flex items-center gap-4">
