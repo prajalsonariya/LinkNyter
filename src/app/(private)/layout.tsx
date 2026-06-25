@@ -25,7 +25,10 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
   if (!session) {
     return (
       <div className="flex h-screen items-center justify-center flex-col gap-6 text-center px-4 relative z-10">
-        <h1 className="font-display-lg text-display-lg font-bold text-primary mb-1 tracking-tighter">LinkNyter</h1>
+        <div className="flex items-center justify-center gap-2 mb-2">
+          <img src="/logo.svg" alt="LinkNyter Logo" className="h-12 md:h-14 w-auto" />
+          <h1 className="font-display-lg text-display-lg font-bold text-primary tracking-tighter">LinkNyter</h1>
+        </div>
         <p className="text-on-surface-variant max-w-md text-body-lg">A secure, zero-cost presentation and delivery layer for your audio files.</p>
         <button 
           onClick={() => signIn('google')}
@@ -58,7 +61,10 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
       {/* Left Sidebar */}
       <aside className="fixed left-0 top-0 h-screen w-64 border-r border-outline-variant bg-surface/80 backdrop-blur-xl flex flex-col py-margin-desktop px-gutter z-50">
         <div className="mb-10">
-          <h1 className="font-display-lg text-display-lg font-bold text-primary mb-1 tracking-tighter">LinkNyter</h1>
+          <div className="flex items-center gap-1.5 mb-2">
+            <img src="/logo.svg" alt="LinkNyter Logo" className="h-8 md:h-10 w-auto" />
+            <h1 className="font-display-lg text-[32px] font-bold text-primary tracking-tighter">LinkNyter</h1>
+          </div>
           <p className="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest">Creator Studio</p>
         </div>
         

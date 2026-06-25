@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Link as LinkIcon, Trash2, Play, Pause, BarChart2, Check } from "lucide-react";
+import { Trash2, Play, Pause, BarChart2, Check } from "lucide-react";
 import { extractDominantColor } from "@/lib/color";
 
 interface TrackItemProps {
@@ -93,7 +93,7 @@ export function TrackItem({
             title="Copy Share Link"
             onClick={handleCopy}
           >
-            {isCopied ? <Check className="w-[18px] h-[18px] text-green-500" /> : <LinkIcon className="w-[18px] h-[18px]" />}
+            {isCopied ? <Check className="w-[28px] h-[28px] text-green-500" /> : <img src="/logo.svg" alt="Copy Link" className="w-[28px] h-[28px] object-contain opacity-70 hover:opacity-100 transition-opacity" />}
           </button>
           
           <div className="flex items-center gap-3">

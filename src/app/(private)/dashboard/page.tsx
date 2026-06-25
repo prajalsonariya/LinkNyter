@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { useSession } from "next-auth/react";
-import { Play, Pause, Link as LinkIcon, Search, Bell, Trash2, Upload, Hourglass, Lock, FileUp } from "lucide-react";
+import { Play, Pause, Search, Bell, Trash2, Upload, Hourglass, Lock, FileUp } from "lucide-react";
 import { toast } from "sonner";
 import { useDashboard } from "@/contexts/DashboardContext";
 import { TrackItem } from "@/components/TrackItem";

@@ -34,7 +34,10 @@ export default function Homepage() {
       {/* Top Navigation */}
       <nav className="fixed top-0 w-full z-50 bg-background/80 backdrop-blur-xl border-b border-outline-variant/30 h-20">
         <div className="flex justify-between items-center px-margin-mobile md:px-margin-desktop h-full w-full max-w-container-max mx-auto">
-          <div className="font-headline-md text-headline-md font-bold tracking-tighter text-on-surface">LinkNyter</div>
+          <div className="flex items-center gap-1.5 md:gap-2">
+            <img src="/logo.svg" alt="LinkNyter Logo" className="h-8 md:h-10 w-auto" />
+            <div className="font-headline-md text-headline-md font-bold tracking-tighter text-on-surface">LinkNyter</div>
+          </div>
           
           <div className="hidden md:flex items-center gap-8">
             <Link className="text-primary font-bold border-b border-primary py-1" href="/">The App</Link>
@@ -203,7 +206,10 @@ export default function Homepage() {
       <footer className="bg-surface-container-lowest border-t border-outline-variant/20 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 px-margin-desktop max-w-container-max mx-auto">
           <div className="flex flex-col gap-4">
-            <div className="font-headline-md text-headline-md font-bold text-on-surface">LinkNyter</div>
+            <div className="flex items-center gap-1.5 md:gap-2">
+              <img src="/logo.svg" alt="LinkNyter Logo" className="h-8 md:h-10 w-auto self-start" />
+              <div className="font-headline-md text-headline-md font-bold text-on-surface">LinkNyter</div>
+            </div>
             <p className="font-body-sm text-body-sm text-on-surface-variant">© 2026 Solnyter Ecosystem. No corporate suits allowed.</p>
           </div>
           <div className="flex flex-col md:items-end justify-between gap-6">

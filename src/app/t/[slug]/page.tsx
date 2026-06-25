@@ -179,10 +179,8 @@ export default function PlayerPage({ params }: { params: Promise<{ slug: string 
 
       {/* Header */}
       <nav className="fixed top-0 left-0 w-full h-20 flex items-center justify-between px-4 md:px-12 z-50">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center border border-white/5" style={{ backdropFilter: 'blur(12px)' }}>
-            <span className="material-symbols-outlined text-white text-lg" style={{ fontVariationSettings: "'FILL' 1" }}>graphic_eq</span>
-          </div>
+        <div className="flex items-center gap-1.5 md:gap-2">
+          <img src="/logo.svg" alt="LinkNyter Logo" className="h-8 md:h-10 w-auto" />
           <span className="text-headline-md font-bold tracking-tight text-white/90">LinkNyter</span>
         </div>
       </nav>
