@@ -11,23 +11,11 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
       return new NextResponse('File ID is required', { status: 400 });
     }
 
-    const auth = new google.auth.GoogleAuth({
-      scopes: ['https://www.googleapis.com/auth/drive.readonly'],
-    });
-    const client = await auth.getClient();
-    const token = await client.getAccessToken();
+    // Since the file was made public during upload, we can fetch it directly without auth
+    const driveUrl = `https://drive.google.com/uc?export=view&id=${fileId}`;
+    const fetchRes = await fetch(driveUrl);
 
-    if (!token.token) {
-      throw new Error("Failed to get Google Drive access token");
-    }
-
-    const driveUrl = `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`;
-    const fetchRes = await fetch(driveUrl, {
-      headers: {
-        Authorization: `Bearer ${token.token}`,
-      }
-    });
-
+    // Google Drive returns 404 for missing files or private files
     if (fetchRes.status === 404) {
       // Lazy cleanup: If the cover art is missing from Drive, clear it from the database
       console.warn(`Cover image missing from Drive: ${fileId}. Resetting in database...`);

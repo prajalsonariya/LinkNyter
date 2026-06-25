@@ -19,24 +19,14 @@ export async function GET(req: Request, props: { params: Promise<{ trackId: stri
   const rangeHeader = req.headers.get('range');
   
   try {
-    const auth = new google.auth.GoogleAuth({
-      scopes: ['https://www.googleapis.com/auth/drive.readonly'],
-    });
-    const client = await auth.getClient();
-    const token = await client.getAccessToken();
-
-    if (!token.token) {
-      throw new Error("Failed to get Google Drive access token");
-    }
-
-    const driveUrl = `https://www.googleapis.com/drive/v3/files/${track.google_drive_file_id}?alt=media`;
+    const driveUrl = `https://drive.google.com/uc?export=view&id=${track.google_drive_file_id}`;
     const fetchRes = await fetch(driveUrl, {
       headers: {
-        Authorization: `Bearer ${token.token}`,
         ...(rangeHeader ? { Range: rangeHeader } : {})
       }
     });
 
+    // Google Drive returns 404 for missing files or private files
     if (fetchRes.status === 404) {
       // Lazy cleanup: If the file is missing from Drive, delete the track from the database
       console.warn(`Audio file missing for track ${trackId}, deleting track from database...`);
