@@ -3,9 +3,14 @@
 import { useState, useEffect } from "react";
 import { AreaChart, Area, XAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { TrendingUp, Loader2, Smartphone, Monitor } from "lucide-react";
+import { useRouter, useSearchParams } from 'next/navigation';
 
 export function AnalyticsView({ tracks }: { tracks: any[] }) {
-  const [activeTab, setActiveTab] = useState<'overview' | 'tracks' | 'audience'>('overview');
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const tabParam = searchParams.get('tab') as 'overview' | 'content' | null;
+  const activeTab = tabParam === 'content' ? 'content' : 'overview';
+  
   const [timeframe, setTimeframe] = useState<'7D' | '30D' | 'ALL'>('30D');
   const [totalStreams, setTotalStreams] = useState(0);
   const [analyticsData, setAnalyticsData] = useState<{ 
@@ -91,25 +96,18 @@ export function AnalyticsView({ tracks }: { tracks: any[] }) {
         
         <div className="flex items-center gap-8 border-b border-outline-variant/30 px-2">
           <button 
-            onClick={() => setActiveTab('overview')}
+            onClick={() => router.push('?tab=overview', { scroll: false })}
             className={`pb-4 font-label-caps text-sm uppercase tracking-wider transition-all relative ${activeTab === 'overview' ? 'text-primary font-bold' : 'text-on-surface-variant hover:text-on-surface'}`}
           >
             Overview
             {activeTab === 'overview' && <div className="absolute bottom-0 left-0 w-full h-0.5 bg-primary rounded-t-full shadow-[0_0_10px_rgba(139,92,246,0.5)]" />}
           </button>
           <button 
-            onClick={() => setActiveTab('tracks')}
-            className={`pb-4 font-label-caps text-sm uppercase tracking-wider transition-all relative ${activeTab === 'tracks' ? 'text-primary font-bold' : 'text-on-surface-variant hover:text-on-surface'}`}
+            onClick={() => router.push('?tab=content', { scroll: false })}
+            className={`pb-4 font-label-caps text-sm uppercase tracking-wider transition-all relative ${activeTab === 'content' ? 'text-primary font-bold' : 'text-on-surface-variant hover:text-on-surface'}`}
           >
-            Tracks
-            {activeTab === 'tracks' && <div className="absolute bottom-0 left-0 w-full h-0.5 bg-primary rounded-t-full shadow-[0_0_10px_rgba(139,92,246,0.5)]" />}
-          </button>
-          <button 
-            onClick={() => setActiveTab('audience')}
-            className={`pb-4 font-label-caps text-sm uppercase tracking-wider transition-all relative ${activeTab === 'audience' ? 'text-primary font-bold' : 'text-on-surface-variant hover:text-on-surface'}`}
-          >
-            Audience
-            {activeTab === 'audience' && <div className="absolute bottom-0 left-0 w-full h-0.5 bg-primary rounded-t-full shadow-[0_0_10px_rgba(139,92,246,0.5)]" />}
+            Content
+            {activeTab === 'content' && <div className="absolute bottom-0 left-0 w-full h-0.5 bg-primary rounded-t-full shadow-[0_0_10px_rgba(139,92,246,0.5)]" />}
           </button>
         </div>
       </header>
@@ -234,11 +232,50 @@ export function AnalyticsView({ tracks }: { tracks: any[] }) {
         </div>
       </section>
 
+      {/* Device Breakdown Section in Overview */}
+      <section className="bg-surface-container-low/50 backdrop-blur-xl border border-outline-variant/50 rounded-2xl p-8 flex flex-col items-center max-w-md mx-auto">
+        <h3 className="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider w-full text-left mb-6">Device Breakdown</h3>
+        {totalDevices === 0 ? (
+          <div className="h-[200px] flex items-center justify-center text-on-surface-variant text-sm">No device data</div>
+        ) : (
+          <div className="w-full flex flex-col items-center">
+            <ResponsiveContainer width="100%" height={250}>
+              <PieChart>
+                <Pie
+                  data={pieData}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={60}
+                  outerRadius={80}
+                  paddingAngle={5}
+                  dataKey="value"
+                >
+                  {pieData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} stroke="transparent" />
+                  ))}
+                </Pie>
+                <Tooltip content={<CustomTooltip />} />
+              </PieChart>
+            </ResponsiveContainer>
+            <div className="flex gap-8 mt-4">
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-[#8B5CF6]"></div>
+                <span className="text-sm text-on-surface">Mobile ({mobilePercent}%)</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-[#222226]"></div>
+                <span className="text-sm text-on-surface">Desktop ({desktopPercent}%)</span>
+              </div>
+            </div>
+          </div>
+        )}
+      </section>
+
       {/* End Overview Tab */}
         </>
       )}
 
-      {activeTab === 'tracks' && (
+      {activeTab === 'content' && (
         <section className="bg-surface-container-low/50 backdrop-blur-xl border border-outline-variant/50 rounded-2xl p-6">
           <div className="flex justify-between items-center mb-6">
             <h3 className="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider">All Tracks</h3>
@@ -251,12 +288,15 @@ export function AnalyticsView({ tracks }: { tracks: any[] }) {
                 <tr className="border-b border-outline-variant/30">
                   <th className="pb-3 px-4 font-label-caps text-xs text-on-surface-variant uppercase tracking-wider">Track</th>
                   <th className="pb-3 px-4 font-label-caps text-xs text-on-surface-variant uppercase tracking-wider text-right">Plays</th>
-                  <th className="pb-3 px-4 font-label-caps text-xs text-on-surface-variant uppercase tracking-wider text-right">Action</th>
                 </tr>
               </thead>
               <tbody>
                 {tracks.map((track) => (
-                  <tr key={track.id} className="border-b border-outline-variant/10 hover:bg-surface-container-high transition-colors group">
+                  <tr 
+                    key={track.id} 
+                    onClick={() => router.push(`/analytics/${track.id}`)}
+                    className="border-b border-outline-variant/10 hover:bg-surface-container-high transition-colors group cursor-pointer"
+                  >
                     <td className="py-4 px-4">
                       <div className="flex items-center gap-4">
                         <div className="w-10 h-10 rounded bg-outline-variant overflow-hidden shrink-0">
@@ -265,11 +305,8 @@ export function AnalyticsView({ tracks }: { tracks: any[] }) {
                         <span className="font-body-lg text-on-surface group-hover:text-primary transition-colors">{track.title}</span>
                       </div>
                     </td>
-                    <td className="py-4 px-4 text-right font-body-md text-on-surface-variant">
+                    <td className="py-4 px-4 text-right font-body-md text-on-surface-variant group-hover:text-primary transition-colors">
                       {track.play_count || 0}
-                    </td>
-                    <td className="py-4 px-4 text-right">
-                      <a href={`/analytics/${track.id}`} className="inline-block bg-surface-container border border-outline-variant/30 hover:border-primary text-primary px-4 py-2 rounded-md font-label-caps text-xs uppercase transition-all">Analyze</a>
                     </td>
                   </tr>
                 ))}
@@ -277,86 +314,6 @@ export function AnalyticsView({ tracks }: { tracks: any[] }) {
             </table>
           </div>
         </section>
-      )}
-
-      {activeTab === 'audience' && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <section className="bg-surface-container-low/50 backdrop-blur-xl border border-outline-variant/50 rounded-2xl p-8 flex flex-col items-center">
-            <h3 className="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider w-full text-left mb-6">Device Breakdown</h3>
-            {totalDevices === 0 ? (
-              <div className="h-[200px] flex items-center justify-center text-on-surface-variant text-sm">No device data</div>
-            ) : (
-              <div className="w-full flex flex-col items-center">
-                <ResponsiveContainer width="100%" height={250}>
-                  <PieChart>
-                    <Pie
-                      data={pieData}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={60}
-                      outerRadius={80}
-                      paddingAngle={5}
-                      dataKey="value"
-                    >
-                      {pieData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} stroke="transparent" />
-                      ))}
-                    </Pie>
-                    <Tooltip content={<CustomTooltip />} />
-                  </PieChart>
-                </ResponsiveContainer>
-                <div className="flex gap-8 mt-4">
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full bg-[#8B5CF6]"></div>
-                    <span className="text-sm text-on-surface">Mobile ({mobilePercent}%)</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full bg-[#222226]"></div>
-                    <span className="text-sm text-on-surface">Desktop ({desktopPercent}%)</span>
-                  </div>
-                </div>
-              </div>
-            )}
-          </section>
-
-          <section className="bg-surface-container-low/50 backdrop-blur-xl border border-outline-variant/50 rounded-2xl p-8">
-            <h3 className="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider mb-6">Top Geographies</h3>
-            
-            <div className="space-y-6">
-              <div>
-                <h4 className="text-xs text-on-surface-variant uppercase mb-3 font-label-caps">Top Countries</h4>
-                {!analyticsData.geo?.countries || analyticsData.geo.countries.length === 0 ? (
-                  <div className="text-sm text-on-surface-variant p-4 bg-surface-container-lowest rounded-lg border border-outline-variant/20">No country data yet</div>
-                ) : (
-                  <div className="space-y-2">
-                    {analyticsData.geo.countries.map(c => (
-                      <div key={c.name} className="flex justify-between items-center p-3 rounded-lg bg-surface-container-high/50">
-                        <span className="text-sm font-semibold">{c.name}</span>
-                        <span className="text-xs text-on-surface-variant bg-surface-container px-2 py-1 rounded">{c.count} sessions</span>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              <div>
-                <h4 className="text-xs text-on-surface-variant uppercase mb-3 font-label-caps">Top Cities</h4>
-                {!analyticsData.geo?.cities || analyticsData.geo.cities.length === 0 ? (
-                  <div className="text-sm text-on-surface-variant p-4 bg-surface-container-lowest rounded-lg border border-outline-variant/20">No city data yet</div>
-                ) : (
-                  <div className="space-y-2">
-                    {analyticsData.geo.cities.map(c => (
-                      <div key={c.name} className="flex justify-between items-center p-3 rounded-lg bg-surface-container-high/50">
-                        <span className="text-sm font-semibold">{decodeURIComponent(c.name)}</span>
-                        <span className="text-xs text-on-surface-variant bg-surface-container px-2 py-1 rounded">{c.count} sessions</span>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-          </section>
-        </div>
       )}
 
     </div>
