@@ -35,8 +35,11 @@ export async function POST(req: Request) {
       masterFolderId = folderRes.data.id;
     }
 
-    // 2. Find or create the "audio" subfolder
-    const subFolderName = "audio";
+    const body = await req.json().catch(() => ({}));
+    const type = body.type || 'audio';
+    
+    // 2. Find or create the appropriate subfolder
+    const subFolderName = type === 'cover art' ? 'cover art' : 'audio';
     let subFolderId = null;
 
     const subSearchRes = await drive.files.list({

@@ -71,13 +71,44 @@ export default function DashboardPage() {
     if (!selectedTrack) return;
     setIsCoverUploading(true);
     try {
-      const formData = new FormData();
-      formData.append("file", file);
+      // 1. Get auth and folder id
+      const initRes = await fetch('/api/upload/init', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'cover art' })
+      });
+      if (!initRes.ok) throw new Error('Failed to initialize upload');
+      const { folderId, accessToken } = await initRes.json();
+
+      // 2. Upload directly to Google Drive
+      const metadata = {
+        name: file.name,
+        parents: [folderId]
+      };
       
+      const form = new FormData();
+      form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
+      form.append('file', file);
+
+      const driveRes = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`
+        },
+        body: form
+      });
+
+      if (!driveRes.ok) throw new Error('Failed to upload to Google Drive');
+      const driveData = await driveRes.json();
+      const driveFileId = driveData.id;
+
+      // 3. Make public and get url
       const res = await fetch("/api/upload-image", {
         method: "POST",
-        body: formData,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ driveFileId }),
       });
+      
       const data = await res.json();
       if (res.ok && data.cover_url) {
         setEditCoverUrl(data.cover_url);
@@ -95,11 +126,11 @@ export default function DashboardPage() {
           setSelectedTrack(saveData.track);
         }
       } else {
-        toast.error("Failed to upload cover: " + data.error);
+        toast.error("Failed to set cover permissions: " + data.error);
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      toast.error("Error uploading cover art.");
+      toast.error("Upload failed: " + err.message);
     } finally {
       setIsCoverUploading(false);
     }
