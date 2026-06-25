@@ -201,8 +201,10 @@ export function TrackAnalyticsClient({ track, sessions }: { track: any, sessions
             <span className="font-label-caps text-outline tracking-wider text-[10px]">SOCIAL SHARES</span>
             <h3 className="font-headline-lg text-headline-lg mt-1">{socialClicks}</h3>
           </div>
-          <div className="flex items-center gap-2 text-primary font-body-sm">
-            <Share2 className="w-4 h-4" /> tracked link clicks
+          <div className="flex -space-x-2">
+            <div className="w-6 h-6 rounded-full border-2 border-[#1e1f23] bg-surface-variant"></div>
+            <div className="w-6 h-6 rounded-full border-2 border-[#1e1f23] bg-outline"></div>
+            <div className="w-6 h-6 rounded-full border-2 border-[#1e1f23] bg-primary-container flex items-center justify-center text-[8px] text-on-primary-container font-bold">+{socialClicks > 2 ? socialClicks - 2 : socialClicks}</div>
           </div>
         </div>
       </div>
