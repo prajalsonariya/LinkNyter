@@ -54,11 +54,35 @@ export async function GET(req: Request) {
     // 3. Process Data
     let mobileCount = 0;
     let desktopCount = 0;
-    
-    // We no longer have user_agent logged in playback_sessions by default in the SQL schema provided,
-    // so we'll just mock it or skip it, but let's keep the API structure same to not break frontend pie chart immediately.
-    // Actually, we can just return devices: { desktop: 0, mobile: 0 } or base it on something else,
-    // or remove it. Let's just return 0 for now.
+    const countryMap = new Map<string, number>();
+    const cityMap = new Map<string, number>();
+
+    (sessions || []).forEach(session => {
+      // Devices
+      if (session.device_type === 'Mobile' || session.device_type === 'Tablet') {
+        mobileCount++;
+      } else {
+        desktopCount++;
+      }
+
+      // Geo
+      if (session.country && session.country !== 'Unknown') {
+        countryMap.set(session.country, (countryMap.get(session.country) || 0) + 1);
+      }
+      if (session.city && session.city !== 'Unknown') {
+        cityMap.set(session.city, (cityMap.get(session.city) || 0) + 1);
+      }
+    });
+
+    const topCountries = Array.from(countryMap.entries())
+      .map(([name, count]) => ({ name, count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 5);
+
+    const topCities = Array.from(cityMap.entries())
+      .map(([name, count]) => ({ name, count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 5);
 
     const timelineMap = new Map<string, number>();
     if (timeframe !== 'ALL' && startDate) {
@@ -98,7 +122,8 @@ export async function GET(req: Request) {
 
     return NextResponse.json({
       timeline,
-      devices: { mobile: 0, desktop: 0 },
+      devices: { mobile: mobileCount, desktop: desktopCount },
+      geo: { countries: topCountries, cities: topCities },
       sessions: sessions || [],
       metrics: {
         totalOpens,

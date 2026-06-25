@@ -5,11 +5,13 @@ import { AreaChart, Area, XAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Ce
 import { TrendingUp, Loader2, Smartphone, Monitor } from "lucide-react";
 
 export function AnalyticsView({ tracks }: { tracks: any[] }) {
+  const [activeTab, setActiveTab] = useState<'overview' | 'tracks' | 'audience'>('overview');
   const [timeframe, setTimeframe] = useState<'7D' | '30D' | 'ALL'>('30D');
   const [totalStreams, setTotalStreams] = useState(0);
   const [analyticsData, setAnalyticsData] = useState<{ 
     timeline: any[], 
     devices: { mobile: number, desktop: number },
+    geo?: { countries: any[], cities: any[] },
     sessions?: any[],
     metrics?: { totalOpens: number, avgListenTime: number, downloads: number, socialClicks: number }
   }>({ 
@@ -80,15 +82,41 @@ export function AnalyticsView({ tracks }: { tracks: any[] }) {
       {/* Top Glow Decoration */}
       <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/5 blur-[120px] rounded-full -z-10"></div>
       
-      {/* Header Section */}
-      <header className="flex justify-between items-end mb-10">
-        <div>
+      {/* Header Section with Tabs */}
+      <header className="mb-10">
+        <div className="mb-8">
           <span className="font-label-caps text-label-caps text-primary mb-2 block tracking-[0.2em] uppercase">Studio Insights</span>
           <h2 className="font-display-lg text-display-lg text-on-surface">Analytics</h2>
         </div>
+        
+        <div className="flex items-center gap-8 border-b border-outline-variant/30 px-2">
+          <button 
+            onClick={() => setActiveTab('overview')}
+            className={`pb-4 font-label-caps text-sm uppercase tracking-wider transition-all relative ${activeTab === 'overview' ? 'text-primary font-bold' : 'text-on-surface-variant hover:text-on-surface'}`}
+          >
+            Overview
+            {activeTab === 'overview' && <div className="absolute bottom-0 left-0 w-full h-0.5 bg-primary rounded-t-full shadow-[0_0_10px_rgba(139,92,246,0.5)]" />}
+          </button>
+          <button 
+            onClick={() => setActiveTab('tracks')}
+            className={`pb-4 font-label-caps text-sm uppercase tracking-wider transition-all relative ${activeTab === 'tracks' ? 'text-primary font-bold' : 'text-on-surface-variant hover:text-on-surface'}`}
+          >
+            Tracks
+            {activeTab === 'tracks' && <div className="absolute bottom-0 left-0 w-full h-0.5 bg-primary rounded-t-full shadow-[0_0_10px_rgba(139,92,246,0.5)]" />}
+          </button>
+          <button 
+            onClick={() => setActiveTab('audience')}
+            className={`pb-4 font-label-caps text-sm uppercase tracking-wider transition-all relative ${activeTab === 'audience' ? 'text-primary font-bold' : 'text-on-surface-variant hover:text-on-surface'}`}
+          >
+            Audience
+            {activeTab === 'audience' && <div className="absolute bottom-0 left-0 w-full h-0.5 bg-primary rounded-t-full shadow-[0_0_10px_rgba(139,92,246,0.5)]" />}
+          </button>
+        </div>
       </header>
 
-      {/* Overview Cards (Top Row) */}
+      {activeTab === 'overview' && (
+        <>
+          {/* Overview Cards (Top Row) */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
         {/* Total Streams */}
         <div className="bg-surface-container-low/50 backdrop-blur-xl border border-outline-variant/50 rounded-xl p-6 flex flex-col justify-between h-40 transition-all hover:border-outline-variant hover:-translate-y-0.5">
@@ -206,75 +234,131 @@ export function AnalyticsView({ tracks }: { tracks: any[] }) {
         </div>
       </section>
 
-      {/* Bottom Split View */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-12">
-        {/* Top Tracks Column */}
-        <section className="bg-surface-container-low/50 backdrop-blur-xl border border-outline-variant/50 rounded-2xl p-6">
-          <h3 className="font-label-caps text-label-caps text-on-surface-variant uppercase mb-6 tracking-wider">Top Tracks</h3>
-          <div className="space-y-4">
-            {topTracks.length === 0 && (
-              <p className="text-on-surface-variant text-body-sm text-center py-4">No data available yet</p>
-            )}
-            {topTracks.map((track, idx) => (
-              <div key={track.id} className="flex items-center justify-between p-3 rounded-lg hover:bg-surface-container-high transition-all group">
-                <div className="flex items-center gap-4">
-                  <span className="text-xs font-bold text-outline w-4">0{idx + 1}</span>
-                  <div className="w-10 h-10 rounded bg-outline-variant overflow-hidden shrink-0">
-                    <img className="w-full h-full object-cover" src={track.cover_url || "/cover-placeholder.jpg"} alt={track.title} />
-                  </div>
-                  <span className="font-body-lg text-on-surface group-hover:text-primary transition-colors truncate max-w-[200px]">{track.title}</span>
-                </div>
-                <div className="flex items-center gap-4">
-                  <span className="font-body-sm text-on-surface-variant shrink-0">{track.play_count || 0}</span>
-                  <a href={`/analytics/${track.id}`} className="bg-surface-container border border-outline-variant/30 hover:border-primary text-primary px-3 py-1 rounded-md font-label-caps text-[10px] uppercase transition-all opacity-0 group-hover:opacity-100">Analyze</a>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
+      {/* End Overview Tab */}
+        </>
+      )}
 
-        {/* Device Breakdown Column -> Now Recent Sessions */}
-        <section className="bg-surface-container-low/50 backdrop-blur-xl border border-outline-variant/50 rounded-2xl p-6 flex flex-col max-h-[500px]">
+      {activeTab === 'tracks' && (
+        <section className="bg-surface-container-low/50 backdrop-blur-xl border border-outline-variant/50 rounded-2xl p-6">
           <div className="flex justify-between items-center mb-6">
-            <h3 className="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider">Recent Sessions</h3>
-            <span className="text-xs text-on-surface-variant">{sessions.length} sessions</span>
+            <h3 className="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider">All Tracks</h3>
+            <span className="text-xs text-on-surface-variant">{tracks.length} tracks</span>
           </div>
           
-          <div className="flex-grow overflow-y-auto custom-scrollbar pr-2 space-y-3">
-            {isLoading ? (
-              <div className="w-full h-[200px] flex items-center justify-center">
-                <Loader2 className="animate-spin text-primary w-8 h-8" />
-              </div>
-            ) : sessions.length === 0 ? (
-              <div className="w-full h-[200px] flex items-center justify-center text-on-surface-variant font-label-caps">
-                No telemetry yet
-              </div>
-            ) : (
-              sessions.map((session) => (
-                <div key={session.id} className="flex flex-col gap-2 p-4 rounded-xl bg-surface-container-high/50 border border-outline-variant/20 hover:border-primary/50 transition-colors">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <div className="font-body-md text-on-surface font-semibold flex items-center gap-2">
-                        {session.tracking_links?.reference_name || 'Open Link'}
-                        {session.download_clicked && (
-                          <span className="bg-primary/20 text-primary text-[10px] px-2 py-0.5 rounded-sm font-label-caps uppercase">Downloaded</span>
-                        )}
+          <div className="w-full overflow-x-auto custom-scrollbar">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="border-b border-outline-variant/30">
+                  <th className="pb-3 px-4 font-label-caps text-xs text-on-surface-variant uppercase tracking-wider">Track</th>
+                  <th className="pb-3 px-4 font-label-caps text-xs text-on-surface-variant uppercase tracking-wider text-right">Plays</th>
+                  <th className="pb-3 px-4 font-label-caps text-xs text-on-surface-variant uppercase tracking-wider text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {tracks.map((track) => (
+                  <tr key={track.id} className="border-b border-outline-variant/10 hover:bg-surface-container-high transition-colors group">
+                    <td className="py-4 px-4">
+                      <div className="flex items-center gap-4">
+                        <div className="w-10 h-10 rounded bg-outline-variant overflow-hidden shrink-0">
+                          <img className="w-full h-full object-cover" src={track.cover_url || "/cover-placeholder.jpg"} alt={track.title} />
+                        </div>
+                        <span className="font-body-lg text-on-surface group-hover:text-primary transition-colors">{track.title}</span>
                       </div>
-                      <div className="text-xs text-on-surface-variant mt-1">
-                        {new Date(session.started_at).toLocaleDateString()} at {new Date(session.started_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <div className="font-body-lg text-primary">{formatTime(session.total_listen_time_seconds || 0)}</div>
-                      <div className="text-[10px] text-on-surface-variant uppercase mt-1 tracking-wider">Listen Time</div>
-                    </div>
-                  </div>
-                </div>
-              ))
-            )}
+                    </td>
+                    <td className="py-4 px-4 text-right font-body-md text-on-surface-variant">
+                      {track.play_count || 0}
+                    </td>
+                    <td className="py-4 px-4 text-right">
+                      <a href={`/analytics/${track.id}`} className="inline-block bg-surface-container border border-outline-variant/30 hover:border-primary text-primary px-4 py-2 rounded-md font-label-caps text-xs uppercase transition-all">Analyze</a>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </section>
-      </div>
+      )}
+
+      {activeTab === 'audience' && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <section className="bg-surface-container-low/50 backdrop-blur-xl border border-outline-variant/50 rounded-2xl p-8 flex flex-col items-center">
+            <h3 className="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider w-full text-left mb-6">Device Breakdown</h3>
+            {totalDevices === 0 ? (
+              <div className="h-[200px] flex items-center justify-center text-on-surface-variant text-sm">No device data</div>
+            ) : (
+              <div className="w-full flex flex-col items-center">
+                <ResponsiveContainer width="100%" height={250}>
+                  <PieChart>
+                    <Pie
+                      data={pieData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={60}
+                      outerRadius={80}
+                      paddingAngle={5}
+                      dataKey="value"
+                    >
+                      {pieData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} stroke="transparent" />
+                      ))}
+                    </Pie>
+                    <Tooltip content={<CustomTooltip />} />
+                  </PieChart>
+                </ResponsiveContainer>
+                <div className="flex gap-8 mt-4">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-[#8B5CF6]"></div>
+                    <span className="text-sm text-on-surface">Mobile ({mobilePercent}%)</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-[#222226]"></div>
+                    <span className="text-sm text-on-surface">Desktop ({desktopPercent}%)</span>
+                  </div>
+                </div>
+              </div>
+            )}
+          </section>
+
+          <section className="bg-surface-container-low/50 backdrop-blur-xl border border-outline-variant/50 rounded-2xl p-8">
+            <h3 className="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider mb-6">Top Geographies</h3>
+            
+            <div className="space-y-6">
+              <div>
+                <h4 className="text-xs text-on-surface-variant uppercase mb-3 font-label-caps">Top Countries</h4>
+                {!analyticsData.geo?.countries || analyticsData.geo.countries.length === 0 ? (
+                  <div className="text-sm text-on-surface-variant p-4 bg-surface-container-lowest rounded-lg border border-outline-variant/20">No country data yet</div>
+                ) : (
+                  <div className="space-y-2">
+                    {analyticsData.geo.countries.map(c => (
+                      <div key={c.name} className="flex justify-between items-center p-3 rounded-lg bg-surface-container-high/50">
+                        <span className="text-sm font-semibold">{c.name}</span>
+                        <span className="text-xs text-on-surface-variant bg-surface-container px-2 py-1 rounded">{c.count} sessions</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <h4 className="text-xs text-on-surface-variant uppercase mb-3 font-label-caps">Top Cities</h4>
+                {!analyticsData.geo?.cities || analyticsData.geo.cities.length === 0 ? (
+                  <div className="text-sm text-on-surface-variant p-4 bg-surface-container-lowest rounded-lg border border-outline-variant/20">No city data yet</div>
+                ) : (
+                  <div className="space-y-2">
+                    {analyticsData.geo.cities.map(c => (
+                      <div key={c.name} className="flex justify-between items-center p-3 rounded-lg bg-surface-container-high/50">
+                        <span className="text-sm font-semibold">{decodeURIComponent(c.name)}</span>
+                        <span className="text-xs text-on-surface-variant bg-surface-container px-2 py-1 rounded">{c.count} sessions</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </section>
+        </div>
+      )}
+
     </div>
   );
 }

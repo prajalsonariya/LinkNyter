@@ -59,7 +59,25 @@ export async function POST(req: Request) {
     // Since we don't have absolute track duration in the DB, we can't reliably compute a true completion %.
     // We will store 0, and the dashboard can use maxAudioTimestamp or totalListenTime to gauge engagement.
     
-    // 3. Upsert into playback_sessions
+    // 3. Extract Audience Demographics
+    const ua = req.headers.get('user-agent') || '';
+    let device_type = 'Desktop';
+    if (/tablet|ipad|playbook|silk/i.test(ua)) device_type = 'Tablet';
+    else if (/mobile/i.test(ua)) device_type = 'Mobile';
+
+    let os = 'Unknown';
+    if (/windows/i.test(ua)) os = 'Windows';
+    else if (/mac/i.test(ua)) os = 'macOS';
+    else if (/android/i.test(ua)) os = 'Android';
+    else if (/ios|iphone|ipad/i.test(ua)) os = 'iOS';
+    else if (/linux/i.test(ua)) os = 'Linux';
+
+    const country = req.headers.get('x-vercel-ip-country') || req.headers.get('cf-ipcountry') || 'Unknown';
+    // City headers are sometimes URI encoded by Vercel
+    const rawCity = req.headers.get('x-vercel-ip-city') || 'Unknown';
+    const city = rawCity !== 'Unknown' ? decodeURIComponent(rawCity) : rawCity;
+
+    // 4. Upsert into playback_sessions
     // We use the Supabase Service Role key if RLS blocks anonymous inserts, 
     // but the SQL policy "Allow public telemetry ingest" allows public inserts/updates.
     const { error: insertError } = await supabase
@@ -72,7 +90,11 @@ export async function POST(req: Request) {
         completion_percentage: maxAudioTimestamp, // Storing max audio time here for now
         event_log: events,
         download_clicked: downloads > 0,
-        social_links_clicked: social_clicks > 0
+        social_links_clicked: social_clicks > 0,
+        device_type,
+        os,
+        country,
+        city
       }, { onConflict: 'id' });
 
     if (insertError) {
