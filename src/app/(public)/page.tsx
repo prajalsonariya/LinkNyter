@@ -55,8 +55,8 @@ export default function Homepage() {
           <div className="hidden md:flex items-center gap-8">
             <Link className="text-primary font-bold border-b border-primary py-1" href="#hero">The App</Link>
             <Link className="text-on-surface-variant hover:text-on-surface transition-colors font-body-lg text-body-lg" href="#storage">Why it&apos;s $0</Link>
-            <Link className="text-on-surface-variant hover:text-on-surface transition-colors font-body-lg text-body-lg" href="#anti-theft">Anti-Theft</Link>
-            <Link className="text-on-surface-variant hover:text-on-surface transition-colors font-body-lg text-body-lg" href="#features">No Nerdy Stuff</Link>
+            <Link className="text-on-surface-variant hover:text-on-surface transition-colors font-body-lg text-body-lg" href="#features">Anti-Theft</Link>
+            <Link className="text-on-surface-variant hover:text-on-surface transition-colors font-body-lg text-body-lg" href="#manifesto">No Nerdy Stuff</Link>
           </div>
           
           <div className="flex items-center gap-4">
@@ -122,7 +122,7 @@ export default function Homepage() {
         </section>
 
         {/* Section 2: Core Manifesto */}
-        <section className="px-margin-mobile md:px-margin-desktop py-24 max-w-container-max mx-auto">
+        <section id="manifesto" className="scroll-mt-[25vh] px-margin-mobile md:px-margin-desktop py-24 max-w-container-max mx-auto">
           <div className="bg-surface p-12 md:p-20 border border-outline-variant/20 rounded-xl relative overflow-hidden">
             <div className="absolute top-0 left-0 w-1 h-full bg-primary"></div>
             <div className="max-w-3xl">
@@ -135,7 +135,7 @@ export default function Homepage() {
         </section>
 
         {/* Section 3: 4-Column Feature Grid */}
-        <section id="features" className="px-margin-mobile md:px-margin-desktop py-24 max-w-container-max mx-auto">
+        <section id="features" className="scroll-mt-[20vh] px-margin-mobile md:px-margin-desktop py-24 max-w-container-max mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-gutter">
             <div className="p-8 border border-outline-variant/20 flex flex-col gap-6 hover:bg-surface-container-low transition-colors duration-300 group">
               <span className="material-symbols-outlined text-primary text-4xl group-hover:scale-110 transition-transform">graphic_eq</span>
@@ -145,7 +145,7 @@ export default function Homepage() {
               </div>
             </div>
 
-            <div id="anti-theft" className="p-8 border border-outline-variant/20 flex flex-col gap-6 hover:bg-surface-container-low transition-colors duration-300 group">
+            <div className="p-8 border border-outline-variant/20 flex flex-col gap-6 hover:bg-surface-container-low transition-colors duration-300 group">
               <span className="material-symbols-outlined text-primary text-4xl group-hover:scale-110 transition-transform">encrypted</span>
               <div>
                 <h3 className="font-headline-md text-headline-md text-on-surface mb-3">The &quot;Don&apos;t Steal My Music&quot; Switch</h3>
@@ -172,7 +172,7 @@ export default function Homepage() {
         </section>
 
         {/* Section 4: Architecture Transparency Block */}
-        <section id="storage" className="px-margin-mobile md:px-margin-desktop py-32 max-w-container-max mx-auto border-t border-outline-variant/20">
+        <section id="storage" className="scroll-mt-[15vh] px-margin-mobile md:px-margin-desktop py-32 max-w-container-max mx-auto border-t border-outline-variant/20">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
             <div className="order-2 lg:order-1 relative">
               <div className="w-full aspect-square bg-surface/80 backdrop-blur-[20px] border border-[#222226] rounded-2xl overflow-hidden relative">
