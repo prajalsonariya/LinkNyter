@@ -254,7 +254,8 @@ export default function DashboardPage() {
       }
       const track = tracks.find(t => t.id === trackId);
       if (track) {
-        const newAudio = new Audio(track.file_url);
+        const streamUrl = `/api/stream/${track.id}`;
+        const newAudio = new Audio(streamUrl);
         newAudio.play();
         newAudio.onended = () => setPlayingTrackId(null);
         setAudioPlayer(newAudio);
