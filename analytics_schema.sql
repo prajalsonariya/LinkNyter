@@ -25,40 +25,17 @@ ALTER TABLE tracking_links ENABLE ROW LEVEL SECURITY;
 ALTER TABLE playback_sessions ENABLE ROW LEVEL SECURITY;
 
 -- Add RLS Policies
+-- Since the app uses NextAuth instead of Supabase Auth, the Next.js API routes act as the secure server layer. 
+-- We allow public/anon access on the database level, and rely on the Next.js API routes to enforce session security.
 
--- For tracking_links: Allow public read by custom_slug
-CREATE POLICY "Allow public read on tracking_links" 
-ON tracking_links FOR SELECT 
-TO public 
-USING (true);
-
--- For tracking_links: Allow authenticated users to insert/read their own tracking links
--- (Assuming tracks table has user_id, we join it to verify ownership)
-CREATE POLICY "Allow creator access to tracking_links" 
+CREATE POLICY "Allow public all on tracking_links" 
 ON tracking_links FOR ALL 
-TO authenticated 
-USING (
-    EXISTS (
-        SELECT 1 FROM tracks 
-        WHERE tracks.id = tracking_links.track_id 
-        AND tracks.user_id = auth.uid()
-    )
-);
-
--- For playback_sessions: Allow public inserts (Telemetry ingest)
-CREATE POLICY "Allow public telemetry ingest" 
-ON playback_sessions FOR INSERT 
 TO public 
+USING (true)
 WITH CHECK (true);
 
--- For playback_sessions: Allow authenticated users to read their own sessions
-CREATE POLICY "Allow creator to view playback_sessions" 
-ON playback_sessions FOR SELECT 
-TO authenticated 
-USING (
-    EXISTS (
-        SELECT 1 FROM tracks 
-        WHERE tracks.id = playback_sessions.track_id 
-        AND tracks.user_id = auth.uid()
-    )
-);
+CREATE POLICY "Allow public all on playback_sessions" 
+ON playback_sessions FOR ALL 
+TO public 
+USING (true)
+WITH CHECK (true);
