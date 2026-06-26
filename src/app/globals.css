@@ -170,6 +170,11 @@ body {
   to { opacity: 1; transform: translateY(0); }
 }
 
+@keyframes slideUpFade {
+  from { opacity: 0; transform: translateY(20px); filter: blur(4px); }
+  to { opacity: 1; transform: translateY(0); filter: blur(0px); }
+}
+
 @keyframes spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
@@ -177,6 +182,10 @@ body {
 
 .animate-fade-in {
   animation: fadeIn 0.5s ease forwards;
+}
+
+.animate-slide-up-fade {
+  animation: slideUpFade 0.25s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
 }
 
 .animate-spin {

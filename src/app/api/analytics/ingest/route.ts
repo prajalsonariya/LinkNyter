@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
+import { UAParser } from 'ua-parser-js';
 
 export async function POST(req: Request) {
   try {
@@ -60,22 +61,44 @@ export async function POST(req: Request) {
     // We will store 0, and the dashboard can use maxAudioTimestamp or totalListenTime to gauge engagement.
     
     // 3. Extract Audience Demographics
-    const ua = req.headers.get('user-agent') || '';
-    let device_type = 'Desktop';
-    if (/tablet|ipad|playbook|silk/i.test(ua)) device_type = 'Tablet';
-    else if (/mobile/i.test(ua)) device_type = 'Mobile';
+    const uaString = req.headers.get('user-agent') || '';
+    const parser = new UAParser(uaString);
+    const result = parser.getResult();
+    
+    let device_type = result.device.type || 'Desktop';
+    if (device_type === 'mobile') device_type = 'Mobile';
+    if (device_type === 'tablet') device_type = 'Tablet';
+    if (device_type !== 'Mobile' && device_type !== 'Tablet') device_type = 'Desktop';
 
-    let os = 'Unknown';
-    if (/windows/i.test(ua)) os = 'Windows';
-    else if (/mac/i.test(ua)) os = 'macOS';
-    else if (/android/i.test(ua)) os = 'Android';
-    else if (/ios|iphone|ipad/i.test(ua)) os = 'iOS';
-    else if (/linux/i.test(ua)) os = 'Linux';
+    const osName = result.os.name || 'Unknown';
+    const browserName = result.browser.name || 'Unknown';
+    // We store browser inside the OS column delimited by '|' to avoid DB schema migrations
+    const os = `${osName} | ${browserName}`;
 
-    const country = req.headers.get('x-vercel-ip-country') || req.headers.get('cf-ipcountry') || 'Unknown';
-    // City headers are sometimes URI encoded by Vercel
-    const rawCity = req.headers.get('x-vercel-ip-city') || 'Unknown';
-    const city = rawCity !== 'Unknown' ? decodeURIComponent(rawCity) : rawCity;
+    let country = req.headers.get('x-vercel-ip-country') || req.headers.get('cf-ipcountry');
+    let rawCity = req.headers.get('x-vercel-ip-city');
+
+    if (!country || country === 'Unknown') {
+      const ip = req.headers.get('x-forwarded-for') || req.headers.get('remote-addr') || '';
+      const realIp = ip.split(',')[0].trim();
+      
+      let fetchUrl = `http://ip-api.com/json/${realIp}?fields=countryCode,city`;
+      if (!realIp || realIp === '::1' || realIp.includes('127.0.0.1') || realIp === 'localhost') {
+        fetchUrl = `http://ip-api.com/json/?fields=countryCode,city`;
+      }
+      
+      try {
+        const res = await fetch(fetchUrl);
+        const data = await res.json();
+        if (data.countryCode) country = data.countryCode;
+        if (data.city) rawCity = data.city;
+      } catch(e) {
+        // ignore
+      }
+    }
+
+    country = country || 'Unknown';
+    const city = rawCity ? decodeURIComponent(rawCity) : 'Unknown';
 
     // 4. Upsert into playback_sessions
     // We use the Supabase Service Role key if RLS blocks anonymous inserts, 

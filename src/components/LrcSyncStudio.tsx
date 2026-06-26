@@ -40,10 +40,36 @@ export function LrcSyncStudio({ track, onSaveSuccess }: LrcSyncStudioProps) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [hasUnsavedRawLyrics, setHasUnsavedRawLyrics] = useState(false);
   const [progress, setProgress] = useState(0);
   const [currentTimeStr, setCurrentTimeStr] = useState("00:00");
   const [durationStr, setDurationStr] = useState("00:00");
   const [initializedId, setInitializedId] = useState<string | null>(null);
+  
+  const [confirmDialog, setConfirmDialog] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    confirmText: string;
+    onConfirm: () => void;
+  }>({
+    isOpen: false,
+    title: "",
+    message: "",
+    confirmText: "Confirm",
+    onConfirm: () => {}
+  });
+
+  const requestConfirm = (title: string, message: string, confirmText: string, onConfirm: () => void) => {
+    setConfirmDialog({
+      isOpen: true,
+      title,
+      message,
+      confirmText,
+      onConfirm
+    });
+  };
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const listContainerRef = useRef<HTMLDivElement | null>(null);
@@ -92,6 +118,13 @@ export function LrcSyncStudio({ track, onSaveSuccess }: LrcSyncStudioProps) {
       window.removeEventListener("keydown", handleKeyDown);
     };
   }, [phase, isPlaying, activeIndex, lines]);
+
+  // Force audio preload
+  useEffect(() => {
+    if ((phase === "sync" || phase === "edit") && audioRef.current) {
+      audioRef.current.load();
+    }
+  }, [phase]);
 
   // Format time in seconds to LRC format: [mm:ss.xx]
   const formatLrcTime = (time: number) => {
@@ -192,6 +225,7 @@ export function LrcSyncStudio({ track, onSaveSuccess }: LrcSyncStudioProps) {
       if (audioRef.current) audioRef.current.pause();
       toast.success("Lyrics fully timestamped! Transitioning to Micro-Editor.");
       setPhase("edit");
+      setHasUnsavedChanges(true);
       return;
     }
 
@@ -257,6 +291,11 @@ export function LrcSyncStudio({ track, onSaveSuccess }: LrcSyncStudioProps) {
     setActiveIndex(0);
   };
 
+  const handleSetTiming = (newTiming: string) => {
+    setTiming(newTiming);
+    setHasUnsavedChanges(true);
+  };
+
   const updateLineTimestamp = (index: number, val: string) => {
     // Basic formatting correction: allow typing, but compute raw seconds
     setLines((prev) => {
@@ -268,6 +307,7 @@ export function LrcSyncStudio({ track, onSaveSuccess }: LrcSyncStudioProps) {
       };
       return updated;
     });
+    setHasUnsavedChanges(true);
   };
 
   const updateLineText = (index: number, val: string) => {
@@ -279,6 +319,7 @@ export function LrcSyncStudio({ track, onSaveSuccess }: LrcSyncStudioProps) {
       };
       return updated;
     });
+    setHasUnsavedChanges(true);
   };
 
   const getPrevSyncIndex = (currentIndex: number) => {
@@ -306,6 +347,7 @@ export function LrcSyncStudio({ track, onSaveSuccess }: LrcSyncStudioProps) {
 
   const deleteLineEditRow = (index: number) => {
     setLines((prev) => prev.filter((_, i) => i !== index));
+    setHasUnsavedChanges(true);
   };
 
   const addLineEditRow = (index: number) => {
@@ -320,6 +362,7 @@ export function LrcSyncStudio({ track, onSaveSuccess }: LrcSyncStudioProps) {
       });
       return updated;
     });
+    setHasUnsavedChanges(true);
   };
 
   const saveLrcData = async () => {
@@ -339,6 +382,7 @@ export function LrcSyncStudio({ track, onSaveSuccess }: LrcSyncStudioProps) {
       if (!response.ok) throw new Error("Failed to save synced lyrics");
       const resJson = await response.json();
       onSaveSuccess(resJson.track);
+      setHasUnsavedChanges(false);
       toast.success("Lyrics sync saved successfully!");
     } catch (e: any) {
       console.error(e);
@@ -349,28 +393,35 @@ export function LrcSyncStudio({ track, onSaveSuccess }: LrcSyncStudioProps) {
   };
 
   const clearLrcData = async () => {
-    if (!confirm("Are you sure you want to completely remove synced lyrics for this track?")) return;
-    setIsSaving(true);
-    try {
-      const response = await fetch(`/api/track/${track.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ lrc_data: null }),
-      });
+    requestConfirm(
+      "Delete Synced Lyrics",
+      "Are you sure you want to completely remove the synced lyrics for this track? This action cannot be undone.",
+      "Delete Lyrics",
+      async () => {
+        setIsSaving(true);
+        try {
+          const response = await fetch(`/api/track/${track.id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ lrc_data: null }),
+          });
 
-      if (!response.ok) throw new Error("Failed to clear lyrics");
-      const resJson = await response.json();
-      onSaveSuccess(resJson.track);
-      setPhase("paste");
-      setRawLyrics("");
-      setLines([]);
-      toast.success("Lyrics removed successfully!");
-    } catch (e: any) {
-      console.error(e);
-      toast.error(e.message || "An error occurred while removing lyrics.");
-    } finally {
-      setIsSaving(false);
-    }
+          if (!response.ok) throw new Error("Failed to clear lyrics");
+          const resJson = await response.json();
+          onSaveSuccess(resJson.track);
+          setPhase("paste");
+          setRawLyrics("");
+          setLines([]);
+          setHasUnsavedRawLyrics(false);
+          toast.success("Lyrics removed successfully!");
+        } catch (e: any) {
+          console.error(e);
+          toast.error(e.message || "An error occurred while removing lyrics.");
+        } finally {
+          setIsSaving(false);
+        }
+      }
+    );
   };
 
   const saveRawLyrics = async () => {
@@ -384,6 +435,7 @@ export function LrcSyncStudio({ track, onSaveSuccess }: LrcSyncStudioProps) {
       if (!response.ok) throw new Error("Failed to save lyrics");
       const resJson = await response.json();
       onSaveSuccess(resJson.track);
+      setHasUnsavedRawLyrics(false);
       toast.success("Lyrics text saved successfully!");
     } catch (e: any) {
       console.error(e);
@@ -396,6 +448,37 @@ export function LrcSyncStudio({ track, onSaveSuccess }: LrcSyncStudioProps) {
   return (
     <div className="flex-1 p-8 max-w-[1280px] mx-auto w-full flex flex-col relative z-10">
       
+      {/* Confirmation Modal */}
+      {confirmDialog.isOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm animate-fade-in">
+          <div className="bg-surface-container-high border border-outline-variant/30 rounded-2xl p-6 max-w-md w-full shadow-2xl animate-slide-up-fade">
+            <h3 className="text-[20px] font-headline-md font-bold text-on-surface mb-2 flex items-center gap-2">
+              <AlertCircle className="w-5 h-5 text-error" />
+              {confirmDialog.title}
+            </h3>
+            <p className="text-[14px] text-on-surface-variant mb-8">
+              {confirmDialog.message}
+            </p>
+            <div className="flex justify-end gap-3">
+              <button 
+                onClick={() => setConfirmDialog(prev => ({ ...prev, isOpen: false }))}
+                className="px-5 py-2 rounded-xl text-[12px] font-bold uppercase tracking-widest text-on-surface-variant hover:bg-surface-variant/50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={() => {
+                  setConfirmDialog(prev => ({ ...prev, isOpen: false }));
+                  confirmDialog.onConfirm();
+                }}
+                className="px-5 py-2 rounded-xl text-[12px] font-bold uppercase tracking-widest bg-error hover:bg-error/90 text-on-error shadow-lg shadow-error/20 transition-colors"
+              >
+                {confirmDialog.confirmText}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       {/* Background Atmospheric Glow */}
       <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/5 rounded-full blur-[120px] pointer-events-none z-0"></div>
 
@@ -427,43 +510,49 @@ export function LrcSyncStudio({ track, onSaveSuccess }: LrcSyncStudioProps) {
                     <span className="material-symbols-outlined text-[16px]">notes</span>
                     Lyrics Editor
                   </span>
-                  <div className="flex items-center gap-4">
-                    {rawLyrics.trim().length === 0 && track.lrc_data ? (
-                      <button 
-                        onClick={clearLrcData}
-                        disabled={isSaving}
-                        className="font-label-caps text-[12px] font-bold text-error hover:text-error/80 transition-colors uppercase disabled:opacity-50 flex items-center gap-1"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                        {isSaving ? "Deleting..." : "Delete Lyrics"}
-                      </button>
-                    ) : (
-                      <button 
-                        onClick={saveRawLyrics}
-                        disabled={isSaving || rawLyrics.trim().length === 0}
-                        className="font-label-caps text-[12px] font-bold text-primary hover:text-primary/80 transition-colors uppercase disabled:opacity-50 flex items-center gap-1"
-                      >
-                        <Save className="w-3.5 h-3.5" />
-                        {isSaving ? "Saving..." : "Save"}
-                      </button>
-                    )}
-                    <div className="w-px h-4 bg-outline-variant/20"></div>
-                    <button onClick={() => setRawLyrics('')} className="font-label-caps text-[12px] font-bold text-on-surface-variant hover:text-error transition-colors uppercase">
-                      Clear All
+                  <div className="flex items-center gap-3">
+                    <button 
+                      onClick={() => { setRawLyrics(''); setHasUnsavedRawLyrics(true); }}
+                      className="p-2 rounded-lg text-on-surface-variant hover:bg-surface-variant/50 hover:text-error transition-colors"
+                      title="Clear notepad"
+                    >
+                      <RotateCcw className="w-4 h-4" />
                     </button>
-                    <div className="w-px h-4 bg-outline-variant/20"></div>
-                    <span className="font-label-caps text-[12px] font-bold text-primary uppercase" id="line-count">
-                      {rawLyrics.split('\n').filter(l => l.trim().length > 0).length} Lines
-                    </span>
+                    <button 
+                      onClick={saveRawLyrics}
+                      disabled={isSaving || rawLyrics.trim().length === 0 || !hasUnsavedRawLyrics}
+                      className="p-2 rounded-lg text-primary hover:bg-primary/10 transition-colors disabled:opacity-50"
+                      title="Save lyrics"
+                    >
+                      <Save className="w-4 h-4" />
+                    </button>
                   </div>
                 </div>
                 <textarea 
                   className="flex-1 bg-transparent border-none resize-none p-8 font-body-lg text-[16px] leading-relaxed custom-scrollbar text-on-surface placeholder:text-outline-variant/40 focus:outline-none focus:border-primary focus:ring-0" 
                   id="lyrics-input" 
                   value={rawLyrics}
-                  onChange={(e) => setRawLyrics(e.target.value)}
+                  onChange={(e) => {
+                    setRawLyrics(e.target.value);
+                    setHasUnsavedRawLyrics(true);
+                  }}
                   placeholder="Start typing or paste your lyrics here...&#10;&#10;[Verse 1]&#10;In the echo of the night&#10;We find our hidden light..."
                 ></textarea>
+                <div className="flex items-center justify-between px-6 py-3 border-t border-outline-variant/10 bg-surface/30">
+                  <span className="font-label-caps text-[12px] font-bold text-on-surface-variant uppercase" id="line-count">
+                    {rawLyrics.split('\n').filter(l => l.trim().length > 0).length} Lines
+                  </span>
+                  {track.lrc_data && (
+                    <button 
+                      onClick={clearLrcData}
+                      disabled={isSaving}
+                      className="font-label-caps text-[12px] font-bold text-error hover:text-error/80 transition-colors uppercase disabled:opacity-50 flex items-center gap-1"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      {isSaving ? "Deleting..." : "Delete Lyrics"}
+                    </button>
+                  )}
+                </div>
                 <div className="h-1 bg-gradient-to-r from-transparent via-primary/50 to-transparent opacity-0 focus-within:opacity-100 transition-opacity duration-300"></div>
               </div>
             </div>
@@ -541,6 +630,8 @@ export function LrcSyncStudio({ track, onSaveSuccess }: LrcSyncStudioProps) {
           <audio
             ref={audioRef}
             src={`/api/stream/${track.id}`}
+            preload="auto"
+            onLoadedMetadata={handleTimeUpdate}
             onPlay={() => setIsPlaying(true)}
             onPause={() => setIsPlaying(false)}
             onTimeUpdate={handleTimeUpdate}
@@ -550,64 +641,63 @@ export function LrcSyncStudio({ track, onSaveSuccess }: LrcSyncStudioProps) {
           {/* Lyrics Display - Focused Centerpiece */}
           <div className="w-full max-w-4xl text-center space-y-12">
             {/* Previous Line (Ghosted) */}
-            <div className="opacity-20 transition-all duration-700 blur-[1px] relative flex justify-center">
+            <div className="opacity-20 relative flex justify-center min-h-[40px] items-center">
               {(() => {
                 const prevIdx = getPrevSyncIndex(activeIndex);
                 const section = activeIndex > 0 ? getSectionsForLine(prevIdx) : null;
                 return (
-                  <>
+                  <div key={`prev-${activeIndex}`} className="animate-slide-up-fade flex flex-col items-center justify-center relative w-full">
                     {section && <span className="absolute -top-5 text-[10px] font-bold text-outline-variant tracking-widest uppercase">{section}</span>}
                     <p className="font-headline-md text-[20px] font-medium text-on-surface-variant">
                       {activeIndex > 0 ? lines[prevIdx]?.text || " " : " "}
                     </p>
-                  </>
+                  </div>
                 );
               })()}
             </div>
 
             {/* Current Line (Primary Focus) */}
-            <div className="relative py-4 bg-transparent flex justify-center">
+            <div className="relative py-4 bg-transparent flex justify-center min-h-[100px] items-center">
               {(() => {
                 const section = getSectionsForLine(activeIndex);
                 return (
-                  <>
+                  <div key={`curr-${activeIndex}`} className="animate-slide-up-fade flex flex-col items-center justify-center relative w-full">
                     {section && <span className="absolute -top-2 text-[14px] font-bold text-primary tracking-[0.2em] uppercase" style={{ textShadow: "rgba(139, 92, 246, 0.4) 0px 0px 10px" }}>{section}</span>}
                     <h2 
-                      className="font-display-lg text-[48px] text-primary relative line-transition px-8 leading-tight" 
+                      className="font-display-lg text-[48px] text-primary relative px-8 leading-tight" 
                       style={{ textShadow: "rgba(139, 92, 246, 0.6) 0px 0px 20px", fontWeight: 500 }}
                     >
                       {activeIndex < lines.length ? lines[activeIndex]?.text || "" : "Recording Completed!"}
                     </h2>
-                  </>
+                  </div>
                 );
               })()}
             </div>
 
             {/* Upcoming Line (Sub-focus) */}
-            <div className="opacity-40 transition-all duration-700 relative flex justify-center">
+            <div className="opacity-40 relative flex justify-center min-h-[50px] items-center">
               {(() => {
                 const nextIdx = getNextSyncIndex(activeIndex);
                 const section = nextIdx < lines.length ? getSectionsForLine(nextIdx) : null;
                 return (
-                  <>
+                  <div key={`next-${activeIndex}`} className="animate-slide-up-fade flex flex-col items-center justify-center relative w-full">
                     {section && <span className="absolute -top-5 text-[12px] font-bold text-primary tracking-widest uppercase">{section}</span>}
                     <p className="font-headline-lg text-[32px] font-semibold text-on-surface-variant">
                       {nextIdx < lines.length ? lines[nextIdx]?.text || " " : " "}
                     </p>
-                  </>
+                  </div>
                 );
               })()}
             </div>
           </div>
 
-          {/* Keyboard Interaction Indicator */}
-          <div className="absolute bottom-40 flex flex-col items-center gap-4">
-            <kbd className="px-5 py-2 bg-[#1a1b1f] border border-outline-variant/30 rounded-xl font-bold text-on-surface-variant text-[14px] shadow-lg tracking-wider">SPACEBAR</kbd>
-          </div>
-
           {/* Controls & Progress Dock */}
           <div className="absolute bottom-12 w-full max-w-3xl px-8">
             <div className="glass-panel rounded-2xl p-6 shadow-2xl space-y-6 relative">
+              {/* Keyboard Interaction Indicator */}
+              <div className="absolute -top-5 left-1/2 -translate-x-1/2">
+                <kbd className="px-6 py-2 bg-[#1a1b1f] border border-outline-variant/30 rounded-xl font-bold text-on-surface-variant text-[14px] shadow-lg tracking-wider">SPACEBAR</kbd>
+              </div>
 
               {/* Audio Progress */}
               <div className="space-y-2 mt-2">
@@ -622,9 +712,9 @@ export function LrcSyncStudio({ track, onSaveSuccess }: LrcSyncStudioProps) {
               </div>
 
               {/* Action Buttons */}
-              <div className="flex items-center justify-between mt-4">
+              <div className="flex items-center justify-between mt-6">
                 {/* Left Side */}
-                <div className="flex-1 flex justify-start">
+                <div className="flex-1 flex justify-start items-center">
                   <button 
                     onClick={resetSync}
                     className="group flex items-center gap-2 px-5 py-2.5 rounded-xl border border-outline-variant/30 text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/50 transition-all"
@@ -635,21 +725,21 @@ export function LrcSyncStudio({ track, onSaveSuccess }: LrcSyncStudioProps) {
                 </div>
 
                 {/* Center Side */}
-                <div className="flex shrink-0 justify-center px-4">
+                <div className="flex flex-col shrink-0 justify-center items-center gap-3 px-4">
+                  <div className="flex flex-col items-center">
+                    <span className="text-[10px] text-on-surface-variant uppercase tracking-tighter">Current Step</span>
+                    <span className="text-[14px] font-bold text-primary whitespace-nowrap">Line {activeIndex < lines.length ? activeIndex : lines.length} / {lines.length}</span>
+                  </div>
                   <button 
                     onClick={togglePlay}
-                    className="w-14 h-14 flex items-center justify-center rounded-full bg-primary text-on-primary hover:scale-105 active:scale-95 transition-all shadow-[0_0_15px_rgba(208,188,255,0.6)]"
+                    className="w-16 h-16 flex items-center justify-center rounded-full bg-primary text-on-primary hover:scale-105 active:scale-95 transition-all shadow-[0_0_15px_rgba(208,188,255,0.6)]"
                   >
-                    {isPlaying ? <Pause className="w-6 h-6 fill-current" /> : <Play className="w-6 h-6 fill-current pl-1" />}
+                    {isPlaying ? <Pause className="w-8 h-8 fill-current" /> : <Play className="w-8 h-8 fill-current pl-1" />}
                   </button>
                 </div>
 
                 {/* Right Side */}
-                <div className="flex-1 flex justify-end items-center gap-3">
-                  <div className="flex flex-col items-end mr-2">
-                    <span className="text-[10px] text-on-surface-variant uppercase tracking-tighter">Current Step</span>
-                    <span className="text-[14px] font-bold text-primary whitespace-nowrap">Line {activeIndex < lines.length ? activeIndex : lines.length} / {lines.length}</span>
-                  </div>
+                <div className="flex-1 flex justify-end items-center">
                   <button 
                     onClick={() => setPhase("edit")}
                     className="flex items-center gap-2 px-6 py-3 rounded-xl bg-primary text-on-primary font-bold shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all whitespace-nowrap"
@@ -680,10 +770,15 @@ export function LrcSyncStudio({ track, onSaveSuccess }: LrcSyncStudioProps) {
             <div className="flex items-center gap-4">
               <button 
                 onClick={() => {
-                  if (confirm("Are you sure you want to discard these timestamps and try the performance again?")) {
-                    resetSync();
-                    setPhase("sync");
-                  }
+                  requestConfirm(
+                    "Retry Performance",
+                    "Are you sure you want to discard these timestamps and try the performance again?",
+                    "Retry",
+                    () => {
+                      resetSync();
+                      setPhase("sync");
+                    }
+                  );
                 }}
                 className="px-6 py-2 border border-outline-variant hover:bg-surface-container-high rounded-xl text-[12px] font-bold tracking-widest uppercase transition-colors"
               >
@@ -691,9 +786,12 @@ export function LrcSyncStudio({ track, onSaveSuccess }: LrcSyncStudioProps) {
               </button>
               <button 
                 onClick={() => {
-                  if (confirm("Discard this track's lyrics entirely and start over?")) {
-                    backToText();
-                  }
+                  requestConfirm(
+                    "Discard Lyrics",
+                    "Discard this track's lyrics entirely and start over?",
+                    "Discard",
+                    () => backToText()
+                  );
                 }}
                 className="px-6 py-2 border border-outline-variant hover:bg-surface-container-high rounded-xl text-[12px] font-bold tracking-widest uppercase transition-colors text-error hover:text-error/90 hover:bg-error/10"
               >
@@ -701,7 +799,7 @@ export function LrcSyncStudio({ track, onSaveSuccess }: LrcSyncStudioProps) {
               </button>
               <button 
                 onClick={saveLrcData}
-                disabled={isSaving}
+                disabled={isSaving || !hasUnsavedChanges}
                 className="px-8 py-3 bg-primary hover:bg-primary/90 disabled:opacity-50 text-on-primary rounded-xl text-[12px] font-bold tracking-widest uppercase shadow-[0_0_15px_rgba(139,92,246,0.3)] transition-all flex items-center gap-2"
               >
                 <Save className="w-4 h-4" />
@@ -713,44 +811,57 @@ export function LrcSyncStudio({ track, onSaveSuccess }: LrcSyncStudioProps) {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 flex-1 min-h-[500px]">
             {/* Left Side: Mini Player & Audio Viz */}
             <div className="lg:col-span-4 flex flex-col gap-6">
-              <div className="w-full aspect-square rounded-2xl overflow-hidden shadow-2xl border border-outline-variant/20 relative">
-                <img 
-                  src={track.cover_url || "/cover-placeholder.jpg"} 
-                  alt={track.title || "Track Cover"} 
-                  className="w-full h-full object-cover"
-                />
-                <audio
-                  ref={audioRef}
-                  src={`/api/stream/${track.id}`}
-                  onPlay={() => setIsPlaying(true)}
-                  onPause={() => setIsPlaying(false)}
-                  onTimeUpdate={handleTimeUpdate}
-                  className="hidden"
-                />
+              <div className="flex flex-col gap-3">
+                <div className="w-full aspect-square rounded-2xl overflow-hidden shadow-2xl border border-outline-variant/20 relative">
+                  <img 
+                    src={track.cover_url || "/cover-placeholder.jpg"} 
+                    alt={track.title || "Track Cover"} 
+                    className="w-full h-full object-cover"
+                  />
+                  <audio
+                    ref={audioRef}
+                    src={`/api/stream/${track.id}`}
+                    preload="auto"
+                    onLoadedMetadata={handleTimeUpdate}
+                    onPlay={() => setIsPlaying(true)}
+                    onPause={() => setIsPlaying(false)}
+                    onTimeUpdate={handleTimeUpdate}
+                    className="hidden"
+                  />
+                </div>
+                <a 
+                  href={`/t/${track.slug}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center gap-2 py-2.5 rounded-xl bg-surface hover:bg-surface-container-high border border-outline-variant/20 text-[12px] font-bold tracking-widest uppercase text-on-surface-variant hover:text-primary transition-colors"
+                >
+                  <span className="material-symbols-outlined text-[16px]">open_in_new</span>
+                  Open in new tab
+                </a>
               </div>
 
-              <div className="obsidian-container rounded-2xl p-6 flex-1 flex flex-col">
+              <div className="obsidian-container rounded-2xl p-6 flex flex-col">
                 <div className="flex items-center justify-between mb-4">
                   <span className="text-[12px] font-bold tracking-widest uppercase text-on-surface-variant">Animation Speed</span>
                   <span className="text-[12px] text-primary">{timing === "400ms" ? "Fast" : timing === "1000ms" ? "Relaxed" : "Default"}</span>
                 </div>
                 <div className="space-y-3">
                   <button 
-                    onClick={() => setTiming("400ms")}
+                    onClick={() => handleSetTiming("400ms")}
                     className={`w-full py-3 rounded-xl text-[14px] font-medium transition-colors text-left px-4 flex justify-between items-center ${timing === "400ms" ? "bg-surface-container-high hover:bg-outline-variant/20 border border-primary/30 text-on-surface" : "bg-surface hover:bg-surface-container-high text-on-surface-variant border border-transparent"}`}
                   >
                     <span>Fast</span>
                     {timing === "400ms" && <Check className="w-4 h-4 text-primary" />}
                   </button>
                   <button 
-                    onClick={() => setTiming("600ms")}
+                    onClick={() => handleSetTiming("600ms")}
                     className={`w-full py-3 rounded-xl text-[14px] font-medium transition-colors text-left px-4 flex justify-between items-center ${timing === "600ms" ? "bg-surface-container-high hover:bg-outline-variant/20 border border-primary/30 text-on-surface" : "bg-surface hover:bg-surface-container-high text-on-surface-variant border border-transparent"}`}
                   >
                     <span>Default</span>
                     {timing === "600ms" && <Check className="w-4 h-4 text-primary" />}
                   </button>
                   <button 
-                    onClick={() => setTiming("1000ms")}
+                    onClick={() => handleSetTiming("1000ms")}
                     className={`w-full py-3 rounded-xl text-[14px] font-medium transition-colors text-left px-4 flex justify-between items-center ${timing === "1000ms" ? "bg-surface-container-high hover:bg-outline-variant/20 border border-primary/30 text-on-surface" : "bg-surface hover:bg-surface-container-high text-on-surface-variant border border-transparent"}`}
                   >
                     <span>Relaxed</span>

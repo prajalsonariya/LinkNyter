@@ -44,6 +44,14 @@ export const authOptions: NextAuthOptions = {
         token.accessToken = account.access_token;
         token.refreshToken = account.refresh_token;
         token.expiresAt = account.expires_at ? account.expires_at * 1000 : 0;
+        
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('email', user.email)
+          .single();
+          
+        token.role = profile?.role || 'user';
       }
       
       // Return previous token if the access token has not expired yet
@@ -82,6 +90,9 @@ export const authOptions: NextAuthOptions = {
     async session({ session, token }) {
       session.accessToken = token.accessToken as string;
       session.error = token.error as string | undefined;
+      if (session.user) {
+        (session.user as any).role = token.role as string;
+      }
       return session;
     }
   },
