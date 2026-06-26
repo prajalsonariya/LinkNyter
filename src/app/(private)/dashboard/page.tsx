@@ -7,6 +7,7 @@ import { Play, Pause, Search, Bell, Trash2, Upload, Hourglass, Lock, FileUp } fr
 import { toast } from "sonner";
 import { useDashboard } from "@/contexts/DashboardContext";
 import { TrackItem } from "@/components/TrackItem";
+import { LrcSyncStudio } from "@/components/LrcSyncStudio";
 
 export default function DashboardPage() {
   const { data: session } = useSession();
@@ -395,6 +396,16 @@ export default function DashboardPage() {
                       </button>
                     </div>
                   </div>
+                </div>
+                
+                <div className="border-t border-outline-variant/10 pt-8 mt-8">
+                  <LrcSyncStudio 
+                    track={selectedTrack} 
+                    onSaveSuccess={(updatedTrack) => {
+                      setSelectedTrack(updatedTrack);
+                      setTracks(prev => prev.map(t => t.id === updatedTrack.id ? updatedTrack : t));
+                    }} 
+                  />
                 </div>
               </div>
             ) : isUploading ? (
