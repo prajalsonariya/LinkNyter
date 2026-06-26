@@ -28,6 +28,11 @@ export function TrackItem({
 }: TrackItemProps) {
   const [accent, setAccent] = useState("139, 92, 246"); // Default primary color
   const [isCopied, setIsCopied] = useState(false);
+  const [optimisticAllowDownloads, setOptimisticAllowDownloads] = useState(track.allow_downloads || false);
+
+  useEffect(() => {
+    setOptimisticAllowDownloads(track.allow_downloads || false);
+  }, [track.allow_downloads]);
 
   const handleCopy = (e: React.MouseEvent) => {
     onCopyLink(e);
@@ -91,34 +96,35 @@ export function TrackItem({
         <div className="flex items-center justify-between pt-3 mt-1 border-t border-outline-variant/30" onClick={(e) => e.stopPropagation()}>
           <div className="flex items-center gap-2">
             <button 
-              className="p-1.5 rounded-md text-on-surface-variant hover:text-primary hover:bg-primary/10 transition-colors" 
+              className="p-3 transition-all hover:-translate-y-[2px] flex items-center justify-center min-w-[50px] h-[50px]"
               title="Copy Share Link"
               onClick={handleCopy}
             >
-              {isCopied ? <Check className="w-[28px] h-[28px] text-green-500" /> : <img src="/logo.svg" alt="Copy Link" className="w-[28px] h-[28px] object-contain opacity-70 hover:opacity-100 transition-opacity" />}
+              {isCopied ? (
+                <Check strokeWidth={1.5} className="w-[28px] h-[28px] text-primary drop-shadow-[0_0_10px_rgba(139,92,246,0.5)] animate-in zoom-in duration-200" />
+              ) : (
+                <img src="/logo.svg" alt="Copy Link" className="w-[28px] h-[28px] object-contain opacity-70 hover:opacity-100 transition-opacity animate-in zoom-in duration-200" />
+              )}
             </button>
-            <a 
-              href="/manage-links"
-              className="p-1.5 rounded-md text-on-surface-variant hover:text-primary hover:bg-primary/10 transition-colors flex items-center gap-1 font-label-caps text-[10px] uppercase"
-              title="Manage Tracking Links"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <BarChart2 className="w-4 h-4" /> Manage Links
-            </a>
           </div>
           
-          <div className="flex items-center gap-3">
-            <span className="font-label-caps text-[10px] uppercase text-on-surface-variant">Public Downloads</span>
-            <label className="relative inline-flex items-center cursor-pointer">
-              <input 
-                type="checkbox" 
-                className="sr-only peer" 
-                checked={track.allow_downloads || false}
-                onChange={(e) => onToggleDownload(track.id, e.target.checked)}
-              />
-              <div className="w-8 h-4 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-primary"></div>
-            </label>
-          </div>
+          <button 
+            onClick={(e) => { 
+              e.stopPropagation(); 
+              const newValue = !optimisticAllowDownloads;
+              setOptimisticAllowDownloads(newValue);
+              onToggleDownload(track.id, newValue); 
+            }}
+            className="flex items-center gap-3 group"
+            title={optimisticAllowDownloads ? "Disable Public Downloads" : "Enable Public Downloads"}
+          >
+            <span className={`font-label-caps text-[10px] uppercase tracking-widest transition-colors ${optimisticAllowDownloads ? 'text-primary drop-shadow-[0_0_5px_rgba(139,92,246,0.5)]' : 'text-on-surface-variant group-hover:text-outline'}`}>
+              Download
+            </span>
+            <div className={`relative w-9 h-5 rounded-full transition-all duration-300 ${optimisticAllowDownloads ? 'bg-primary shadow-[0_0_12px_rgba(139,92,246,0.6)]' : 'bg-[#2a2b30] group-hover:bg-[#33343a]'}`}>
+              <div className={`absolute top-[2px] left-[2px] w-4 h-4 bg-white rounded-full transition-all duration-300 ${optimisticAllowDownloads ? 'translate-x-4' : 'translate-x-0 opacity-40'}`} />
+            </div>
+          </button>
         </div>
       </div>
     </div>

@@ -106,7 +106,7 @@ export function AnalyticsView({ tracks }: { tracks: any[] }) {
             onClick={() => router.push('?tab=content', { scroll: false })}
             className={`pb-4 font-label-caps text-sm uppercase tracking-wider transition-all relative ${activeTab === 'content' ? 'text-primary font-bold' : 'text-on-surface-variant hover:text-on-surface'}`}
           >
-            Content
+            Tracks
             {activeTab === 'content' && <div className="absolute bottom-0 left-0 w-full h-0.5 bg-primary rounded-t-full shadow-[0_0_10px_rgba(139,92,246,0.5)]" />}
           </button>
         </div>

@@ -41,16 +41,25 @@ export default function PrivacyPage() {
 
           <section>
             <h2 className="font-headline-lg text-headline-lg text-on-surface font-semibold mb-6">4. Analytics, Telemetry, and Listener Tracking</h2>
-            <p className="mb-4">LinkNyter employs advanced telemetry to provide creators with detailed playback analytics. When a public listener opens a tracking link, we collect specific behavioral data.</p>
+            <p className="mb-4">LinkNyter employs advanced telemetry to provide creators with detailed playback analytics isolated by individual custom tracking links. When a public listener opens a tracking link, we collect specific behavioral and session metrics.</p>
             <ul className="list-disc pl-5 space-y-3">
-              <li><strong className="text-on-surface">Playback Telemetry:</strong> We track real time playback events within the browser, logging exact timestamps for when a track is played, paused, or scrubbed.</li>
-              <li><strong className="text-on-surface">Engagement Metrics:</strong> We calculate total completion percentage and track specific user interface interactions, including clicks on the download button and embedded social media links.</li>
-              <li><strong className="text-on-surface">Session Data:</strong> We generate and log unique session identifiers to differentiate individual tracking links and monitor whether a listener returns for repeat plays. This data is collected locally in the browser and transmitted via batch processing to our database.</li>
+              <li><strong className="text-on-surface">Link-Level Attribution:</strong> We track real-time playback events, play counts, and unique listener interactions mapped directly to the specific custom tracking links you generate.</li>
+              <li><strong className="text-on-surface">Behavioral Metrics:</strong> We calculate total completion percentage, track abandonment rates, and specific user interface interactions (such as downloads) to provide aggregated deep-dive analytics on a per-link and per-track basis.</li>
+              <li><strong className="text-on-surface">Session and Technical Data:</strong> We utilize anonymized session identifiers and basic technical parameters to differentiate unique listeners and aggregate temporal playback statistics. This data is strictly partitioned and only accessible via your authenticated creator dashboard.</li>
             </ul>
           </section>
 
           <section>
-            <h2 className="font-headline-lg text-headline-lg text-on-surface font-semibold mb-6">5. Data Retention and Deletion</h2>
+            <h2 className="font-headline-lg text-headline-lg text-on-surface font-semibold mb-6">5. Custom Tracking Links and Recipient Data</h2>
+            <p className="mb-4">The Platform provides a &quot;Manage Links&quot; utility allowing creators to generate isolated, trackable URLs for specific recipients or campaigns.</p>
+            <ul className="list-disc pl-5 space-y-3">
+              <li><strong className="text-on-surface">Reference Data:</strong> If you input personal information (such as a recipient&apos;s name or corporate affiliation) into the link generation tool as a &quot;Reference Name,&quot; this text is stored securely in our database.</li>
+              <li><strong className="text-on-surface">Data Processing:</strong> We do not process this reference data for any purpose other than displaying it within your private dashboard for campaign management.</li>
+            </ul>
+          </section>
+
+          <section>
+            <h2 className="font-headline-lg text-headline-lg text-on-surface font-semibold mb-6">6. Data Retention and Deletion</h2>
             <p className="mb-4">You maintain complete control over your metadata and assets at all times.</p>
             <ul className="list-disc pl-5 space-y-3">
               <li>If you delete a track from your LinkNyter dashboard, the corresponding row of text metadata and all associated playback analytics are instantly and permanently purged from our database.</li>
@@ -59,7 +68,7 @@ export default function PrivacyPage() {
           </section>
 
           <section>
-            <h2 className="font-headline-lg text-headline-lg text-on-surface font-semibold mb-6">6. Third Party Sharing</h2>
+            <h2 className="font-headline-lg text-headline-lg text-on-surface font-semibold mb-6">7. Third Party Sharing</h2>
             <p>
               We do not sell, rent, lease, or trade your personal information, telemetry data, metadata, or tracking metrics to third party advertising companies or data brokers. Data is processed exclusively to maintain the live playback interface and populate your private creator dashboard.
             </p>

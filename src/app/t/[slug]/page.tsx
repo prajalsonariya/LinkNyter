@@ -252,7 +252,7 @@ export default function PlayerPage({ params }: { params: Promise<{ slug: string 
               <img
                 ref={imgRef}
                 alt={track.title}
-                className="w-full h-full object-contain"
+                className="w-full h-full object-cover"
                 src={coverSrc}
                 onError={(e) => { e.currentTarget.src = "/cover-placeholder.jpg" }}
               />
@@ -377,7 +377,10 @@ export default function PlayerPage({ params }: { params: Promise<{ slug: string 
                   if (!rawUrl || !rawUrl.trim()) return null;
                   const url = rawUrl.trim().startsWith('http') ? rawUrl.trim() : `https://${rawUrl.trim()}`;
                   return (
-                    <a key={key} href={url} target="_blank" rel="noopener noreferrer" onMouseDown={() => telemetry.current.social_clicks += 1} className="group flex items-center justify-center text-white/40 hover:text-white transition-all">
+                    <a key={key} href={url} target="_blank" rel="noopener noreferrer" onMouseDown={() => {
+                      telemetry.current.social_clicks += 1;
+                      telemetry.current.events.push({ action: `share_${key}`, timestamp: audioRef.current?.currentTime || 0, time: new Date().toISOString() });
+                    }} className="group flex items-center justify-center text-white/40 hover:text-white transition-all">
                       <span className="group-hover:scale-110 transition-transform">{icon}</span>
                     </a>
                   );

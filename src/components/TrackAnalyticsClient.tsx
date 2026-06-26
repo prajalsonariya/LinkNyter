@@ -1,16 +1,55 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { AreaChart, Area, XAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { 
   ArrowLeft, Share2, MoreVertical, TrendingUp, Play, Pause, 
-  FastForward, Download, Heart, RotateCcw, LogOut, Activity, LayoutDashboard 
+  FastForward, Download, Heart, RotateCcw, LogOut, Activity, LayoutDashboard,
+  Music, Globe, Check
 } from "lucide-react";
+import { InstagramIcon, TwitterIcon, YouTubeIcon, SpotifyIcon, AppleMusicIcon, GlobeIcon } from "@/components/SocialIcons";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 
-export function TrackAnalyticsClient({ track, sessions }: { track: any, sessions: any[] }) {
+export function TrackAnalyticsClient({ track, sessions: initialSessions }: { track: any, sessions: any[] }) {
   const { data: session } = useSession();
+
+  const [selectedLinkFilter, setSelectedLinkFilter] = useState<string>('all');
+  const [isCopied, setIsCopied] = useState(false);
+  
+  // Extract all unique tracking links from sessions
+  const availableLinks = useMemo(() => {
+    const links = new Map<string, string>();
+    links.set('open', 'Public Link');
+    initialSessions.forEach(s => {
+      if (s.tracking_link_id && s.tracking_links) {
+        links.set(s.tracking_link_id, s.tracking_links.reference_name);
+      }
+    });
+    return Array.from(links.entries());
+  }, [initialSessions]);
+
+  // Filter sessions based on selection
+  const sessions = useMemo(() => {
+    if (selectedLinkFilter === 'all') return initialSessions;
+    if (selectedLinkFilter === 'open') return initialSessions.filter(s => !s.tracking_link_id);
+    return initialSessions.filter(s => s.tracking_link_id === selectedLinkFilter);
+  }, [initialSessions, selectedLinkFilter]);
+
+  const handleCopy = () => {
+    let url = `${window.location.origin}/t/${track.slug}`;
+    
+    if (selectedLinkFilter !== 'all' && selectedLinkFilter !== 'open') {
+      const selectedSession = initialSessions.find(s => s.tracking_link_id === selectedLinkFilter);
+      if (selectedSession && selectedSession.tracking_links?.custom_slug) {
+        url = `${url}?ref=${selectedSession.tracking_links.custom_slug}`;
+      }
+    }
+    
+    navigator.clipboard.writeText(url);
+    setIsCopied(true);
+    setTimeout(() => setIsCopied(false), 2000);
+  };
 
   const formatTime = (t: number) => {
     const m = Math.floor(t / 60);
@@ -22,7 +61,31 @@ export function TrackAnalyticsClient({ track, sessions }: { track: any, sessions
   const avgListenTime = totalOpens > 0 ? Math.round(sessions.reduce((acc, s) => acc + (s.total_listen_time_seconds || 0), 0) / totalOpens) : 0;
   const downloads = sessions.filter(s => s.download_clicked).length;
   const downloadRate = totalOpens > 0 ? ((downloads / totalOpens) * 100).toFixed(1) : "0.0";
-  const socialClicks = sessions.filter(s => s.social_links_clicked).length;
+
+  // Unique Social Platforms Shared with Counts
+  const sharedPlatformCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    sessions.forEach(s => {
+      let hasSpecificShares = false;
+      if (s.event_log) {
+        s.event_log.forEach((e: any) => {
+          if (e.action && typeof e.action === 'string' && e.action.startsWith('share_')) {
+            counts[e.action] = (counts[e.action] || 0) + 1;
+            hasSpecificShares = true;
+          }
+        });
+      }
+      // If legacy session with social clicks but no specific events
+      if (s.social_links_clicked && !hasSpecificShares) {
+        counts['share_unknown'] = (counts['share_unknown'] || 0) + 1;
+      }
+    });
+    return Object.entries(counts).sort((a, b) => b[1] - a[1]);
+  }, [sessions]);
+
+  const socialClicks = useMemo(() => {
+    return sharedPlatformCounts.reduce((acc, [_, count]) => acc + count, 0);
+  }, [sharedPlatformCounts]);
 
   // Aggregate Timeline (Last 7 Days)
   const timelineData = useMemo(() => {
@@ -58,13 +121,24 @@ export function TrackAnalyticsClient({ track, sessions }: { track: any, sessions
       const evs = s.event_log || [];
       const sessionEvents = evs.map((e: any) => ({ ...e, session: s }));
       if (s.download_clicked) sessionEvents.push({ action: 'download', time: s.started_at, session: s });
-      if (s.social_links_clicked) sessionEvents.push({ action: 'share', time: s.started_at, session: s });
+      
+      const hasSpecificShares = evs.some((e: any) => typeof e.action === 'string' && e.action.startsWith('share_'));
+      if (s.social_links_clicked && !hasSpecificShares) {
+        sessionEvents.push({ action: 'share', time: s.started_at, session: s });
+      }
       return sessionEvents;
     });
     return allEvents.sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime()).slice(0, 20);
   }, [sessions]);
 
   const getFeedIcon = (action: string) => {
+    if (action === 'share_instagram') return <InstagramIcon className="w-4 h-4 text-[#E1306C]" />;
+    if (action === 'share_twitter') return <TwitterIcon className="w-4 h-4 text-[#1DA1F2]" />;
+    if (action === 'share_youtube') return <YouTubeIcon className="w-4 h-4 text-[#FF0000]" />;
+    if (action === 'share_spotify') return <SpotifyIcon className="w-4 h-4 text-[#1DB954]" />;
+    if (action === 'share_apple_music') return <AppleMusicIcon className="w-4 h-4 text-[#fa243c]" />;
+    if (action.startsWith('share_')) return <GlobeIcon className="w-4 h-4 text-secondary" />;
+
     switch (action) {
       case 'play': return <Play className="w-4 h-4 text-primary" />;
       case 'pause': return <Pause className="w-4 h-4 text-outline" />;
@@ -76,6 +150,10 @@ export function TrackAnalyticsClient({ track, sessions }: { track: any, sessions
   };
 
   const getFeedText = (ev: any) => {
+    if (ev.action.startsWith('share_')) {
+      const platformName = ev.action.replace('share_', '').split('_').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+      return <p className="font-body-sm text-on-surface">Clicked <span className="text-primary">{platformName}</span> link</p>;
+    }
     switch (ev.action) {
       case 'play': return <p className="font-body-sm text-on-surface">Listener played the track</p>;
       case 'pause': return <p className="font-body-sm text-on-surface">Listener paused the track</p>;
@@ -97,7 +175,7 @@ export function TrackAnalyticsClient({ track, sessions }: { track: any, sessions
 
   // Retention Heatmap Calculation
   const heatmap = useMemo(() => {
-    const bars = 20;
+    const bars = 26;
     const maxTime = Math.max(...sessions.map(s => s.completion_percentage || 0), 1); // Avoid 0
     const segment = maxTime / bars;
     const retentions = [];
@@ -130,6 +208,8 @@ export function TrackAnalyticsClient({ track, sessions }: { track: any, sessions
           <span className="font-label-caps uppercase tracking-widest text-[10px]">Back to Dashboard</span>
         </Link>
         <div className="flex gap-4">
+
+          
           <button className={`p-2 ${glassCardClass} rounded-lg flex items-center justify-center`}>
             <Share2 className="w-5 h-5 text-outline" />
           </button>
@@ -138,6 +218,30 @@ export function TrackAnalyticsClient({ track, sessions }: { track: any, sessions
           </button>
         </div>
       </div>
+
+      {/* Track Filters */}
+      {availableLinks.length > 1 && (
+        <div className="mb-12 border-b border-outline-variant/10 pb-8">
+          <span className="font-label-caps text-outline tracking-widest text-[10px] mb-4 block">Filter by Tracking Link</span>
+          <div className="flex gap-3 overflow-x-auto custom-scrollbar pb-2 items-center">
+            <button 
+              onClick={() => setSelectedLinkFilter('all')}
+              className={`px-5 py-2.5 rounded-full font-label-caps text-[11px] tracking-wider transition-all whitespace-nowrap border ${selectedLinkFilter === 'all' ? 'bg-primary text-on-primary border-primary shadow-[0_0_15px_rgba(139,92,246,0.3)]' : 'bg-[#121214] text-outline border-[#222226] hover:border-[#333338] hover:text-on-surface shadow-sm'}`}
+            >
+              ALL LINKS
+            </button>
+            {availableLinks.map(([id, name]) => (
+              <button 
+                key={id}
+                onClick={() => setSelectedLinkFilter(id)}
+                className={`px-5 py-2.5 rounded-full font-label-caps text-[11px] tracking-wider transition-all whitespace-nowrap border ${selectedLinkFilter === id ? 'bg-primary text-on-primary border-primary shadow-[0_0_15px_rgba(139,92,246,0.3)]' : 'bg-[#121214] text-outline border-[#222226] hover:border-[#333338] hover:text-on-surface shadow-sm'}`}
+              >
+                {name.toUpperCase()}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Hero Section */}
       <section className="flex flex-col md:flex-row items-end gap-8 mb-16">
@@ -150,6 +254,19 @@ export function TrackAnalyticsClient({ track, sessions }: { track: any, sessions
           />
         </div>
         <div className="flex-1 pb-4">
+          <div className="mb-6">
+            <button 
+              onClick={handleCopy}
+              className={`transition-all hover:scale-105 active:scale-95 flex items-center justify-center min-w-[32px] h-[32px] ${isCopied ? '' : 'opacity-80 hover:opacity-100 drop-shadow-[0_0_15px_rgba(139,92,246,0.15)]'}`}
+              title="Copy Active Link"
+            >
+              {isCopied ? (
+                <Check strokeWidth={1.5} className="w-8 h-8 text-primary drop-shadow-[0_0_10px_rgba(139,92,246,0.5)] animate-in zoom-in duration-200" />
+              ) : (
+                <img src="/logo.svg" alt="Copy Link" className="w-8 h-8 object-contain animate-in zoom-in duration-200" />
+              )}
+            </button>
+          </div>
           <span className="font-label-caps text-primary tracking-[0.2em] mb-4 block uppercase">Deep Dive Analytics</span>
           <h2 className="font-display-lg text-display-lg text-on-surface leading-tight mb-2">{track.title}</h2>
           <div className="flex items-center gap-3">
@@ -196,16 +313,59 @@ export function TrackAnalyticsClient({ track, sessions }: { track: any, sessions
           </div>
         </div>
 
-        <div className={`${glassCardClass} p-6 rounded-xl flex flex-col justify-between h-40`}>
-          <div>
-            <span className="font-label-caps text-outline tracking-wider text-[10px]">SOCIAL SHARES</span>
-            <h3 className="font-headline-lg text-headline-lg mt-1">{socialClicks}</h3>
+        <div className={`${glassCardClass} p-6 rounded-xl flex items-center justify-between h-40 relative group cursor-pointer overflow-hidden`}>
+          <div className="flex flex-col justify-between h-full relative z-10 transition-transform duration-300 group-hover:-translate-x-2">
+            <div>
+              <span className="font-label-caps text-outline tracking-wider text-[10px]">SOCIAL SHARES</span>
+              <h3 className="font-headline-lg text-headline-lg mt-1">{socialClicks}</h3>
+            </div>
+            <div className="flex -space-x-2">
+              {sharedPlatformCounts.length > 0 ? (
+                sharedPlatformCounts.slice(0, 5).map(([action, count], i) => (
+                  <div key={i} className="w-6 h-6 rounded-full border-2 border-[#121214] bg-[#1e1f23] flex items-center justify-center relative" style={{ zIndex: 10 - i }}>
+                    {/* Clone the icon element to override its size specifically for this row */}
+                    {(() => {
+                      const iconEl = getFeedIcon(action) as any;
+                      return iconEl ? { ...iconEl, props: { ...iconEl.props, className: iconEl.props.className.replace('w-4 h-4', 'w-3 h-3') } } : null;
+                    })()}
+                  </div>
+                ))
+              ) : (
+                socialClicks > 0 ? (
+                  <div className="flex items-center gap-2 text-primary font-body-sm">
+                    <Share2 className="w-4 h-4" /> untracked platforms
+                  </div>
+                ) : null
+              )}
+              {sharedPlatformCounts.length > 5 && (
+                <div className="w-6 h-6 rounded-full border-2 border-[#121214] bg-primary-container flex items-center justify-center text-[8px] text-on-primary-container font-bold relative" style={{ zIndex: 0 }}>
+                  +{sharedPlatformCounts.length - 5}
+                </div>
+              )}
+            </div>
           </div>
-          <div className="flex -space-x-2">
-            <div className="w-6 h-6 rounded-full border-2 border-[#1e1f23] bg-surface-variant"></div>
-            <div className="w-6 h-6 rounded-full border-2 border-[#1e1f23] bg-outline"></div>
-            <div className="w-6 h-6 rounded-full border-2 border-[#1e1f23] bg-primary-container flex items-center justify-center text-[8px] text-on-primary-container font-bold">+{socialClicks > 2 ? socialClicks - 2 : socialClicks}</div>
-          </div>
+          
+          {/* Animated inside content on hover taking up the right side */}
+          {sharedPlatformCounts.length > 0 && (
+            <div className="flex-1 max-w-[55%] h-full flex flex-col justify-center gap-2 opacity-0 translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 relative z-10 pl-4 border-l border-white/5">
+              <div className="font-label-caps text-[9px] text-outline tracking-wider uppercase mb-0.5">Click Breakdown</div>
+              {sharedPlatformCounts.slice(0, 3).map(([action, count]) => (
+                  <div key={action} className="flex items-center justify-between gap-2 text-xs">
+                    <div className="flex items-center gap-2 text-on-surface-variant">
+                      {(() => {
+                        const iconEl = getFeedIcon(action) as any;
+                        return iconEl ? { ...iconEl, props: { ...iconEl.props, className: iconEl.props.className.replace('w-4 h-4', 'w-3 h-3') } } : null;
+                      })()}
+                      <span className="truncate max-w-[65px]">{action === 'share_unknown' ? 'Other' : action.replace('share_', '').split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}</span>
+                    </div>
+                    <span className="font-bold text-on-surface">{count}</span>
+                  </div>
+              ))}
+            </div>
+          )}
+          
+          {/* Subtle gradient background on hover to frame the inner breakdown */}
+          <div className="absolute inset-y-0 right-0 w-2/3 bg-gradient-to-l from-[#1e1f23]/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-0"></div>
         </div>
       </div>
 
@@ -280,7 +440,7 @@ export function TrackAnalyticsClient({ track, sessions }: { track: any, sessions
                 <div className="pb-6 pt-1">
                   {getFeedText(ev)}
                   <span className="font-label-caps text-[10px] text-outline mt-1 block">
-                    {getTimeAgo(ev.time)} • {ev.session.tracking_links?.reference_name || 'OPEN LINK'}
+                    {getTimeAgo(ev.time)} • {ev.session.tracking_links?.reference_name || 'PUBLIC LINK'}
                   </span>
                 </div>
               </div>

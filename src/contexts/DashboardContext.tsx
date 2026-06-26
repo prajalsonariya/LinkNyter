@@ -55,6 +55,23 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
   const handleGlobalDrag = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    
+    // Check if dragging an image, if so, don't show the global audio drop overlay
+    let isImage = false;
+    if (e.dataTransfer.items && e.dataTransfer.items.length > 0) {
+      for (let i = 0; i < e.dataTransfer.items.length; i++) {
+        if (e.dataTransfer.items[i].kind === 'file' && e.dataTransfer.items[i].type.startsWith('image/')) {
+          isImage = true;
+          break;
+        }
+      }
+    }
+
+    if (isImage) {
+      setDragActive(false);
+      return;
+    }
+
     if (e.type === "dragenter" || e.type === "dragover") {
       setDragActive(true);
     } else if (e.type === "dragleave") {

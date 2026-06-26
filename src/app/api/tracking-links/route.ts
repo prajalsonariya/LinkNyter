@@ -68,7 +68,8 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Unauthorized or track not found' }, { status: 403 });
     }
 
-    const slug = reference_name.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-') + '-' + Math.random().toString(36).substring(2, 6);
+    // Generate an anonymous 8-character alphanumeric slug
+    const slug = Math.random().toString(36).substring(2, 10);
 
     const { data: newLink, error: insertError } = await supabase
       .from('tracking_links')

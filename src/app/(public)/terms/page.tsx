@@ -50,14 +50,28 @@ export default function TermsPage() {
           </section>
 
           <section>
-            <h2 className="font-headline-lg text-headline-lg text-on-surface font-semibold mb-6">5. Google Drive API Policy Compliance</h2>
+            <h2 className="font-headline-lg text-headline-lg text-on-surface font-semibold mb-6">5. Custom Tracking Links and Data Processing</h2>
+            <p>
+              The Service allows you to generate custom URLs (&quot;Tracking Links&quot;) designated for specific campaigns or individuals. You are solely responsible for ensuring you have the lawful right and necessary consent to track the engagement of the recipients to whom you distribute these links. Furthermore, you agree not to input sensitive personal data or regulated Personally Identifiable Information (PII) into the Platform&apos;s link generation reference fields. LinkNyter acts exclusively as a data processor in this regard and bears no liability for your distribution or tracking practices.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="font-headline-lg text-headline-lg text-on-surface font-semibold mb-6">6. Prohibited Use of Analytics</h2>
+            <p>
+              The telemetry and analytics provided within the dashboard are for your personal or internal business evaluation of your audio assets. You are strictly prohibited from utilizing the Platform&apos;s analytics tools for malicious surveillance, harassment, doxxing, or reverse-engineering the identity of your listeners beyond the aggregated metrics provided by the Service.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="font-headline-lg text-headline-lg text-on-surface font-semibold mb-6">7. Google Drive API Policy Compliance</h2>
             <p>
               Because LinkNyter relies directly on third-party cloud APIs to fetch and route data, your use of the Service is simultaneously governed by the Google Terms of Service and Google Drive Additional Terms of Service. LinkNyter is not liable for service disruptions, bandwidth throttling, account suspensions, or download quotas enforced on your cloud account by Google.
             </p>
           </section>
 
           <section>
-            <h2 className="font-headline-lg text-headline-lg text-on-surface font-semibold mb-6">6. Limitation of Liability and Disclaimer of Warranties</h2>
+            <h2 className="font-headline-lg text-headline-lg text-on-surface font-semibold mb-6">8. Limitation of Liability and Disclaimer of Warranties</h2>
             <p className="mb-4">LinkNyter is provided on an &quot;as-is&quot; and &quot;as-available&quot; basis without warranties of any kind, either express or implied.</p>
             <ul className="list-disc pl-5 space-y-3 mb-6">
               <li>We do not guarantee that the Service will be uninterrupted, completely secure, or entirely error-free.</li>
@@ -66,7 +80,7 @@ export default function TermsPage() {
           </section>
 
           <section>
-            <h2 className="font-headline-lg text-headline-lg text-on-surface font-semibold mb-6">7. Modifications to Service and Terms</h2>
+            <h2 className="font-headline-lg text-headline-lg text-on-surface font-semibold mb-6">9. Modifications to Service and Terms</h2>
             <p>
               We reserve the right to modify, update, or temporarily discontinue sections of this free Service at any time to accommodate changing cloud API frameworks or operational server constraints. Continued use of the Platform following any modifications constitutes formal acceptance of the updated Terms and Conditions.
             </p>

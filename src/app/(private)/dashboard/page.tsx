@@ -396,13 +396,6 @@ export default function DashboardPage() {
                     </div>
                   </div>
                 </div>
-
-                {/* Waveform Decoration */}
-                <div className="h-24 w-full flex items-center justify-center gap-1 opacity-20 pointer-events-none mt-12">
-                  {Array.from({ length: 60 }).map((_, i) => (
-                    <div key={i} className="w-1 bg-primary-container" style={{ height: `${Math.floor(Math.random() * 80) + 10}%` }}></div>
-                  ))}
-                </div>
               </div>
             ) : isUploading ? (
               <div className="space-y-3 p-8 border border-outline-variant rounded-xl bg-surface-container-lowest">
@@ -432,12 +425,7 @@ export default function DashboardPage() {
             )}
           </section>
 
-          {/* Visualization Decoration */}
-          <div className="h-32 w-full flex items-center justify-center gap-1 opacity-20 pointer-events-none">
-            {Array.from({ length: 40 }).map((_, i) => (
-              <div key={i} className="w-1 bg-primary-container" style={{ height: `${Math.floor(Math.random() * 80) + 10}%` }}></div>
-            ))}
-          </div>
+
         </div>
       </main>
 
