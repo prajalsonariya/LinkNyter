@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession, signIn, signOut } from "next-auth/react";
-import { LayoutGrid, BarChart2, User, Shield, UploadCloud, LogOut, Link as LinkIcon } from "lucide-react";
+import { LayoutGrid, BarChart2, User, Shield, UploadCloud, LogOut, Link as LinkIcon, ListMusic } from "lucide-react";
 import { DashboardProvider, useDashboard } from "@/contexts/DashboardContext";
 
 function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
@@ -80,6 +80,10 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
           <Link href="/analytics" className={`flex items-center gap-3 py-3 px-4 rounded transition-all w-full ${pathname === '/analytics' ? 'text-primary font-bold border-r-2 border-primary bg-surface-container-high active:scale-95 duration-100' : 'text-on-surface-variant font-body-sm hover:bg-surface-container-high'}`}>
             <BarChart2 className="w-5 h-5" />
             <span className="font-label-caps text-label-caps">Analytics</span>
+          </Link>
+          <Link href="/lrc-sync" className={`flex items-center gap-3 py-3 px-4 rounded transition-all w-full ${pathname === '/lrc-sync' ? 'text-primary font-bold border-r-2 border-primary bg-surface-container-high active:scale-95 duration-100' : 'text-on-surface-variant font-body-sm hover:bg-surface-container-high'}`}>
+            <ListMusic className="w-5 h-5" />
+            <span className="font-label-caps text-label-caps">LRC Sync</span>
           </Link>
           <Link href="/profile" className={`flex items-center gap-3 py-3 px-4 rounded transition-all w-full ${pathname === '/profile' ? 'text-primary font-bold border-r-2 border-primary bg-surface-container-high active:scale-95 duration-100' : 'text-on-surface-variant font-body-sm hover:bg-surface-container-high'}`}>
             <User className="w-5 h-5" />

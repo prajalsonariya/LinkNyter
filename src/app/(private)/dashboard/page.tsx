@@ -7,7 +7,7 @@ import { Play, Pause, Search, Bell, Trash2, Upload, Hourglass, Lock, FileUp } fr
 import { toast } from "sonner";
 import { useDashboard } from "@/contexts/DashboardContext";
 import { TrackItem } from "@/components/TrackItem";
-import { LrcSyncStudio } from "@/components/LrcSyncStudio";
+import Link from "next/link";
 
 export default function DashboardPage() {
   const { data: session } = useSession();
@@ -398,14 +398,47 @@ export default function DashboardPage() {
                   </div>
                 </div>
                 
-                <div className="border-t border-outline-variant/10 pt-8 mt-8">
-                  <LrcSyncStudio 
-                    track={selectedTrack} 
-                    onSaveSuccess={(updatedTrack) => {
-                      setSelectedTrack(updatedTrack);
-                      setTracks(prev => prev.map(t => t.id === updatedTrack.id ? updatedTrack : t));
-                    }} 
-                  />
+                <div className="border-t border-outline-variant/10 pt-8 mt-8 flex flex-col items-center">
+                  <h4 className="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest mb-4">Lyrics Synchronization</h4>
+                  <p className="text-body-sm text-on-surface-variant/80 text-center mb-6 max-w-sm">
+                    Enhance your track with timed lyrics. Head over to the LRC Sync Studio to align your lyrics perfectly with the audio.
+                  </p>
+                  <div className="flex items-center gap-4">
+                    <Link 
+                      href={`/lrc-sync?trackId=${selectedTrack.id}`}
+                      className="flex items-center gap-2 px-8 py-3 bg-primary/10 text-primary hover:bg-primary/20 border border-primary/20 rounded-xl font-label-caps text-label-caps transition-all active:scale-95"
+                    >
+                      {selectedTrack.lrc_data ? "Edit Lyrics in Studio" : "Add Lyrics in Studio"}
+                    </Link>
+                    {selectedTrack.lrc_data && (
+                      <button 
+                        onClick={async () => {
+                          if (confirm("Are you sure you want to delete all lyrics for this track?")) {
+                            try {
+                              const res = await fetch(`/api/track/${selectedTrack.id}`, {
+                                method: 'PUT',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ lrc_data: null })
+                              });
+                              if (res.ok) {
+                                setTracks(tracks.map(t => t.id === selectedTrack.id ? { ...t, lrc_data: null } : t));
+                                setSelectedTrack({ ...selectedTrack, lrc_data: null });
+                                toast.success("Lyrics deleted successfully");
+                              } else {
+                                toast.error("Failed to delete lyrics");
+                              }
+                            } catch (e: any) {
+                                toast.error(e.message);
+                            }
+                          }
+                        }}
+                        className="flex items-center gap-2 px-6 py-3 border border-error/30 text-error hover:bg-error/10 rounded-xl font-label-caps text-label-caps transition-all active:scale-95"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                        Delete Lyrics
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
             ) : isUploading ? (

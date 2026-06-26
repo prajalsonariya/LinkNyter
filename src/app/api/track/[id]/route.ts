@@ -37,6 +37,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     if (updates.description !== undefined) updateData.description = updates.description;
     if (updates.allow_downloads !== undefined) updateData.allow_downloads = updates.allow_downloads;
     if (updates.lrc_data !== undefined) updateData.lrc_data = updates.lrc_data;
+    if (updates.lrc_timing !== undefined) updateData.lrc_timing = updates.lrc_timing;
     
     if (updates.cover_url !== undefined && updates.cover_url !== track.cover_url) {
       updateData.cover_url = updates.cover_url;
