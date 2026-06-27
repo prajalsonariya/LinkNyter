@@ -616,6 +616,21 @@ export function LrcSyncStudio({ track, onSaveSuccess }: LrcSyncStudioProps) {
       {/* PHASE 2: Spacebar performance sync */}
       {phase === "sync" && (
         <div className="flex-1 flex flex-col items-center justify-center relative z-10 w-full min-h-[500px]">
+          {/* Back Button */}
+          <button 
+            onClick={() => {
+              if (audioRef.current) {
+                audioRef.current.pause();
+                setIsPlaying(false);
+              }
+              setPhase("paste");
+            }}
+            className="absolute top-12 left-8 md:left-12 px-5 py-2 border border-outline-variant hover:bg-surface-container-high rounded-xl text-[12px] font-bold tracking-widest uppercase transition-colors flex items-center gap-2 z-50 text-on-surface-variant hover:text-on-surface"
+          >
+            <span className="material-symbols-outlined text-[16px]">arrow_back</span>
+            Back
+          </button>
+
           {/* Sync Status Header */}
           <div className="absolute top-12 flex flex-col items-center gap-4">
             <div className="flex items-center gap-3 bg-surface-container-high/50 backdrop-blur-md px-4 py-2 rounded-full border border-outline-variant/30">
