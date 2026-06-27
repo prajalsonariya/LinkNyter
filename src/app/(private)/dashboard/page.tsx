@@ -371,7 +371,7 @@ export default function DashboardPage() {
                     </div>
 
                     <div className="space-y-2">
-                      <h3 className="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest">Artist Name (Optional)</h3>
+                      <h3 className="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest">Artist Name</h3>
                       <input 
                         className="w-full bg-surface-container-lowest border border-outline-variant focus:border-primary rounded-lg px-4 py-4 font-body-lg text-on-surface placeholder:text-outline-variant outline-none transition-all" 
                         type="text" 
