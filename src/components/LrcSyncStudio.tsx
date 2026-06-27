@@ -898,7 +898,7 @@ export function LrcSyncStudio({ track, onSaveSuccess }: LrcSyncStudioProps) {
             </div>
 
             {/* Right Side: The Editor List */}
-            <div className="lg:col-span-8 obsidian-container rounded-2xl overflow-hidden flex flex-col">
+            <div className="lg:col-span-8 obsidian-container rounded-2xl overflow-hidden flex flex-col max-h-[600px] lg:max-h-[calc(100vh-200px)]">
               <div className="grid grid-cols-[60px_100px_1fr_100px] gap-4 p-4 border-b border-outline-variant/10 bg-surface/50 text-[10px] font-bold tracking-widest uppercase text-on-surface-variant">
                 <div className="text-center">Line</div>
                 <div>Time</div>
