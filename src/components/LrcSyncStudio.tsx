@@ -710,12 +710,12 @@ export function LrcSyncStudio({ track, onSaveSuccess }: LrcSyncStudioProps) {
           <div className="absolute bottom-12 w-full max-w-3xl px-8">
             <div className="glass-panel rounded-2xl p-6 shadow-2xl space-y-6 relative">
               {/* Keyboard Interaction Indicator */}
-              <div className="absolute -top-5 left-1/2 -translate-x-1/2">
+              <div className="flex justify-center mb-4">
                 <kbd className="px-6 py-2 bg-[#1a1b1f] border border-outline-variant/30 rounded-xl font-bold text-on-surface-variant text-[14px] shadow-lg tracking-wider">SPACEBAR</kbd>
               </div>
 
               {/* Audio Progress */}
-              <div className="space-y-2 mt-2">
+              <div className="space-y-2">
                 <div className="flex justify-between text-[10px] font-bold tracking-widest text-on-surface-variant uppercase">
                   <span>{currentTimeStr}</span>
                   <span>{durationStr}</span>
