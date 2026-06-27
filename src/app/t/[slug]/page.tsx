@@ -73,10 +73,10 @@ const TwoLineLyrics = ({ lrcData, isPlaying, audioRef, accent, lrcTiming = "600m
 
   return (
     <div 
-      className="relative w-full h-[12rem] md:h-[14rem] overflow-hidden flex flex-col justify-center items-center pointer-events-none select-none"
+      className="relative w-full h-[8rem] md:h-[10rem] overflow-hidden flex flex-col justify-center items-center pointer-events-none select-none"
       style={{ 
-        maskImage: 'linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%)', 
-        WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%)' 
+        maskImage: 'linear-gradient(to bottom, transparent 0%, black 20%, black 80%, transparent 100%)', 
+        WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 20%, black 80%, transparent 100%)' 
       }}
     >
       {parsed.map((line, i) => {
@@ -91,19 +91,19 @@ const TwoLineLyrics = ({ lrcData, isPlaying, audioRef, accent, lrcTiming = "600m
         let scale = 0.75;
         
         if (offset < -1) {
-          translateY = "-5rem";
+          translateY = "-5.5rem";
           opacity = 0;
           scale = 0.7;
         } else if (offset === -1) {
-          translateY = "0.5rem";
+          translateY = "-2.8rem";
           opacity = 0.4;
           scale = 0.75;
         } else if (offset === 0) {
-          translateY = "5.5rem";
+          translateY = "0rem";
           opacity = 1; 
           scale = 1;
         } else if (offset > 0) {
-          translateY = "10.5rem";
+          translateY = "2.8rem";
           opacity = 0;
           scale = 0.8;
         }
@@ -128,9 +128,9 @@ const TwoLineLyrics = ({ lrcData, isPlaying, audioRef, accent, lrcTiming = "600m
         return (
           <div
             key={i}
-            className={`absolute top-0 left-0 w-full text-center transition-all ${durationClass} ease-[cubic-bezier(0.2,0.8,0.2,1)] will-change-transform origin-center`}
+            className={`absolute top-1/2 left-0 w-full text-center transition-all ${durationClass} ease-[cubic-bezier(0.2,0.8,0.2,1)] will-change-transform origin-center`}
             style={{
-              transform: `translateY(${translateY}) scale(${scale})`,
+              transform: `translateY(calc(-50% + ${translateY})) scale(${scale})`,
               opacity: opacity,
               textShadow: isActive ? `0 0 30px rgba(${accent}, 0.8)` : 'none'
             }}
