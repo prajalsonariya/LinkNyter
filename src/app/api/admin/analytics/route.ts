@@ -37,8 +37,14 @@ export async function GET(req: Request) {
       .order('created_at', { ascending: false })
       .limit(5);
 
-    if (usersError || tracksError || sessionsError) {
-      console.error(usersError || tracksError || sessionsError);
+    // 5. Fetch deleted accounts
+    const { data: deletedAccounts, error: deletedAccountsError } = await supabase
+      .from('deleted_accounts')
+      .select('email, deleted_at')
+      .order('deleted_at', { ascending: false });
+
+    if (usersError || tracksError || sessionsError || deletedAccountsError) {
+      console.error(usersError || tracksError || sessionsError || deletedAccountsError);
       return NextResponse.json({ error: 'Database error' }, { status: 500 });
     }
 
@@ -96,6 +102,7 @@ export async function GET(req: Request) {
       topOs,
       topBrowsers,
       recentUsers: recentUsers || [],
+      deletedAccounts: deletedAccounts || [],
     });
   } catch (error: any) {
     console.error('Admin analytics error:', error);

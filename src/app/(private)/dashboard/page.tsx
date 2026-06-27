@@ -276,8 +276,8 @@ export default function DashboardPage() {
 
   return (
     <>
-      <main className="flex-1 ml-64 overflow-y-auto custom-scrollbar relative z-10 mr-80">
-        <header className="sticky top-0 w-full z-40 flex justify-between items-center px-margin-desktop h-20 bg-surface/60 backdrop-blur-xl">
+      <main className="flex-1 overflow-y-auto custom-scrollbar relative z-10 md:ml-64 md:mr-80 pb-32 pt-20 md:pt-0 md:pb-0">
+        <header className="sticky top-0 w-full z-40 hidden md:flex justify-between items-center px-margin-desktop h-20 bg-surface/60 backdrop-blur-xl">
           <h2 className="font-headline-md text-headline-md text-on-surface font-semibold">Artist Dashboard</h2>
           <div className="flex items-center gap-6">
             <div className="relative group">
@@ -298,11 +298,20 @@ export default function DashboardPage() {
           </div>
         </header>
 
-        <div className="p-margin-desktop max-w-4xl mx-auto space-y-12">
+        <div className="p-4 md:p-margin-desktop max-w-4xl mx-auto space-y-8 md:space-y-12">
+          
+          {/* Mobile Welcome Section (Hidden on Desktop, hidden when editing track on mobile) */}
+          {!selectedTrack && (
+            <section className="flex md:hidden flex-col gap-1 mb-4">
+              <span className="text-label-caps font-label-caps text-primary tracking-widest">CREATOR STUDIO</span>
+              <h2 className="font-display-sm text-[28px] font-bold text-on-surface">Upload Your Sound</h2>
+            </section>
+          )}
+
           <section className="space-y-8 animate-fade-in">
             {selectedTrack ? (
               <div className="space-y-12">
-                <div className="flex flex-col md:flex-row gap-12">
+                <div className="flex flex-col md:flex-row gap-8 md:gap-12">
                   {/* Left Column: Cover Art */}
                   <div className="w-full md:w-[320px] shrink-0 space-y-4">
                     <h3 className="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest">Cover Art</h3>
@@ -483,12 +492,54 @@ export default function DashboardPage() {
             )}
           </section>
 
+          {/* Mobile Track List (Hidden on desktop, hidden when a track is selected) */}
+          {!selectedTrack && (
+            <section className="flex md:hidden flex-col gap-4 mt-8">
+              <div className="flex justify-between items-end px-1">
+                <h3 className="font-headline-md text-headline-md text-on-surface">Your Tracks</h3>
+                <span className="text-label-caps font-label-caps text-primary">{tracks.length} Total</span>
+              </div>
+              <div className="flex flex-col gap-3">
+                {tracks.length === 0 ? (
+                  <p className="text-on-surface-variant text-body-sm text-center mt-6 border border-outline-variant/20 rounded-xl p-8 bg-surface-container-low/30">No tracks uploaded yet.</p>
+                ) : (
+                  tracks.map((track) => (
+                    <TrackItem
+                      key={track.id}
+                      track={track}
+                      isSelected={selectedTrack?.id === track.id}
+                      isPlaying={playingTrackId === track.id}
+                      onSelect={() => {
+                        setSelectedTrack(track);
+                        setEditTitle(track.title);
+                        setEditDescription(track.description || "");
+                        setEditCoverUrl(track.cover_url || "");
+                      }}
+                      onTogglePlay={(e) => {
+                        e.stopPropagation();
+                        togglePlay(track.id);
+                      }}
+                      onDelete={(e) => {
+                        e.stopPropagation();
+                        handleDeleteTrack(track.id);
+                      }}
+                      onCopyLink={(e) => {
+                        e.stopPropagation();
+                        copyLink(e, track.slug);
+                      }}
+                      onToggleDownload={toggleDownloads}
+                    />
+                  ))
+                )}
+              </div>
+            </section>
+          )}
 
         </div>
       </main>
 
-      {/* Right Sidebar (Track Management) */}
-      <aside className="fixed right-0 top-0 h-screen w-80 border-l border-outline-variant glass-panel flex flex-col py-margin-desktop px-6 z-40">
+      {/* Right Sidebar (Track Management) - Desktop Only */}
+      <aside className="hidden md:flex fixed right-0 top-0 h-screen w-80 border-l border-outline-variant glass-panel flex-col py-margin-desktop px-6 z-40">
         <div className="mb-8 flex justify-between items-center">
           <h2 className="font-headline-md text-headline-md font-semibold text-on-surface">Your Tracks</h2>
           <span className="text-primary font-label-caps text-label-caps">{tracks.length} Total</span>

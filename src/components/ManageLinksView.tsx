@@ -80,7 +80,7 @@ export function ManageLinksView({ tracks }: { tracks: any[] }) {
   };
 
   return (
-    <section className="p-12 flex flex-col gap-10 max-w-7xl mx-auto w-full relative z-10 h-full overflow-y-auto custom-scrollbar">
+    <section className="p-4 md:p-12 flex flex-col gap-8 md:gap-10 max-w-7xl mx-auto w-full relative z-10 h-full overflow-y-auto custom-scrollbar">
       {/* Header Section */}
       <div className="flex flex-col gap-2">
         <h2 className="font-headline-lg text-headline-lg text-on-surface">Manage Links</h2>
@@ -91,7 +91,7 @@ export function ManageLinksView({ tracks }: { tracks: any[] }) {
         {/* Left Column: Create New Link & Stats */}
         <div className="lg:col-span-4 flex flex-col gap-8">
           {/* Create New Link Panel */}
-          <div className="bg-[#1a1a1d]/70 backdrop-blur-xl border border-[#333338] p-8 rounded-xl flex flex-col gap-6">
+          <div className="bg-[#1a1a1d]/70 backdrop-blur-xl border border-[#333338] p-6 md:p-8 rounded-xl flex flex-col gap-6">
             <div className="flex items-center gap-3">
               <div className="p-1 bg-primary/10 rounded-lg flex items-center justify-center w-[36px] h-[36px]">
                 <img src="/logo.svg" alt="LinkNyter Logo" className="w-7 h-7 object-contain" />
@@ -157,7 +157,7 @@ export function ManageLinksView({ tracks }: { tracks: any[] }) {
 
         {/* Command Center */}
         <div className="lg:col-span-8 flex flex-col gap-6">
-          <div className="bg-[#1a1a1d]/70 backdrop-blur-xl border border-[#333338] rounded-xl overflow-hidden flex flex-col h-[700px]">
+          <div className="bg-[#1a1a1d]/70 backdrop-blur-xl border border-[#333338] rounded-xl overflow-hidden flex flex-col h-auto md:h-[700px]">
             {/* Filter Bar */}
             <div className="p-6 border-b border-outline-variant/10 bg-[#121317]/50">
               <h3 className="font-headline-md text-headline-md text-on-surface">Active Distribution Links</h3>
@@ -182,7 +182,7 @@ export function ManageLinksView({ tracks }: { tracks: any[] }) {
                         <p className="text-sm text-outline truncate">{track?.title || 'Unknown Track'} • Created {new Date(link.created_at).toLocaleDateString()}</p>
                       </div>
                       
-                      <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="flex flex-row md:flex-row items-center gap-2 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity">
                         <button 
                           onClick={() => handleCopy(link)}
                           className="p-2 transition-all flex items-center justify-center rounded-lg hover:bg-surface-variant/50 w-[42px] h-[42px]"

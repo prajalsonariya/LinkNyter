@@ -14,7 +14,9 @@ interface AdminStats {
   deviceTypes: { name: string; count: number }[];
   topOs: { name: string; count: number }[];
   topBrowsers: { name: string; count: number }[];
+  topBrowsers: { name: string; count: number }[];
   recentUsers: { name: string; email: string; created_at: string }[];
+  deletedAccounts: { email: string; deleted_at: string }[];
 }
 
 export default function AdminDashboard() {
@@ -24,6 +26,9 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [revealedEmails, setRevealedEmails] = useState<Set<string>>(new Set());
+  const [isPasswordAuthed, setIsPasswordAuthed] = useState(false);
+  const [passwordInput, setPasswordInput] = useState("");
+  const [showDeletedUsers, setShowDeletedUsers] = useState(false);
 
   useEffect(() => {
     if (status === "loading") return;
@@ -52,7 +57,7 @@ export default function AdminDashboard() {
 
   if (loading) {
     return (
-      <div className="flex-1 flex items-center justify-center p-8">
+      <div className="flex-1 ml-64 flex items-center justify-center p-8">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
       </div>
     );
@@ -60,7 +65,7 @@ export default function AdminDashboard() {
 
   if (error) {
     return (
-      <div className="flex-1 p-8">
+      <div className="flex-1 ml-64 p-8 flex items-center justify-center min-h-screen">
         <div className="bg-error/10 border border-error/20 p-6 rounded-2xl flex items-center gap-4 text-error max-w-2xl">
           <AlertCircle className="w-8 h-8 flex-shrink-0" />
           <div>
@@ -74,7 +79,49 @@ export default function AdminDashboard() {
 
   if (!stats) return null;
 
-
+  if (!isPasswordAuthed) {
+    return (
+      <div className="flex-1 ml-64 flex flex-col items-center justify-center p-8 bg-surface relative h-screen">
+        <div className="fixed top-0 left-1/4 w-[800px] h-[500px] bg-error/5 blur-[120px] rounded-full pointer-events-none -z-10" />
+        <div className="bg-surface-container/50 border border-outline-variant/30 p-8 rounded-3xl max-w-md w-full shadow-2xl backdrop-blur-xl animate-fade-in">
+          <div className="flex items-center gap-3 mb-6 justify-center">
+            <AlertCircle className="w-8 h-8 text-error" />
+            <h2 className="font-display-sm text-2xl font-bold text-on-surface">Admin Access</h2>
+          </div>
+          <p className="text-on-surface-variant text-center mb-8">
+            Please enter the admin password to view analytics.
+          </p>
+          <form 
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (passwordInput === "Prajal is my name2312") {
+                setIsPasswordAuthed(true);
+              } else {
+                toast.error("Incorrect password");
+                setPasswordInput("");
+              }
+            }}
+            className="flex flex-col gap-4"
+          >
+            <input 
+              type="password"
+              value={passwordInput}
+              onChange={(e) => setPasswordInput(e.target.value)}
+              placeholder="Enter password..."
+              className="w-full bg-surface border border-outline-variant rounded-xl px-4 py-3 text-on-surface focus:outline-none focus:border-primary transition-colors text-center"
+              autoFocus
+            />
+            <button 
+              type="submit"
+              className="w-full py-3 bg-primary text-on-primary rounded-xl font-bold uppercase tracking-widest text-[12px] hover:bg-primary/90 transition-all shadow-lg shadow-primary/20"
+            >
+              Verify Identity
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
 
   const calculatePercentage = (count: number, total: number) => {
     if (total === 0) return 0;
@@ -124,7 +171,7 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div className="flex-1 overflow-y-auto bg-surface relative h-screen">
+    <div className="flex-1 ml-64 overflow-y-auto bg-surface relative h-screen">
       {/* Background gradients */}
       <div className="fixed top-0 left-1/4 w-[800px] h-[500px] bg-primary/5 blur-[120px] rounded-full pointer-events-none -z-10" />
       
@@ -380,6 +427,64 @@ export default function AdminDashboard() {
                 </tbody>
               </table>
             </div>
+          </div>
+
+          {/* Deleted Users View */}
+          <div className="bg-surface-container/30 border border-error/20 p-8 rounded-3xl mt-8">
+            <div className="flex items-center justify-between mb-8">
+              <div className="flex items-center gap-3">
+                <AlertCircle className="w-6 h-6 text-error" />
+                <h2 className="font-display-sm text-2xl font-bold text-error flex items-center gap-3">
+                  Deleted Accounts
+                  <span className="text-[14px] font-label-caps tracking-widest bg-error/10 text-error px-3 py-1 rounded-full border border-error/20">
+                    {stats.deletedAccounts?.length || 0} Total
+                  </span>
+                </h2>
+              </div>
+              <button 
+                onClick={() => setShowDeletedUsers(!showDeletedUsers)}
+                className="px-6 py-2 border border-error/30 text-error hover:bg-error/10 rounded-xl font-label-caps text-label-caps transition-colors"
+              >
+                {showDeletedUsers ? "Hide Deleted Users" : "See Deleted Users"}
+              </button>
+            </div>
+            
+            {showDeletedUsers && (
+              <div className="overflow-x-auto animate-fade-in">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="border-b border-error/20">
+                      <th className="pb-4 font-label-caps text-label-caps text-error uppercase tracking-widest">Email</th>
+                      <th className="pb-4 font-label-caps text-label-caps text-error uppercase tracking-widest">Deleted On</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-error/10">
+                    {stats.deletedAccounts?.map((account, i) => (
+                      <tr key={i} className="group hover:bg-error/5 transition-colors">
+                        <td className="py-4 px-2 text-on-surface-variant flex items-center gap-2">
+                          {revealedEmails.has(`del_${account.email}`) ? account.email : maskEmail(account.email)}
+                          <button 
+                            onClick={() => toggleEmail(`del_${account.email}`)} 
+                            className="text-on-surface-variant/50 hover:text-error transition-colors p-1"
+                            title={revealedEmails.has(`del_${account.email}`) ? "Hide Email" : "Reveal Email"}
+                          >
+                            {revealedEmails.has(`del_${account.email}`) ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                          </button>
+                        </td>
+                        <td className="py-4 px-2 text-on-surface-variant">{new Date(account.deleted_at).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}</td>
+                      </tr>
+                    ))}
+                    {(!stats.deletedAccounts || stats.deletedAccounts.length === 0) && (
+                      <tr>
+                        <td colSpan={2} className="py-8 text-center text-on-surface-variant">
+                          No deleted accounts found.
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
 
         </div>

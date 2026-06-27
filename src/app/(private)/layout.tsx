@@ -58,8 +58,8 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
         </div>
       )}
 
-      {/* Left Sidebar */}
-      <aside className="fixed left-0 top-0 h-screen w-64 border-r border-outline-variant bg-surface/80 backdrop-blur-xl flex flex-col py-margin-desktop px-gutter z-50">
+      {/* Left Sidebar (Desktop Only) */}
+      <aside className="hidden md:flex fixed left-0 top-0 h-screen w-64 border-r border-outline-variant bg-surface/80 backdrop-blur-xl flex-col py-margin-desktop px-gutter z-50">
         <div className="mb-10">
           <div className="flex items-center gap-1.5 mb-2">
             <img src="/logo.svg" alt="LinkNyter Logo" className="h-8 md:h-10 w-auto" />
@@ -133,8 +133,56 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
         </div>
       </aside>
 
+      {/* Mobile Top App Bar */}
+      <header className="flex md:hidden fixed top-0 w-full bg-surface/80 backdrop-blur-xl text-primary border-b border-outline-variant/20 justify-between items-center px-4 h-16 z-50">
+        <div className="flex items-center gap-4">
+          {/* <button className="hover:opacity-80 transition-opacity active:scale-95 transition-transform">
+            <Menu className="w-6 h-6" />
+          </button> */}
+          <div className="flex items-center gap-1.5">
+            <img src="/logo.svg" alt="LinkNyter Logo" className="h-6 w-auto" />
+            <h1 className="font-display-lg text-[24px] tracking-tighter text-primary font-bold">LinkNyter</h1>
+          </div>
+        </div>
+        <div className="w-8 h-8 rounded-full border border-primary-container p-0.5 overflow-hidden">
+          <div 
+            className="w-full h-full rounded-full bg-cover bg-center" 
+            style={{ backgroundImage: `url('${session?.user?.image || "/cover-placeholder.jpg"}')` }} 
+          />
+        </div>
+      </header>
+
       {/* Main Content Rendered Here */}
       {children}
+
+      {/* Mobile Bottom Navigation Bar */}
+      <nav className="flex md:hidden fixed bottom-0 left-0 w-full z-50 justify-around items-center px-2 pb-safe h-20 bg-surface-container/90 backdrop-blur-xl border-t border-outline-variant/20 rounded-t-3xl">
+        <Link href="/dashboard" className={`flex flex-col items-center justify-center transition-colors active:scale-90 transition-transform duration-200 ${pathname === '/dashboard' ? 'text-primary' : 'text-on-surface-variant hover:text-primary-fixed-dim'}`}>
+          <LayoutGrid className="w-6 h-6" />
+          <span className="font-label-caps text-[10px] tracking-widest mt-1">Library</span>
+          {pathname === '/dashboard' && <div className="absolute -bottom-1 w-1 h-1 bg-primary rounded-full shadow-[0_0_10px_#8B5CF6]"></div>}
+        </Link>
+        <Link href="/manage-links" className={`flex flex-col items-center justify-center transition-colors active:scale-90 transition-transform duration-200 ${pathname === '/manage-links' ? 'text-primary' : 'text-on-surface-variant hover:text-primary-fixed-dim'}`}>
+          <LinkIcon className="w-6 h-6" />
+          <span className="font-label-caps text-[10px] tracking-widest mt-1">Links</span>
+          {pathname === '/manage-links' && <div className="absolute -bottom-1 w-1 h-1 bg-primary rounded-full shadow-[0_0_10px_#8B5CF6]"></div>}
+        </Link>
+        <Link href="/analytics" className={`flex flex-col items-center justify-center transition-colors active:scale-90 transition-transform duration-200 ${pathname === '/analytics' ? 'text-primary' : 'text-on-surface-variant hover:text-primary-fixed-dim'}`}>
+          <BarChart2 className="w-6 h-6" />
+          <span className="font-label-caps text-[10px] tracking-widest mt-1">Analytics</span>
+          {pathname === '/analytics' && <div className="absolute -bottom-1 w-1 h-1 bg-primary rounded-full shadow-[0_0_10px_#8B5CF6]"></div>}
+        </Link>
+        <Link href="/lrc-sync" className={`flex flex-col items-center justify-center transition-colors active:scale-90 transition-transform duration-200 ${pathname === '/lrc-sync' ? 'text-primary' : 'text-on-surface-variant hover:text-primary-fixed-dim'}`}>
+          <ListMusic className="w-6 h-6" />
+          <span className="font-label-caps text-[10px] tracking-widest mt-1">Studio</span>
+          {pathname === '/lrc-sync' && <div className="absolute -bottom-1 w-1 h-1 bg-primary rounded-full shadow-[0_0_10px_#8B5CF6]"></div>}
+        </Link>
+        <Link href="/profile" className={`flex flex-col items-center justify-center transition-colors active:scale-90 transition-transform duration-200 ${pathname === '/profile' ? 'text-primary' : 'text-on-surface-variant hover:text-primary-fixed-dim'}`}>
+          <User className="w-6 h-6" />
+          <span className="font-label-caps text-[10px] tracking-widest mt-1">Profile</span>
+          {pathname === '/profile' && <div className="absolute -bottom-1 w-1 h-1 bg-primary rounded-full shadow-[0_0_10px_#8B5CF6]"></div>}
+        </Link>
+      </nav>
     </div>
   );
 }

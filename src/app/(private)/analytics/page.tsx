@@ -8,8 +8,8 @@ export default function AnalyticsPage() {
   const { tracks } = useDashboard();
   
   return (
-    <main className="flex-1 ml-64 overflow-y-auto custom-scrollbar relative z-10">
-      <Suspense fallback={<div className="p-12">Loading analytics...</div>}>
+    <main className="flex-1 overflow-y-auto custom-scrollbar relative z-10 md:ml-64 pb-32 pt-20 md:pt-0 md:pb-0">
+      <Suspense fallback={<div className="p-4 md:p-12">Loading analytics...</div>}>
         <AnalyticsView tracks={tracks} />
       </Suspense>
     </main>

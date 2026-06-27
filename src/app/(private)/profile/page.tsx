@@ -2,14 +2,18 @@
 
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { UserCheck, Share2 } from "lucide-react";
+import { UserCheck, Share2, AlertTriangle, AlertCircle, Trash2 } from "lucide-react";
 import { InstagramIcon, TwitterIcon, YouTubeIcon, SpotifyIcon, AppleMusicIcon, GlobeIcon } from "@/components/SocialIcons";
+import { signOut } from "next-auth/react";
 
 export default function ProfilePage() {
   const [artistName, setArtistName] = useState("");
   const [artistBio, setArtistBio] = useState("");
   const [socialLinks, setSocialLinks] = useState({ instagram: "", twitter: "", youtube: "", spotify: "", apple_music: "", website: "" });
   const [isSavingProfile, setIsSavingProfile] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteConfirmationText, setDeleteConfirmationText] = useState("");
+  const [isDeletingAccount, setIsDeletingAccount] = useState(false);
 
   useEffect(() => {
     fetch('/api/profile')
@@ -42,6 +46,29 @@ export default function ProfilePage() {
       toast.error("Error saving profile: " + e.message);
     } finally {
       setIsSavingProfile(false);
+    }
+  };
+
+  const handleAccountDeletion = async () => {
+    if (deleteConfirmationText !== "Delete my LinkNyter account") return;
+    
+    setIsDeletingAccount(true);
+    try {
+      const res = await fetch('/api/profile/delete', {
+        method: 'DELETE'
+      });
+      
+      if (res.ok) {
+        toast.success("Account deleted successfully");
+        signOut({ callbackUrl: '/' });
+      } else {
+        const data = await res.json();
+        toast.error("Failed to delete account: " + data.error);
+        setIsDeletingAccount(false);
+      }
+    } catch (e: any) {
+      toast.error("Error deleting account: " + e.message);
+      setIsDeletingAccount(false);
     }
   };
 
@@ -132,9 +159,89 @@ export default function ProfilePage() {
           </button>
         </div>
 
+        {/* Danger Zone */}
+        <section className="space-y-6 pt-12 border-t border-error/20">
+          <div className="flex items-center gap-3 mb-2">
+            <AlertTriangle className="w-7 h-7 text-error" />
+            <h3 className="font-headline-md text-headline-md font-semibold text-error">Danger Zone</h3>
+          </div>
+          
+          <div className="bg-error/5 border border-error/20 rounded-2xl p-8 space-y-6">
+            <div>
+              <h4 className="font-bold text-on-surface mb-2">Delete Account</h4>
+              <p className="text-body-sm text-on-surface-variant max-w-2xl">
+                Permanently delete your account, including all your tracks, custom links, lyrics, and analytics. This action cannot be undone.
+              </p>
+            </div>
+            
+            <button 
+              onClick={() => {
+                setDeleteConfirmationText("");
+                setShowDeleteModal(true);
+              }}
+              className="px-6 py-2.5 border border-error/50 text-error hover:bg-error hover:text-on-error rounded-xl font-label-caps text-label-caps transition-colors shadow-lg shadow-error/10"
+            >
+              Delete My Account
+            </button>
+          </div>
+        </section>
+
         {/* Spacer */}
         <div className="h-16" />
       </div>
+
+      {/* Account Deletion Modal */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm animate-fade-in">
+          <div className="bg-surface-container-high border border-outline-variant/30 rounded-2xl p-8 max-w-md w-full shadow-2xl animate-slide-up-fade">
+            <h3 className="text-[24px] font-headline-md font-bold text-error mb-4 flex items-center gap-2">
+              <AlertCircle className="w-6 h-6" />
+              Delete Account
+            </h3>
+            
+            <p className="text-[14px] text-on-surface-variant mb-4 leading-relaxed">
+              You are about to <span className="font-bold text-on-surface">permanently delete</span> your account. All your music, custom URLs, syncing data, and analytics will be wiped immediately.
+            </p>
+            
+            <p className="text-[14px] text-on-surface-variant mb-6">
+              To confirm, please type <strong className="text-on-surface select-none">Delete my LinkNyter account</strong> below:
+            </p>
+            
+            <input 
+              type="text" 
+              value={deleteConfirmationText}
+              onChange={(e) => setDeleteConfirmationText(e.target.value)}
+              placeholder="Delete my LinkNyter account"
+              className="w-full bg-surface-container border border-error/50 focus:border-error rounded-lg px-4 py-3 text-on-surface focus:outline-none transition-colors mb-8"
+              autoFocus
+            />
+            
+            <div className="flex justify-end gap-3">
+              <button 
+                onClick={() => setShowDeleteModal(false)}
+                disabled={isDeletingAccount}
+                className="px-5 py-2.5 rounded-xl text-[12px] font-bold uppercase tracking-widest text-on-surface-variant hover:bg-surface-variant/50 transition-colors disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={handleAccountDeletion}
+                disabled={isDeletingAccount || deleteConfirmationText !== "Delete my LinkNyter account"}
+                className="px-5 py-2.5 rounded-xl text-[12px] font-bold uppercase tracking-widest bg-error hover:bg-error/90 text-on-error shadow-lg shadow-error/20 transition-all disabled:opacity-50 flex items-center gap-2"
+              >
+                {isDeletingAccount ? (
+                  "Deleting..."
+                ) : (
+                  <>
+                    <Trash2 className="w-4 h-4" />
+                    Delete Account
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }

@@ -83,7 +83,7 @@ export function AnalyticsView({ tracks }: { tracks: any[] }) {
   const sessions = analyticsData.sessions || [];
 
   return (
-    <div className="relative w-full h-full overflow-y-auto custom-scrollbar p-12 pr-16 z-10">
+    <div className="relative w-full h-full overflow-y-auto custom-scrollbar p-4 pt-6 md:p-12 md:pr-16 z-10">
       {/* Top Glow Decoration */}
       <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/5 blur-[120px] rounded-full -z-10"></div>
       
@@ -159,8 +159,8 @@ export function AnalyticsView({ tracks }: { tracks: any[] }) {
       </div>
 
       {/* Hero Section (Chart) */}
-      <section className="bg-surface-container-low/50 backdrop-blur-xl border border-outline-variant/50 rounded-2xl p-8 mb-6">
-        <div className="flex justify-between items-center mb-8">
+      <section className="bg-surface-container-low/50 backdrop-blur-xl border border-outline-variant/50 rounded-2xl p-4 md:p-8 mb-6">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
           <h3 className="font-headline-md text-on-surface">Streams Over Time</h3>
           <div className="flex bg-surface-container-lowest rounded-lg p-1 border border-outline-variant/50">
             <button 
@@ -233,7 +233,7 @@ export function AnalyticsView({ tracks }: { tracks: any[] }) {
       </section>
 
       {/* Device Breakdown Section in Overview */}
-      <section className="bg-surface-container-low/50 backdrop-blur-xl border border-outline-variant/50 rounded-2xl p-8 flex flex-col items-center max-w-md mx-auto">
+      <section className="bg-surface-container-low/50 backdrop-blur-xl border border-outline-variant/50 rounded-2xl p-4 md:p-8 flex flex-col items-center max-w-md mx-auto mb-6">
         <h3 className="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider w-full text-left mb-6">Device Breakdown</h3>
         {totalDevices === 0 ? (
           <div className="h-[200px] flex items-center justify-center text-on-surface-variant text-sm">No device data</div>
@@ -276,7 +276,7 @@ export function AnalyticsView({ tracks }: { tracks: any[] }) {
       )}
 
       {activeTab === 'content' && (
-        <section className="bg-surface-container-low/50 backdrop-blur-xl border border-outline-variant/50 rounded-2xl p-6">
+        <section className="bg-surface-container-low/50 backdrop-blur-xl border border-outline-variant/50 rounded-2xl p-4 md:p-6 mb-6">
           <div className="flex justify-between items-center mb-6">
             <h3 className="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider">All Tracks</h3>
             <span className="text-xs text-on-surface-variant">{tracks.length} tracks</span>
