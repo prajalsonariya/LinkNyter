@@ -73,10 +73,10 @@ const TwoLineLyrics = ({ lrcData, isPlaying, audioRef, accent, lrcTiming = "600m
 
   return (
     <div 
-      className="relative w-full h-[6rem] md:h-[7rem] overflow-hidden flex flex-col justify-center items-center pointer-events-none select-none"
+      className="relative w-full h-[12rem] md:h-[14rem] overflow-hidden flex flex-col justify-center items-center pointer-events-none select-none"
       style={{ 
-        maskImage: 'linear-gradient(to bottom, transparent 0%, black 25%, black 75%, transparent 100%)', 
-        WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 25%, black 75%, transparent 100%)' 
+        maskImage: 'linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%)', 
+        WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%)' 
       }}
     >
       {parsed.map((line, i) => {
@@ -91,7 +91,7 @@ const TwoLineLyrics = ({ lrcData, isPlaying, audioRef, accent, lrcTiming = "600m
         let scale = 0.75;
         
         if (offset < -1) {
-          translateY = "-2rem";
+          translateY = "-5rem";
           opacity = 0;
           scale = 0.7;
         } else if (offset === -1) {
@@ -99,11 +99,11 @@ const TwoLineLyrics = ({ lrcData, isPlaying, audioRef, accent, lrcTiming = "600m
           opacity = 0.4;
           scale = 0.75;
         } else if (offset === 0) {
-          translateY = "3.2rem";
+          translateY = "5.5rem";
           opacity = 1; 
           scale = 1;
         } else if (offset > 0) {
-          translateY = "6rem";
+          translateY = "10.5rem";
           opacity = 0;
           scale = 0.8;
         }
