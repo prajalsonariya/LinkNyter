@@ -19,6 +19,7 @@ export default function DashboardPage() {
   // Edit Mode States
   const [editTitle, setEditTitle] = useState("");
   const [editDescription, setEditDescription] = useState("");
+  const [editArtist, setEditArtist] = useState("");
   const [editCoverUrl, setEditCoverUrl] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -30,6 +31,7 @@ export default function DashboardPage() {
     if (selectedTrack) {
       setEditTitle(selectedTrack.title);
       setEditDescription(selectedTrack.description || "");
+      setEditArtist(selectedTrack.artist || "");
       setEditCoverUrl(selectedTrack.cover_url || "");
     }
   }, [selectedTrack]);
@@ -174,7 +176,7 @@ export default function DashboardPage() {
       const res = await fetch(`/api/track/${selectedTrack.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title: editTitle, description: editDescription, cover_url: editCoverUrl })
+        body: JSON.stringify({ title: editTitle, description: editDescription, artist: editArtist, cover_url: editCoverUrl })
       });
       const data = await res.json();
       if (res.ok) {
@@ -268,6 +270,7 @@ export default function DashboardPage() {
   const hasChanges = selectedTrack ? (
     editTitle !== selectedTrack.title ||
     editDescription !== (selectedTrack.description || "") ||
+    editArtist !== (selectedTrack.artist || "") ||
     editCoverUrl !== (selectedTrack.cover_url || "")
   ) : false;
 
@@ -364,6 +367,17 @@ export default function DashboardPage() {
                         type="text" 
                         value={editTitle}
                         onChange={(e) => setEditTitle(e.target.value)}
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <h3 className="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest">Artist Name (Optional)</h3>
+                      <input 
+                        className="w-full bg-surface-container-lowest border border-outline-variant focus:border-primary rounded-lg px-4 py-4 font-body-lg text-on-surface placeholder:text-outline-variant outline-none transition-all" 
+                        type="text" 
+                        placeholder="Leave blank to use profile name"
+                        value={editArtist}
+                        onChange={(e) => setEditArtist(e.target.value)}
                       />
                     </div>
                     

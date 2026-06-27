@@ -35,6 +35,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     const updateData: any = {};
     if (updates.title !== undefined) updateData.title = updates.title;
     if (updates.description !== undefined) updateData.description = updates.description;
+    if (updates.artist !== undefined) updateData.artist = updates.artist;
     if (updates.allow_downloads !== undefined) updateData.allow_downloads = updates.allow_downloads;
     if (updates.lrc_data !== undefined) updateData.lrc_data = updates.lrc_data;
     if (updates.lrc_timing !== undefined) updateData.lrc_timing = updates.lrc_timing;

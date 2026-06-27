@@ -208,7 +208,7 @@ export default function PlayerPage({ params }: { params: Promise<{ slug: string 
       if (trackData) {
         const { data: profile } = await supabase
           .from('profiles').select('name, bio, social_links').eq('email', trackData.user_email).single();
-        setTrack({ ...trackData, artist_name: profile?.name, artist_bio: profile?.bio, social_links: profile?.social_links });
+        setTrack({ ...trackData, artist_name: trackData.artist || profile?.name, artist_bio: profile?.bio, social_links: profile?.social_links });
       }
       setLoading(false);
     }
