@@ -616,30 +616,41 @@ export function LrcSyncStudio({ track, onSaveSuccess }: LrcSyncStudioProps) {
       {/* PHASE 2: Spacebar performance sync */}
       {phase === "sync" && (
         <div className="flex-1 flex flex-col relative z-10 w-full min-h-[500px] pt-24 pb-8">
-          {/* Back Button */}
-          <button 
-            onClick={() => {
-              if (audioRef.current) {
-                audioRef.current.pause();
-                setIsPlaying(false);
-              }
-              setPhase("paste");
-            }}
-            className="absolute top-12 left-8 md:left-12 px-5 py-2 border border-outline-variant hover:bg-surface-container-high rounded-xl text-[12px] font-bold tracking-widest uppercase transition-colors flex items-center gap-2 z-50 text-on-surface-variant hover:text-on-surface"
-          >
-            <span className="material-symbols-outlined text-[16px]">arrow_back</span>
-            Back
-          </button>
+          {/* Top Navigation & Status */}
+          <div className="absolute top-8 left-0 right-0 px-4 md:px-8 flex items-start justify-between z-50 w-full">
+            {/* Left: Back Button */}
+            <div className="flex-1 flex justify-start">
+              <button 
+                onClick={() => {
+                  if (audioRef.current) {
+                    audioRef.current.pause();
+                    setIsPlaying(false);
+                  }
+                  setPhase("paste");
+                }}
+                className="px-4 py-2 border border-outline-variant hover:bg-surface-container-high rounded-xl text-[12px] font-bold tracking-widest uppercase transition-colors flex items-center gap-2 text-on-surface-variant hover:text-on-surface bg-background/80 backdrop-blur-md"
+              >
+                <span className="material-symbols-outlined text-[16px]">arrow_back</span>
+                <span className="hidden sm:inline">Back</span>
+              </button>
+            </div>
 
-          {/* Sync Status Header */}
-          <div className="absolute top-12 flex flex-col items-center gap-4">
-            <div className="flex items-center gap-3 bg-surface-container-high/50 backdrop-blur-md px-4 py-2 rounded-full border border-outline-variant/30">
-              <div className="w-2.5 h-2.5 bg-primary rounded-full recording-pulse shadow-[0_0_8px_#d0bcff]"></div>
-              <span className="text-[12px] font-bold tracking-[0.2em] text-on-surface-variant uppercase">Recording Sync Performance</span>
+            {/* Center: Sync Status Header */}
+            <div className="shrink-0 flex flex-col items-center gap-3">
+              <div className="flex items-center gap-3 bg-surface-container-high/80 backdrop-blur-md px-4 py-2 rounded-full border border-outline-variant/30">
+                <div className="w-2.5 h-2.5 bg-primary rounded-full recording-pulse shadow-[0_0_8px_#d0bcff]"></div>
+                <span className="text-[10px] md:text-[12px] font-bold tracking-[0.2em] text-on-surface-variant uppercase hidden sm:block">Recording Sync Performance</span>
+                <span className="text-[10px] md:text-[12px] font-bold tracking-[0.2em] text-on-surface-variant uppercase sm:hidden">Recording</span>
+              </div>
+              <div className="text-center hidden sm:block">
+                <p className="text-on-surface-variant text-[12px] md:text-[14px] font-medium bg-background/50 backdrop-blur-md px-3 py-1 rounded-full">
+                  Synchronizing: <span className="text-on-surface font-bold">{track.title || "Unknown Track"}</span>
+                </p>
+              </div>
             </div>
-            <div className="text-center">
-              <p className="text-on-surface-variant text-[14px] font-medium">Synchronizing: <span className="text-on-surface font-bold">{track.title || "Unknown Track"}</span></p>
-            </div>
+
+            {/* Right: Empty space to balance flex centering */}
+            <div className="flex-1"></div>
           </div>
           
           <audio
