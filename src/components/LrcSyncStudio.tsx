@@ -615,7 +615,7 @@ export function LrcSyncStudio({ track, onSaveSuccess }: LrcSyncStudioProps) {
 
       {/* PHASE 2: Spacebar performance sync */}
       {phase === "sync" && (
-        <div className="flex-1 flex flex-col items-center justify-center relative z-10 w-full min-h-[500px]">
+        <div className="flex-1 flex flex-col relative z-10 w-full min-h-[500px] pt-24 pb-8">
           {/* Back Button */}
           <button 
             onClick={() => {
@@ -654,7 +654,7 @@ export function LrcSyncStudio({ track, onSaveSuccess }: LrcSyncStudioProps) {
           />
 
           {/* Lyrics Display - Focused Centerpiece */}
-          <div className="w-full max-w-4xl text-center space-y-12">
+          <div className="flex-1 w-full max-w-4xl mx-auto flex flex-col justify-center text-center space-y-12 mb-8 mt-12">
             {/* Previous Line (Ghosted) */}
             <div className="opacity-20 relative flex justify-center min-h-[40px] items-center">
               {(() => {
@@ -707,8 +707,8 @@ export function LrcSyncStudio({ track, onSaveSuccess }: LrcSyncStudioProps) {
           </div>
 
           {/* Controls & Progress Dock */}
-          <div className="absolute bottom-12 w-full max-w-3xl px-8">
-            <div className="glass-panel rounded-2xl p-6 shadow-2xl space-y-6 relative">
+          <div className="w-full max-w-3xl mx-auto px-4 sm:px-8 shrink-0">
+            <div className="glass-panel rounded-2xl p-6 shadow-2xl space-y-4 relative">
               {/* Keyboard Interaction Indicator */}
               <div className="flex justify-center mb-4">
                 <kbd className="px-6 py-2 bg-[#1a1b1f] border border-outline-variant/30 rounded-xl font-bold text-on-surface-variant text-[14px] shadow-lg tracking-wider">SPACEBAR</kbd>
