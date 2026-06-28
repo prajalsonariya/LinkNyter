@@ -1,7 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { AreaChart, Area, XAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { useMemo, useState, useEffect } from "react";
+import { AreaChart, Area, XAxis, Tooltip, ResponsiveContainer, YAxis } from 'recharts';
 import { 
   ArrowLeft, Share2, MoreVertical, TrendingUp, Play, Pause, 
   FastForward, Download, Heart, RotateCcw, LogOut, Activity, LayoutDashboard,
@@ -16,6 +16,11 @@ export function TrackAnalyticsClient({ track, sessions: initialSessions }: { tra
 
   const [selectedLinkFilter, setSelectedLinkFilter] = useState<string>('all');
   const [isCopied, setIsCopied] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
   
   // Extract all unique tracking links from sessions
   const availableLinks = useMemo(() => {
@@ -199,7 +204,7 @@ export function TrackAnalyticsClient({ track, sessions: initialSessions }: { tra
   const activeGlowClass = "shadow-[0_0_30px_0_rgba(139,92,246,0.15)]";
 
   return (
-    <div className="relative w-full h-full overflow-y-auto custom-scrollbar p-12 z-10">
+    <div className="relative w-full h-full overflow-y-auto custom-scrollbar p-4 md:p-12 pt-6 md:pt-12 z-10">
       
       {/* Header / Breadcrumb */}
       <div className="flex items-center justify-between mb-8">
@@ -244,7 +249,7 @@ export function TrackAnalyticsClient({ track, sessions: initialSessions }: { tra
       )}
 
       {/* Hero Section */}
-      <section className="flex flex-col md:flex-row items-end gap-8 mb-16">
+      <section className="flex flex-col md:flex-row items-center md:items-end text-center md:text-left gap-8 mb-12 md:mb-16">
         <div className="relative group">
           <div className="absolute -inset-1 bg-primary/20 blur-xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
           <img 
@@ -253,8 +258,8 @@ export function TrackAnalyticsClient({ track, sessions: initialSessions }: { tra
             alt={track.title} 
           />
         </div>
-        <div className="flex-1 pb-4">
-          <div className="mb-6">
+        <div className="flex-1 pb-4 flex flex-col items-center md:items-start">
+          <div className="mb-6 flex justify-center md:justify-start">
             <button 
               onClick={handleCopy}
               className={`transition-all hover:scale-105 active:scale-95 flex items-center justify-center min-w-[32px] h-[32px] ${isCopied ? '' : 'opacity-80 hover:opacity-100 drop-shadow-[0_0_15px_rgba(139,92,246,0.15)]'}`}
@@ -269,18 +274,13 @@ export function TrackAnalyticsClient({ track, sessions: initialSessions }: { tra
           </div>
           <span className="font-label-caps text-primary tracking-[0.2em] mb-4 block uppercase">Deep Dive Analytics</span>
           <h2 className="font-display-lg text-display-lg text-on-surface leading-tight mb-2">{track.title}</h2>
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-secondary-container overflow-hidden">
-              {session?.user?.image && <img src={session.user.image} className="w-full h-full" />}
-            </div>
-            <p className="font-headline-md text-headline-md text-outline">{session?.user?.name || 'Creator'}</p>
-          </div>
+          <p className="font-headline-md text-headline-md text-outline">{track.artist || session?.user?.name || 'Creator'}</p>
         </div>
       </section>
 
       {/* Key Metrics Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
-        <div className={`${glassCardClass} p-6 rounded-xl flex flex-col justify-between h-40`}>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-12">
+        <div className={`${glassCardClass} p-4 md:p-6 rounded-xl flex flex-col justify-between h-36 md:h-40`}>
           <div>
             <span className="font-label-caps text-outline tracking-wider text-[10px]">TOTAL STREAMS</span>
             <h3 className="font-headline-lg text-headline-lg mt-1">{totalOpens}</h3>
@@ -292,7 +292,7 @@ export function TrackAnalyticsClient({ track, sessions: initialSessions }: { tra
           </div>
         </div>
 
-        <div className={`${glassCardClass} p-6 rounded-xl flex flex-col justify-between h-40`}>
+        <div className={`${glassCardClass} p-4 md:p-6 rounded-xl flex flex-col justify-between h-36 md:h-40`}>
           <div>
             <span className="font-label-caps text-outline tracking-wider text-[10px]">AVG. LISTEN TIME</span>
             <h3 className="font-headline-lg text-headline-lg mt-1">{formatTime(avgListenTime)}</h3>
@@ -303,7 +303,7 @@ export function TrackAnalyticsClient({ track, sessions: initialSessions }: { tra
           </div>
         </div>
 
-        <div className={`${glassCardClass} p-6 rounded-xl flex flex-col justify-between h-40`}>
+        <div className={`${glassCardClass} p-4 md:p-6 rounded-xl flex flex-col justify-between h-36 md:h-40`}>
           <div>
             <span className="font-label-caps text-outline tracking-wider text-[10px]">DOWNLOAD RATE</span>
             <h3 className="font-headline-lg text-headline-lg mt-1">{downloadRate}%</h3>
@@ -313,8 +313,8 @@ export function TrackAnalyticsClient({ track, sessions: initialSessions }: { tra
           </div>
         </div>
 
-        <div className={`${glassCardClass} p-6 rounded-xl flex items-center justify-between h-40 relative group cursor-pointer overflow-hidden`}>
-          <div className="flex flex-col justify-between h-full relative z-10 transition-transform duration-300 group-hover:-translate-x-2">
+        <div className={`${glassCardClass} p-4 md:p-6 rounded-xl flex items-center justify-between h-36 md:h-40 relative group cursor-pointer overflow-hidden`}>
+          <div className="flex flex-col justify-between h-full relative z-10 transition-transform duration-300 -translate-x-2 md:translate-x-0 md:group-hover:-translate-x-2">
             <div>
               <span className="font-label-caps text-outline tracking-wider text-[10px]">SOCIAL SHARES</span>
               <h3 className="font-headline-lg text-headline-lg mt-1">{socialClicks}</h3>
@@ -345,9 +345,9 @@ export function TrackAnalyticsClient({ track, sessions: initialSessions }: { tra
             </div>
           </div>
           
-          {/* Animated inside content on hover taking up the right side */}
+          {/* Animated inside content on hover taking up the right side (always visible on mobile) */}
           {sharedPlatformCounts.length > 0 && (
-            <div className="flex-1 max-w-[55%] h-full flex flex-col justify-center gap-2 opacity-0 translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 relative z-10 pl-4 border-l border-white/5">
+            <div className="flex-1 max-w-[55%] h-full flex flex-col justify-center gap-1 md:gap-2 opacity-100 translate-x-0 md:opacity-0 md:translate-x-4 md:group-hover:opacity-100 md:group-hover:translate-x-0 transition-all duration-300 relative z-10 pl-2 md:pl-4 border-l border-white/5">
               <div className="font-label-caps text-[9px] text-outline tracking-wider uppercase mb-0.5">Click Breakdown</div>
               {sharedPlatformCounts.slice(0, 3).map(([action, count]) => (
                   <div key={action} className="flex items-center justify-between gap-2 text-xs">
@@ -364,8 +364,8 @@ export function TrackAnalyticsClient({ track, sessions: initialSessions }: { tra
             </div>
           )}
           
-          {/* Subtle gradient background on hover to frame the inner breakdown */}
-          <div className="absolute inset-y-0 right-0 w-2/3 bg-gradient-to-l from-[#1e1f23]/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-0"></div>
+          {/* Subtle gradient background on hover to frame the inner breakdown (always visible on mobile) */}
+          <div className="absolute inset-y-0 right-0 w-2/3 bg-gradient-to-l from-[#1e1f23]/80 to-transparent opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-0"></div>
         </div>
       </div>
 
@@ -383,9 +383,10 @@ export function TrackAnalyticsClient({ track, sessions: initialSessions }: { tra
             </div>
           </div>
           
-          <div className="flex-1 w-full relative h-[300px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={timelineData} margin={{ top: 10, right: 0, left: 0, bottom: 0 }}>
+          <div className="flex-1 w-full relative h-[300px] mt-4">
+            {isMounted ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={timelineData} margin={{ top: 10, right: 0, left: 0, bottom: 0 }}>
                 <defs>
                   <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="0%" stopColor="#8B5CF6" stopOpacity={0.3} />
@@ -406,6 +407,7 @@ export function TrackAnalyticsClient({ track, sessions: initialSessions }: { tra
                   tick={{ fill: '#958ea0', fontSize: 10, fontFamily: 'Geist' }}
                   dy={10}
                 />
+                <YAxis hide domain={[0, 'dataMax + 10']} />
                 <Tooltip content={<CustomTooltip />} />
                 <Area 
                   type="monotone" 
@@ -418,6 +420,7 @@ export function TrackAnalyticsClient({ track, sessions: initialSessions }: { tra
                 />
               </AreaChart>
             </ResponsiveContainer>
+            ) : null}
           </div>
         </div>
 

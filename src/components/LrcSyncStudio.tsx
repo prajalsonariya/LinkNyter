@@ -446,7 +446,7 @@ export function LrcSyncStudio({ track, onSaveSuccess }: LrcSyncStudioProps) {
   };
 
   return (
-    <div className="flex-1 p-8 max-w-[1280px] mx-auto w-full flex flex-col relative z-10">
+    <div className="flex-1 p-4 md:p-8 pt-6 md:pt-8 w-full flex flex-col relative z-10">
       
       {/* Confirmation Modal */}
       {confirmDialog.isOpen && (
@@ -484,7 +484,7 @@ export function LrcSyncStudio({ track, onSaveSuccess }: LrcSyncStudioProps) {
 
       {/* PHASE 1: Paste lyrics */}
       {phase === "paste" && (
-        <div className="flex-1 max-w-container-max mx-auto w-full flex flex-col p-margin-desktop z-10">
+        <div className="flex-1 max-w-container-max mx-auto w-full flex flex-col z-10">
           
           <div className="mb-6">
             <button onClick={() => router.push('/lrc-sync')} className="flex items-center gap-2 text-on-surface-variant hover:text-on-surface transition-colors">
@@ -502,8 +502,8 @@ export function LrcSyncStudio({ track, onSaveSuccess }: LrcSyncStudioProps) {
             <p className="text-on-surface-variant font-body-lg text-[16px] opacity-80">Paste your track lyrics below. Ensure each sentence is on a new line for precise synchronization.</p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-gutter flex-1 min-h-0">
-            <div className="lg:col-span-8 flex flex-col">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-gutter flex-1 lg:min-h-0 mb-8 lg:mb-0">
+            <div className="lg:col-span-8 flex flex-col min-h-[50vh] lg:min-h-0">
               <div className="obsidian-container rounded-xl flex-1 flex flex-col overflow-hidden relative transition-shadow duration-500 shadow-[0_0_60px_15px_rgba(139,92,246,0.25)]">
                 <div className="flex items-center justify-between px-6 py-4 border-b border-outline-variant/10 bg-surface/30">
                   <span className="font-label-caps text-[12px] font-bold text-on-surface-variant uppercase flex items-center gap-2">
@@ -516,7 +516,7 @@ export function LrcSyncStudio({ track, onSaveSuccess }: LrcSyncStudioProps) {
                       className="p-2 rounded-lg text-on-surface-variant hover:bg-surface-variant/50 hover:text-error transition-colors"
                       title="Clear notepad"
                     >
-                      <RotateCcw className="w-4 h-4" />
+                      <Trash2 className="w-4 h-4" />
                     </button>
                     <button 
                       onClick={saveRawLyrics}
@@ -558,25 +558,51 @@ export function LrcSyncStudio({ track, onSaveSuccess }: LrcSyncStudioProps) {
             </div>
 
             <div className="lg:col-span-4 flex flex-col gap-6 relative z-10">
-              <div className="glass-panel rounded-xl p-6">
-                <h3 className="font-headline-md text-[20px] font-bold text-on-surface mb-4 flex items-center gap-2">
-                  <span className="material-symbols-outlined text-primary">auto_awesome</span>
-                  Pro Tips
-                </h3>
-                <ul className="space-y-4 text-on-surface-variant text-[14px] leading-relaxed">
-                  <li className="flex gap-3">
-                    <span className="text-primary">•</span>
-                    <span>Use square brackets for section labels like <code className="text-primary bg-primary/5 px-1 rounded">[Chorus]</code>. These are ignored in timing but help navigation.</span>
-                  </li>
-                  <li className="flex gap-3">
-                    <span className="text-primary">•</span>
-                    <span>Keep lines short. Long sentences might be cut off on smaller mobile player screens.</span>
-                  </li>
-                  <li className="flex gap-3">
-                    <span className="text-primary">•</span>
-                    <span>Syncing works by tapping the spacebar. Ready your rhythm before the next step.</span>
-                  </li>
-                </ul>
+              <div className="glass-panel rounded-xl p-4 md:p-6">
+                {/* Mobile Accordion */}
+                <details className="group md:hidden">
+                  <summary className="font-headline-md text-[18px] font-bold text-on-surface flex items-center gap-2 cursor-pointer list-none">
+                    <span className="material-symbols-outlined text-primary">auto_awesome</span>
+                    Pro Tips
+                    <span className="material-symbols-outlined ml-auto transition-transform group-open:rotate-180">expand_more</span>
+                  </summary>
+                  <ul className="space-y-4 text-on-surface-variant text-[14px] leading-relaxed mt-4">
+                    <li className="flex gap-3">
+                      <span className="text-primary">•</span>
+                      <span>Use square brackets for section labels like <code className="text-primary bg-primary/5 px-1 rounded">[Chorus]</code>. These are ignored in timing but help navigation.</span>
+                    </li>
+                    <li className="flex gap-3">
+                      <span className="text-primary">•</span>
+                      <span>Keep lines short. Long sentences might be cut off on smaller mobile player screens.</span>
+                    </li>
+                    <li className="flex gap-3">
+                      <span className="text-primary">•</span>
+                      <span>Syncing works by tapping the spacebar. Ready your rhythm before the next step.</span>
+                    </li>
+                  </ul>
+                </details>
+
+                {/* Desktop Fixed View */}
+                <div className="hidden md:block">
+                  <h3 className="font-headline-md text-[20px] font-bold text-on-surface mb-4 flex items-center gap-2">
+                    <span className="material-symbols-outlined text-primary">auto_awesome</span>
+                    Pro Tips
+                  </h3>
+                  <ul className="space-y-4 text-on-surface-variant text-[14px] leading-relaxed">
+                    <li className="flex gap-3">
+                      <span className="text-primary">•</span>
+                      <span>Use square brackets for section labels like <code className="text-primary bg-primary/5 px-1 rounded">[Chorus]</code>. These are ignored in timing but help navigation.</span>
+                    </li>
+                    <li className="flex gap-3">
+                      <span className="text-primary">•</span>
+                      <span>Keep lines short. Long sentences might be cut off on smaller mobile player screens.</span>
+                    </li>
+                    <li className="flex gap-3">
+                      <span className="text-primary">•</span>
+                      <span>Syncing works by tapping the spacebar. Ready your rhythm before the next step.</span>
+                    </li>
+                  </ul>
+                </div>
               </div>
 
               <div className="obsidian-container rounded-xl p-6 mt-auto">
@@ -615,9 +641,9 @@ export function LrcSyncStudio({ track, onSaveSuccess }: LrcSyncStudioProps) {
 
       {/* PHASE 2: Spacebar performance sync */}
       {phase === "sync" && (
-        <div className="flex-1 flex flex-col relative z-10 w-full min-h-[500px] pt-24 pb-8">
+        <div className="flex-1 flex flex-col relative z-10 w-full min-h-[500px] pt-12 md:pt-24 pb-8">
           {/* Top Navigation & Status */}
-          <div className="absolute top-8 left-0 right-0 px-4 md:px-8 flex items-start justify-between z-50 w-full">
+          <div className="absolute top-0 md:top-8 left-0 right-0 px-4 md:px-8 flex items-start justify-between z-50 w-full">
             {/* Left: Back Button */}
             <div className="flex-1 flex justify-start">
               <button 
@@ -665,7 +691,7 @@ export function LrcSyncStudio({ track, onSaveSuccess }: LrcSyncStudioProps) {
           />
 
           {/* Lyrics Display - Focused Centerpiece */}
-          <div className="flex-1 w-full max-w-4xl mx-auto flex flex-col justify-center text-center space-y-12 mb-8 mt-12">
+          <div className="flex-1 w-full max-w-4xl mx-auto flex flex-col justify-center text-center space-y-8 md:space-y-12 pb-[240px] md:pb-0 px-4">
             {/* Previous Line (Ghosted) */}
             <div className="opacity-20 relative flex justify-center min-h-[40px] items-center">
               {(() => {
@@ -718,10 +744,10 @@ export function LrcSyncStudio({ track, onSaveSuccess }: LrcSyncStudioProps) {
           </div>
 
           {/* Controls & Progress Dock */}
-          <div className="w-full max-w-3xl mx-auto px-4 sm:px-8 shrink-0">
-            <div className="glass-panel rounded-2xl p-6 shadow-2xl space-y-4 relative">
+          <div className="fixed md:static bottom-0 left-0 right-0 z-40 md:z-auto bg-surface/90 md:bg-transparent backdrop-blur-2xl md:backdrop-blur-none border-t border-outline-variant/30 md:border-none w-full md:max-w-3xl mx-auto px-4 md:px-8 pt-4 md:pt-0 pb-28 md:pb-0 shrink-0">
+            <div className="md:glass-panel md:rounded-2xl md:p-6 md:shadow-2xl space-y-3 md:space-y-4 relative">
               {/* Keyboard Interaction Indicator */}
-              <div className="flex justify-center mb-4">
+              <div className="hidden md:flex justify-center mb-4">
                 <kbd className="px-6 py-2 bg-[#1a1b1f] border border-outline-variant/30 rounded-xl font-bold text-on-surface-variant text-[14px] shadow-lg tracking-wider">SPACEBAR</kbd>
               </div>
 
@@ -738,42 +764,56 @@ export function LrcSyncStudio({ track, onSaveSuccess }: LrcSyncStudioProps) {
               </div>
 
               {/* Action Buttons */}
-              <div className="flex items-center justify-between mt-6">
-                {/* Left Side */}
-                <div className="flex-1 flex justify-start items-center">
+              <div className="flex flex-row items-stretch justify-between mt-4 gap-2 relative z-30">
+                {/* Left Side (Reset) */}
+                <div className="flex-1 md:flex-none flex justify-start items-stretch">
                   <button 
                     onClick={resetSync}
-                    className="group flex items-center gap-2 px-5 py-2.5 rounded-xl border border-outline-variant/30 text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/50 transition-all"
+                    className="w-full md:w-auto group flex items-center justify-center gap-2 px-3 md:px-5 py-2.5 rounded-lg md:rounded-xl border border-outline-variant/30 text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/50 transition-all active:scale-95"
                   >
-                    <span className="material-symbols-outlined text-[20px] group-hover:rotate-180 transition-transform duration-500">restart_alt</span>
-                    <span className="text-[14px] font-bold">Reset Sync</span>
+                    <span className="material-symbols-outlined text-[16px] md:text-[20px] group-hover:rotate-180 transition-transform duration-500">history</span>
+                    <span className="text-[10px] md:text-[14px] font-bold">Reset</span>
                   </button>
                 </div>
 
-                {/* Center Side */}
-                <div className="flex flex-col shrink-0 justify-center items-center gap-3 px-4">
-                  <div className="flex flex-col items-center">
+                {/* Center Side (Play/Pause) */}
+                <div className="flex flex-col shrink-0 justify-center items-center gap-2 md:gap-3 px-1 md:px-4">
+                  <div className="hidden md:flex flex-col items-center">
                     <span className="text-[10px] text-on-surface-variant uppercase tracking-tighter">Current Step</span>
                     <span className="text-[14px] font-bold text-primary whitespace-nowrap">Line {activeIndex < lines.length ? activeIndex : lines.length} / {lines.length}</span>
                   </div>
                   <button 
                     onClick={togglePlay}
-                    className="w-16 h-16 flex items-center justify-center rounded-full bg-primary text-on-primary hover:scale-105 active:scale-95 transition-all shadow-[0_0_15px_rgba(208,188,255,0.6)]"
+                    className="w-12 md:w-16 h-full min-h-[36px] md:min-h-[64px] flex items-center justify-center rounded-lg md:rounded-full bg-primary text-on-primary hover:scale-105 active:scale-95 transition-all shadow-[0_0_15px_rgba(208,188,255,0.6)]"
                   >
-                    {isPlaying ? <Pause className="w-8 h-8 fill-current" /> : <Play className="w-8 h-8 fill-current pl-1" />}
+                    {isPlaying ? <Pause className="w-5 h-5 md:w-8 md:h-8 fill-current" /> : <Play className="w-5 h-5 md:w-8 md:h-8 fill-current pl-0.5 md:pl-1" />}
                   </button>
                 </div>
 
-                {/* Right Side */}
-                <div className="flex-1 flex justify-end items-center">
+                {/* Right Side (Finish) */}
+                <div className="flex-[1.2] md:flex-none flex justify-end items-stretch">
                   <button 
                     onClick={() => setPhase("edit")}
-                    className="flex items-center gap-2 px-6 py-3 rounded-xl bg-primary text-on-primary font-bold shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all whitespace-nowrap"
+                    className="w-full md:w-auto flex items-center justify-center gap-1 md:gap-2 px-3 md:px-6 py-2.5 rounded-lg md:rounded-xl bg-primary-container md:bg-primary text-on-primary-container md:text-on-primary font-bold shadow-lg shadow-primary/20 md:hover:scale-[1.02] active:scale-[0.98] transition-all whitespace-nowrap"
                   >
-                    <span className="material-symbols-outlined">check_circle</span>
-                    <span>Finish Performance</span>
+                    <span className="material-symbols-outlined text-[16px] md:text-[18px]">check_circle</span>
+                    <span className="text-[10px] md:text-[14px]">Finish</span>
                   </button>
                 </div>
+              </div>
+
+              {/* Mobile Sync Button */}
+              <div className="md:hidden mt-3 pt-3 border-t border-outline-variant/10">
+                <button 
+                  onClick={() => {
+                    if (!isPlaying) togglePlay();
+                    else recordTimestamp();
+                  }}
+                  className="w-full py-2.5 rounded-lg bg-primary/20 border border-primary text-primary font-bold active:bg-primary active:text-on-primary transition-colors text-[12px] tracking-widest uppercase flex justify-center items-center gap-2"
+                >
+                  <span className="material-symbols-outlined text-[18px]">touch_app</span>
+                  Tap To Sync
+                </button>
               </div>
 
             </div>
@@ -783,17 +823,23 @@ export function LrcSyncStudio({ track, onSaveSuccess }: LrcSyncStudioProps) {
 
       {/* PHASE 3: Micro-Editor */}
       {phase === "edit" && (
-        <div className="flex-1 flex flex-col p-8 max-w-[1400px] mx-auto w-full">
+        <div className="flex-1 flex flex-col p-4 md:p-8 pb-48 md:pb-8 max-w-[1400px] mx-auto w-full">
+          <div className="mb-4 md:mb-6">
+            <button onClick={() => router.push('/lrc-sync')} className="flex items-center gap-2 text-on-surface-variant hover:text-on-surface transition-colors">
+              <span className="material-symbols-outlined text-[20px]">arrow_back</span>
+              <span className="font-body-lg text-[14px] md:text-[16px] font-medium">Back to Track Selection</span>
+            </button>
+          </div>
           {/* Header */}
-          <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center justify-between mb-4 md:mb-8">
             <div>
               <div className="flex items-center gap-4 mb-2">
                 <span className="px-3 py-1 bg-primary/20 text-primary rounded-full text-[12px] font-semibold tracking-widest uppercase">Step 3</span>
               </div>
-              <h2 className="text-[32px] font-bold text-on-surface">Fine-Tuning & Export</h2>
-              <p className="text-on-surface-variant text-[16px] opacity-80 mt-1">Perfect your timing. Adjust timestamps directly or use the quick actions.</p>
+              <h2 className="text-[24px] md:text-[32px] font-bold text-on-surface">Fine-Tuning & Export</h2>
+              <p className="text-on-surface-variant text-[14px] md:text-[16px] opacity-80 mt-1">Perfect your timing. Adjust timestamps directly or use the quick actions.</p>
             </div>
-            <div className="flex items-center gap-4">
+            <div className="hidden md:flex items-center gap-4">
               <button 
                 onClick={() => {
                   requestConfirm(
@@ -866,32 +912,26 @@ export function LrcSyncStudio({ track, onSaveSuccess }: LrcSyncStudioProps) {
                 </a>
               </div>
 
-              <div className="obsidian-container rounded-2xl p-6 flex flex-col">
-                <div className="flex items-center justify-between mb-4">
-                  <span className="text-[12px] font-bold tracking-widest uppercase text-on-surface-variant">Animation Speed</span>
-                  <span className="text-[12px] text-primary">{timing === "400ms" ? "Fast" : timing === "1000ms" ? "Relaxed" : "Default"}</span>
-                </div>
-                <div className="space-y-3">
+              <div className="mb-4 md:mb-0">
+                <label className="font-label-caps text-[12px] text-on-surface-variant mb-3 block tracking-widest uppercase">Animation Speed</label>
+                <div className="bg-surface-container-high rounded-full p-1 flex items-center">
                   <button 
-                    onClick={() => handleSetTiming("400ms")}
-                    className={`w-full py-3 rounded-xl text-[14px] font-medium transition-colors text-left px-4 flex justify-between items-center ${timing === "400ms" ? "bg-surface-container-high hover:bg-outline-variant/20 border border-primary/30 text-on-surface" : "bg-surface hover:bg-surface-container-high text-on-surface-variant border border-transparent"}`}
+                    onClick={() => handleSetTiming("1000ms")}
+                    className={`flex-1 py-2 text-center rounded-full font-label-caps text-[12px] transition-all tracking-widest uppercase ${timing === "1000ms" ? "bg-primary text-on-primary shadow-[0_0_15px_rgba(139,92,246,0.3)]" : "text-on-surface-variant hover:text-on-surface"}`}
                   >
-                    <span>Fast</span>
-                    {timing === "400ms" && <Check className="w-4 h-4 text-primary" />}
+                    Relaxed
                   </button>
                   <button 
                     onClick={() => handleSetTiming("600ms")}
-                    className={`w-full py-3 rounded-xl text-[14px] font-medium transition-colors text-left px-4 flex justify-between items-center ${timing === "600ms" ? "bg-surface-container-high hover:bg-outline-variant/20 border border-primary/30 text-on-surface" : "bg-surface hover:bg-surface-container-high text-on-surface-variant border border-transparent"}`}
+                    className={`flex-1 py-2 text-center rounded-full font-label-caps text-[12px] transition-all tracking-widest uppercase ${timing === "600ms" ? "bg-primary text-on-primary shadow-[0_0_15px_rgba(139,92,246,0.3)]" : "text-on-surface-variant hover:text-on-surface"}`}
                   >
-                    <span>Default</span>
-                    {timing === "600ms" && <Check className="w-4 h-4 text-primary" />}
+                    Default
                   </button>
                   <button 
-                    onClick={() => handleSetTiming("1000ms")}
-                    className={`w-full py-3 rounded-xl text-[14px] font-medium transition-colors text-left px-4 flex justify-between items-center ${timing === "1000ms" ? "bg-surface-container-high hover:bg-outline-variant/20 border border-primary/30 text-on-surface" : "bg-surface hover:bg-surface-container-high text-on-surface-variant border border-transparent"}`}
+                    onClick={() => handleSetTiming("400ms")}
+                    className={`flex-1 py-2 text-center rounded-full font-label-caps text-[12px] transition-all tracking-widest uppercase ${timing === "400ms" ? "bg-primary text-on-primary shadow-[0_0_15px_rgba(139,92,246,0.3)]" : "text-on-surface-variant hover:text-on-surface"}`}
                   >
-                    <span>Relaxed</span>
-                    {timing === "1000ms" && <Check className="w-4 h-4 text-primary" />}
+                    Fast
                   </button>
                 </div>
               </div>
@@ -899,19 +939,25 @@ export function LrcSyncStudio({ track, onSaveSuccess }: LrcSyncStudioProps) {
 
             {/* Right Side: The Editor List */}
             <div className="lg:col-span-8 obsidian-container rounded-2xl overflow-hidden flex flex-col max-h-[600px] lg:max-h-[calc(100vh-200px)]">
-              <div className="grid grid-cols-[60px_100px_1fr_100px] gap-4 p-4 border-b border-outline-variant/10 bg-surface/50 text-[10px] font-bold tracking-widest uppercase text-on-surface-variant">
+              <div className="hidden md:grid grid-cols-[60px_100px_1fr_100px] gap-4 p-4 border-b border-outline-variant/10 bg-surface/50 text-[10px] font-bold tracking-widest uppercase text-on-surface-variant">
                 <div className="text-center">Line</div>
                 <div>Time</div>
                 <div>Lyric</div>
                 <div className="text-center">Actions</div>
               </div>
-              <div className="flex-1 overflow-y-auto p-4 space-y-2 custom-scrollbar">
+              <div className="flex-1 overflow-y-auto p-4 space-y-4 md:space-y-2 custom-scrollbar pb-32 md:pb-4">
                 {lines.map((line, idx) => (
-                  <div key={idx} className="grid grid-cols-[60px_100px_1fr_100px] gap-4 items-center p-3 rounded-xl hover:bg-surface-container-high/50 transition-colors group/row">
-                    <div className="text-center text-[12px] font-mono text-outline-variant group-hover/row:text-primary transition-colors">
-                      {(idx + 1).toString().padStart(2, '0')}
+                  <div key={idx} className="flex flex-col md:grid md:grid-cols-[60px_100px_1fr_100px] gap-2 md:gap-4 items-start md:items-center p-4 md:p-3 rounded-xl bg-surface-container-lowest md:bg-transparent border border-outline-variant/10 md:border-transparent hover:bg-surface-container-high/50 transition-colors group/row">
+                    <div className="w-full md:w-auto flex justify-between md:justify-center items-center">
+                      <div className="text-[12px] font-mono text-primary md:text-outline-variant group-hover/row:text-primary transition-colors bg-primary/10 md:bg-transparent px-2 md:px-0 py-0.5 rounded">
+                        {(idx + 1).toString().padStart(2, '0')}
+                      </div>
+                      <div className="flex md:hidden items-center gap-2">
+                        <button onClick={() => addLineEditRow(idx)} className="p-1 text-on-surface-variant hover:text-primary"><Plus className="w-4 h-4" /></button>
+                        <button onClick={() => deleteLineEditRow(idx)} className="p-1 text-on-surface-variant hover:text-error"><Trash2 className="w-4 h-4" /></button>
+                      </div>
                     </div>
-                    <div>
+                    <div className="w-full md:w-auto">
                       {!line.isSection ? (
                         <input 
                           type="text" 
@@ -920,20 +966,20 @@ export function LrcSyncStudio({ track, onSaveSuccess }: LrcSyncStudioProps) {
                           className="bg-surface border border-outline-variant/20 focus:border-primary focus:ring-1 focus:ring-primary/50 text-primary font-mono text-[13px] rounded-lg px-2 py-1.5 w-full outline-none transition-all"
                         />
                       ) : (
-                        <div className="flex items-center h-full px-2">
+                        <div className="flex items-center h-full px-2 mt-2 md:mt-0">
                           <span className="text-[10px] uppercase font-bold text-outline-variant tracking-widest border border-outline-variant/30 px-2 py-0.5 rounded-full">Section</span>
                         </div>
                       )}
                     </div>
-                    <div>
+                    <div className="w-full md:w-auto">
                       <input 
                         type="text" 
                         value={line.text}
                         onChange={(e) => updateLineText(idx, e.target.value)}
-                        className={`bg-transparent border border-transparent hover:border-outline-variant/20 focus:bg-surface focus:border-outline-variant/40 rounded-lg px-3 py-1.5 w-full outline-none transition-all ${line.isSection ? 'text-primary font-bold text-[16px]' : 'text-on-surface text-[14px]'}`}
+                        className={`bg-transparent border border-transparent hover:border-outline-variant/20 focus:bg-surface focus:border-outline-variant/40 rounded-lg md:px-3 py-1.5 w-full outline-none transition-all ${line.isSection ? 'text-primary font-bold text-[16px]' : 'text-on-surface text-[14px]'}`}
                       />
                     </div>
-                    <div className="flex items-center justify-center gap-1 opacity-0 group-hover/row:opacity-100 transition-opacity">
+                    <div className="hidden md:flex items-center justify-center gap-1 opacity-0 group-hover/row:opacity-100 transition-opacity">
                       <button 
                         onClick={() => addLineEditRow(idx)}
                         className="p-1.5 text-outline-variant hover:text-primary hover:bg-primary/10 rounded-lg transition-colors"
@@ -966,6 +1012,53 @@ export function LrcSyncStudio({ track, onSaveSuccess }: LrcSyncStudioProps) {
                 </button>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Mobile Floating Bottom Bar for Phase 3 */}
+      {phase === "edit" && (
+        <div className="md:hidden fixed bottom-0 left-0 right-0 bg-surface/90 backdrop-blur-2xl border-t border-outline-variant/30 z-40">
+          <div className="max-w-lg mx-auto px-4 pt-4 pb-28 flex flex-col gap-2">
+            <div className="flex gap-2">
+              <button 
+                onClick={() => {
+                  requestConfirm(
+                    "Retry Performance",
+                    "Are you sure you want to discard these timestamps and try the performance again?",
+                    "Retry",
+                    () => {
+                      resetSync();
+                      setPhase("sync");
+                    }
+                  );
+                }}
+                className="flex-1 py-2.5 bg-surface-container-high rounded-lg font-label-caps text-[10px] md:text-[12px] font-bold tracking-widest text-on-surface hover:bg-surface-container-highest transition-colors active:scale-95"
+              >
+                RETRY
+              </button>
+              <button 
+                onClick={() => {
+                  requestConfirm(
+                    "Discard Lyrics",
+                    "Discard this track's lyrics entirely and start over?",
+                    "Discard",
+                    () => backToText()
+                  );
+                }}
+                className="flex-1 py-2.5 bg-surface-container-high rounded-lg font-label-caps text-[10px] md:text-[12px] font-bold tracking-widest text-error border border-error/20 hover:bg-error/10 transition-colors active:scale-95"
+              >
+                DISCARD
+              </button>
+            </div>
+            <button 
+              onClick={saveLrcData}
+              disabled={isSaving || !hasUnsavedChanges}
+              className="w-full py-3 bg-primary text-on-primary rounded-lg font-headline-md text-[14px] md:text-[18px] font-bold shadow-[0_0_15px_rgba(139,92,246,0.3)] active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+            >
+              <Save className="w-4 h-4" />
+              {isSaving ? "SAVING..." : "SAVE & PUBLISH"}
+            </button>
           </div>
         </div>
       )}

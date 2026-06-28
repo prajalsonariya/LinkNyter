@@ -32,7 +32,7 @@ export default async function TrackAnalyticsPage({ params }: { params: { id: str
     .order("started_at", { ascending: false });
 
   return (
-    <main className="flex-1 ml-64 overflow-y-auto custom-scrollbar relative z-10">
+    <main className="flex-1 overflow-y-auto custom-scrollbar relative z-10 md:ml-64 pb-32 pt-20 md:pt-0 md:pb-0">
       <TrackAnalyticsClient track={track} sessions={sessions || []} />
     </main>
   );

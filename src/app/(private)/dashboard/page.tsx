@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { useSession } from "next-auth/react";
-import { Play, Pause, Search, Bell, Trash2, Upload, Hourglass, Lock, FileUp } from "lucide-react";
+import { Play, Pause, Search, Bell, Trash2, Upload, Hourglass, Lock, FileUp, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import { useDashboard } from "@/contexts/DashboardContext";
 import { TrackItem } from "@/components/TrackItem";
@@ -310,7 +310,15 @@ export default function DashboardPage() {
 
           <section className="space-y-8 animate-fade-in">
             {selectedTrack ? (
-              <div className="space-y-12">
+              <div className="space-y-8 md:space-y-12">
+                {/* Mobile Back Button */}
+                <button 
+                  onClick={() => setSelectedTrack(null)}
+                  className="md:hidden flex items-center gap-2 text-on-surface-variant hover:text-primary transition-colors font-label-caps text-label-caps tracking-widest"
+                >
+                  <ArrowLeft className="w-5 h-5" />
+                  Back to Library
+                </button>
                 <div className="flex flex-col md:flex-row gap-8 md:gap-12">
                   {/* Left Column: Cover Art */}
                   <div className="w-full md:w-[320px] shrink-0 space-y-4">

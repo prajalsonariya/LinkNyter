@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef, useMemo } from "react";
 import { supabase } from "@/lib/supabase";
-import { Download } from "lucide-react";
+import { Download, RotateCcw, RotateCw } from "lucide-react";
 import { InstagramIcon, TwitterIcon, YouTubeIcon, SpotifyIcon, AppleMusicIcon, GlobeIcon } from "@/components/SocialIcons";
 import Link from "next/link";
 
@@ -180,6 +180,7 @@ export default function PlayerPage({ params }: { params: Promise<{ slug: string 
   const [currentTime, setCurrentTime] = useState("0:00");
   const [duration, setDuration] = useState("0:00");
   const [volume, setVolume] = useState(1);
+  const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
   const imgRef = useRef<HTMLImageElement>(null);
   const hasTrackedPlay = useRef(false);
@@ -199,6 +200,24 @@ export default function PlayerPage({ params }: { params: Promise<{ slug: string 
   const onPlay = () => telemetry.current.events.push({ action: 'play', timestamp: audioRef.current?.currentTime || 0, time: new Date().toISOString() });
   const onPause = () => telemetry.current.events.push({ action: 'pause', timestamp: audioRef.current?.currentTime || 0, time: new Date().toISOString() });
   const onSeeked = () => telemetry.current.events.push({ action: 'seeked', timestamp: audioRef.current?.currentTime || 0, time: new Date().toISOString() });
+
+  const skipBackward = () => {
+    if (audioRef.current) {
+      audioRef.current.currentTime = Math.max(0, audioRef.current.currentTime - 5);
+    }
+  };
+
+  const skipForward = () => {
+    if (audioRef.current) {
+      audioRef.current.currentTime = Math.min(audioRef.current.duration || 0, audioRef.current.currentTime + 5);
+    }
+  };
+
+
+
+  const toggleDescription = () => {
+    setIsDescriptionExpanded(!isDescriptionExpanded);
+  };
 
   useEffect(() => {
     async function loadTrack() {
@@ -416,10 +435,10 @@ export default function PlayerPage({ params }: { params: Promise<{ slug: string 
         </Link>
       </nav>
 
-      <main className="relative z-10 flex-1 flex flex-col items-center justify-center px-4 md:px-12 pt-24 pb-12">
-        <div className={`w-full max-w-7xl grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-start ${track.lrc_data ? 'lg:items-stretch' : 'lg:items-center'} mx-auto`}>
+      <main className="relative z-10 flex-1 flex flex-col items-center justify-start pt-[max(6rem,calc(50vh-300px))] px-4 md:px-12 pb-12 min-h-[100dvh]">
+        <div className={`w-full max-w-7xl grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-start mx-auto`}>
           
-          <div className="relative group mx-auto w-full max-w-[360px] md:max-w-[500px]">
+          <div className={`relative group mx-auto w-full ${track.lrc_data ? 'max-w-[200px] sm:max-w-[240px]' : 'max-w-[280px] sm:max-w-[320px]'} md:max-w-[500px] transition-all duration-500`}>
             <div className="absolute inset-0 bg-white/5 blur-2xl rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
             <div className="relative aspect-square rounded-2xl overflow-hidden border border-white/5" style={{ boxShadow: '0 40px 100px -20px rgba(0,0,0,0.8)' }}>
               <img
@@ -434,33 +453,61 @@ export default function PlayerPage({ params }: { params: Promise<{ slug: string 
 
           <div className={`flex flex-col w-full max-w-[500px] mx-auto lg:mx-0 ${track.lrc_data ? 'min-h-full' : ''}`}>
             <div className="flex flex-col gap-4 lg:gap-6">
-              <section className="space-y-4 text-left">
+              <section className={`space-y-4 order-2 lg:order-1 ${track.lrc_data ? 'text-left' : 'text-center lg:text-left'}`}>
                 <div>
-                  <h1 className="text-[36px] md:text-display-lg font-bold tracking-tighter text-white mb-2 leading-tight">{track.title}</h1>
+                  <h1 className="text-3xl sm:text-[36px] md:text-display-lg font-bold tracking-tighter text-white mb-2 leading-tight">{track.title}</h1>
                   <p className="text-headline-md font-medium tracking-tight opacity-90" style={{ color: `rgb(${accent})` }}>
                     {artistName}
                   </p>
                 </div>
-                <p className="text-body-lg text-white/40 max-w-lg leading-relaxed font-light">
-                  {track.description || track.artist_bio || "A secure, private stream hosted on LinkNyter."}
-                </p>
+                <div 
+                  className={`flex flex-col cursor-pointer group w-full ${track.lrc_data ? 'items-start' : 'items-center lg:items-start mx-auto lg:mx-0'}`}
+                  onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
+                >
+                  <div className={`relative transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] overflow-hidden w-full max-w-lg ${isDescriptionExpanded ? 'max-h-[800px]' : 'max-h-[28px]'}`}>
+                    
+                    <div className={`transition-opacity duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] ${isDescriptionExpanded || ((track.description || track.artist_bio || "A secure, private stream hosted on LinkNyter.").length <= 50) ? 'opacity-100' : 'opacity-0'}`}>
+                      <p className="text-body-lg text-white/40 leading-relaxed font-light">
+                        {track.description || track.artist_bio || "A secure, private stream hosted on LinkNyter."}
+                      </p>
+                      {((track.description || track.artist_bio || "A secure, private stream hosted on LinkNyter.").length > 50) && (
+                        <span className="text-white/60 text-[13px] font-medium mt-2 inline-block group-hover:text-white transition-colors">
+                          Show less
+                        </span>
+                      )}
+                    </div>
+                    
+                    {((track.description || track.artist_bio || "A secure, private stream hosted on LinkNyter.").length > 50) && (
+                      <div className={`absolute top-0 left-0 w-full transition-opacity duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] ${isDescriptionExpanded ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
+                        <p className="text-body-lg text-white/40 leading-relaxed font-light">
+                          {(track.description || track.artist_bio || "A secure, private stream hosted on LinkNyter.").slice(0, 50).trim()}
+                          <span className="text-white/60 text-[14px] font-medium ml-1 group-hover:text-white transition-colors">
+                            ...more
+                          </span>
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </div>
               </section>
 
               {track.lrc_data && (
-                <TwoLineLyrics 
-                  lrcData={track.lrc_data} 
-                  isPlaying={isPlaying} 
-                  audioRef={audioRef} 
-                  accent={accent} 
-                  lrcTiming={track.lrc_timing}
-                />
+                <div className="order-1 lg:order-2 w-full">
+                  <TwoLineLyrics 
+                    lrcData={track.lrc_data} 
+                    isPlaying={isPlaying} 
+                    audioRef={audioRef} 
+                    accent={accent} 
+                    lrcTiming={track.lrc_timing}
+                  />
+                </div>
               )}
             </div>
 
-            <section className={`space-y-10 mt-10 ${track.lrc_data ? 'lg:mt-auto' : 'lg:mt-14'}`}>
+            <section className={`w-full mt-8 lg:mt-8 space-y-8 ${track.lrc_data ? 'lg:mt-auto' : ''}`}>
               <div className="space-y-3">
                 <div 
-                  className="relative py-4 w-full cursor-pointer group/rail flex items-center" 
+                  className="relative py-6 md:py-4 w-full cursor-pointer group/rail flex items-center" 
                   onPointerDown={handlePointerDown}
                   onPointerMove={handlePointerMove}
                   onPointerUp={handlePointerUp}
@@ -478,38 +525,34 @@ export default function PlayerPage({ params }: { params: Promise<{ slug: string 
               </div>
 
               <div className="flex items-center flex-col md:flex-row gap-8 md:gap-0 justify-center lg:gap-24">
-                <div className="flex items-center gap-10">
-                  <button className="text-white/40 hover:text-white transition-colors">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                      <polygon points="16 18 9 12 16 6 16 18" />
-                      <line x1="7" y1="18" x2="7" y2="6" />
-                    </svg>
+                <div className="flex items-center gap-6 md:gap-10">
+                  <button onClick={skipBackward} className="relative text-white/40 hover:text-white transition-colors active:scale-95" aria-label="Skip Backward 5s">
+                    <RotateCcw className="w-7 h-7 stroke-[1.5]" />
+                    <span className="absolute inset-0 flex items-center justify-center text-[10px] font-bold">5</span>
                   </button>
                   <button
                     onClick={togglePlay}
-                    className="w-16 h-16 shrink-0 aspect-square rounded-full flex items-center justify-center text-white transition-all active:scale-95 hover:scale-105 hover:border-white/30"
+                    className="w-20 h-20 lg:w-16 lg:h-16 shrink-0 aspect-square rounded-full flex items-center justify-center text-white transition-all active:scale-95 hover:scale-105 hover:border-white/30"
                     style={{ borderRadius: '50%', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}
                   >
                     {isPlaying ? (
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                      <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
                         <rect x="7" y="6" width="3" height="12" rx="1" />
                         <rect x="14" y="6" width="3" height="12" rx="1" />
                       </svg>
                     ) : (
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" className="translate-x-0.5">
+                      <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" className="translate-x-0.5">
                         <path d="M7 5.5C7 4.5 8.1 3.9 8.9 4.4L18.4 10.9C19.1 11.4 19.1 12.6 18.4 13.1L8.9 19.6C8.1 20.1 7 19.5 7 18.5V5.5Z" />
                       </svg>
                     )}
                   </button>
-                  <button className="text-white/40 hover:text-white transition-colors">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                      <polygon points="8 6 15 12 8 18 8 6" />
-                      <line x1="17" y1="6" x2="17" y2="18" />
-                    </svg>
+                  <button onClick={skipForward} className="relative text-white/40 hover:text-white transition-colors active:scale-95" aria-label="Skip Forward 5s">
+                    <RotateCw className="w-7 h-7 stroke-[1.5]" />
+                    <span className="absolute inset-0 flex items-center justify-center text-[10px] font-bold">5</span>
                   </button>
                 </div>
 
-                <div className="flex items-center gap-4 group">
+                <div className="hidden md:flex items-center gap-4 group">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-white/40 group-hover:text-white/60 transition-colors">
                     <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
                     <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />

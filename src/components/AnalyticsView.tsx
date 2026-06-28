@@ -115,44 +115,44 @@ export function AnalyticsView({ tracks }: { tracks: any[] }) {
       {activeTab === 'overview' && (
         <>
           {/* Overview Cards (Top Row) */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-6">
         {/* Total Streams */}
-        <div className="bg-surface-container-low/50 backdrop-blur-xl border border-outline-variant/50 rounded-xl p-6 flex flex-col justify-between h-40 transition-all hover:border-outline-variant hover:-translate-y-0.5">
+        <div className="bg-surface-container-low/50 backdrop-blur-xl border border-outline-variant/50 rounded-xl p-4 md:p-6 flex flex-col justify-between h-36 md:h-40 transition-all hover:border-outline-variant hover:-translate-y-0.5">
           <div className="flex justify-between items-start">
-            <span className="font-label-caps text-label-caps text-on-surface-variant uppercase">Total Streams</span>
+            <span className="font-label-caps text-[10px] md:text-label-caps text-on-surface-variant uppercase">Total Streams</span>
             <div className="flex items-center text-primary gap-1">
-              <TrendingUp className="w-[18px] h-[18px]" />
+              <TrendingUp className="w-4 h-4 md:w-[18px] md:h-[18px]" />
             </div>
           </div>
-          <div className="text-4xl font-headline-lg font-black text-on-surface">{totalStreams.toLocaleString()}</div>
+          <div className="text-2xl md:text-4xl font-headline-lg font-black text-on-surface">{totalStreams.toLocaleString()}</div>
         </div>
 
         {/* Total Unique Opens */}
-        <div className="bg-surface-container-low/50 backdrop-blur-xl border border-outline-variant/50 rounded-xl p-6 flex flex-col justify-between h-40 transition-all hover:border-outline-variant hover:-translate-y-0.5">
-          <span className="font-label-caps text-label-caps text-on-surface-variant uppercase">Tracked Opens</span>
-          <div className="text-4xl font-headline-lg font-black text-on-surface">{metrics.totalOpens.toLocaleString()}</div>
+        <div className="bg-surface-container-low/50 backdrop-blur-xl border border-outline-variant/50 rounded-xl p-4 md:p-6 flex flex-col justify-between h-36 md:h-40 transition-all hover:border-outline-variant hover:-translate-y-0.5">
+          <span className="font-label-caps text-[10px] md:text-label-caps text-on-surface-variant uppercase">Tracked Opens</span>
+          <div className="text-2xl md:text-4xl font-headline-lg font-black text-on-surface">{metrics.totalOpens.toLocaleString()}</div>
         </div>
 
         {/* Avg Listen Time */}
-        <div className="bg-surface-container-low/50 backdrop-blur-xl border border-outline-variant/50 rounded-xl p-6 flex flex-col justify-between h-40 transition-all hover:border-outline-variant hover:-translate-y-0.5">
-          <span className="font-label-caps text-label-caps text-on-surface-variant uppercase">Avg. Listen Time</span>
-          <div className="text-4xl font-headline-lg font-black text-on-surface">{formatTime(metrics.avgListenTime)}</div>
+        <div className="bg-surface-container-low/50 backdrop-blur-xl border border-outline-variant/50 rounded-xl p-4 md:p-6 flex flex-col justify-between h-36 md:h-40 transition-all hover:border-outline-variant hover:-translate-y-0.5">
+          <span className="font-label-caps text-[10px] md:text-label-caps text-on-surface-variant uppercase">Avg Listen Time</span>
+          <div className="text-2xl md:text-4xl font-headline-lg font-black text-on-surface">{formatTime(metrics.avgListenTime)}</div>
         </div>
 
         {/* Top Track */}
-        <div className="bg-surface-container-low/50 backdrop-blur-xl border border-outline-variant/50 rounded-xl p-6 flex flex-col justify-between h-40 transition-all hover:border-outline-variant hover:-translate-y-0.5">
-          <span className="font-label-caps text-label-caps text-on-surface-variant uppercase">Top Track</span>
-          <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-lg overflow-hidden border border-outline-variant bg-surface-container-high shrink-0">
+        <div className="bg-surface-container-low/50 backdrop-blur-xl border border-outline-variant/50 rounded-xl p-4 md:p-6 flex flex-col justify-between h-36 md:h-40 transition-all hover:border-outline-variant hover:-translate-y-0.5 overflow-hidden">
+          <span className="font-label-caps text-[10px] md:text-label-caps text-on-surface-variant uppercase">Top Track</span>
+          <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mt-2">
+            <div className="w-8 h-8 md:w-14 md:h-14 rounded-md md:rounded-lg overflow-hidden border border-outline-variant bg-surface-container-high shrink-0">
               <img 
                 className="w-full h-full object-cover" 
                 src={highestTrack?.cover_url || "/cover-placeholder.jpg"} 
                 alt="Top Track" 
               />
             </div>
-            <div className="overflow-hidden">
-              <div className="font-headline-md text-on-surface truncate max-w-full">{highestTrack?.title || "N/A"}</div>
-              <div className="text-xs text-on-surface-variant">{highestTrack?.play_count || 0} streams all time</div>
+            <div className="overflow-hidden w-full">
+              <div className="font-headline-md text-[14px] md:text-[16px] text-on-surface truncate">{highestTrack?.title || "N/A"}</div>
+              <div className="text-[10px] md:text-xs text-on-surface-variant truncate">{highestTrack?.play_count || 0} streams</div>
             </div>
           </div>
         </div>

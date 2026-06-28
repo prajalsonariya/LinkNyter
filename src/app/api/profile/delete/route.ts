@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
+import { supabaseAdmin } from '@/lib/supabase-admin';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '../../auth/[...nextauth]/route';
 import { google } from 'googleapis';
@@ -72,7 +73,10 @@ export async function DELETE(req: Request) {
     await supabase.from('profiles').delete().eq('email', userEmail);
 
     // 6. Log the deleted account in the new admin table
-    await supabase.from('deleted_accounts').insert({ email: userEmail });
+    const { error: logError } = await supabaseAdmin.from('deleted_accounts').insert({ email: userEmail });
+    if (logError) {
+      console.error('Failed to log deleted account (Admin Client):', logError);
+    }
 
     return NextResponse.json({ success: true, message: 'Account and all associated data deleted successfully.' });
   } catch (error: any) {

@@ -10,6 +10,7 @@ export function ManageLinksView({ tracks }: { tracks: any[] }) {
   const [newLinkName, setNewLinkName] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   useEffect(() => {
     fetchLinks();
@@ -91,7 +92,7 @@ export function ManageLinksView({ tracks }: { tracks: any[] }) {
         {/* Left Column: Create New Link & Stats */}
         <div className="lg:col-span-4 flex flex-col gap-8">
           {/* Create New Link Panel */}
-          <div className="bg-[#1a1a1d]/70 backdrop-blur-xl border border-[#333338] p-6 md:p-8 rounded-xl flex flex-col gap-6">
+          <div className="bg-[#1a1a1d]/70 backdrop-blur-xl border border-[#333338] p-6 md:p-8 rounded-xl flex flex-col gap-6 relative z-50">
             <div className="flex items-center gap-3">
               <div className="p-1 bg-primary/10 rounded-lg flex items-center justify-center w-[36px] h-[36px]">
                 <img src="/logo.svg" alt="LinkNyter Logo" className="w-7 h-7 object-contain" />
@@ -108,17 +109,38 @@ export function ManageLinksView({ tracks }: { tracks: any[] }) {
               <div className="flex flex-col gap-1.5">
                 <label className="text-label-caps font-label-caps text-outline uppercase tracking-wider">Select Track</label>
                 <div className="relative">
-                  <select 
-                    className="w-full bg-[#121317] border border-outline-variant/30 rounded-lg py-3 px-4 text-on-surface appearance-none focus:border-primary focus:ring-0"
-                    value={selectedTrackId}
-                    onChange={e => setSelectedTrackId(e.target.value)}
+                  <div 
+                    className={`w-full bg-[#121317] border ${isDropdownOpen ? 'border-primary shadow-[0_0_15px_rgba(139,92,246,0.15)]' : 'border-outline-variant/30'} rounded-lg py-3 px-4 text-on-surface cursor-pointer flex items-center justify-between transition-all hover:border-primary/50`}
+                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                   >
-                    <option value="ALL">-- Select Track --</option>
-                    {tracks.map(t => (
-                      <option key={t.id} value={t.id}>{t.title}</option>
-                    ))}
-                  </select>
-                  <ChevronDown className="w-5 h-5 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-outline" />
+                    <span className={selectedTrackId === 'ALL' ? 'text-outline' : 'text-on-surface font-medium'}>
+                      {selectedTrackId === 'ALL' 
+                        ? '-- Select Track --' 
+                        : tracks.find(t => t.id === selectedTrackId)?.title || '-- Select Track --'}
+                    </span>
+                    <ChevronDown className={`w-5 h-5 text-outline transition-transform duration-300 ${isDropdownOpen ? 'rotate-180 text-primary' : ''}`} />
+                  </div>
+                  
+                  {isDropdownOpen && (
+                    <>
+                      <div className="fixed inset-0 z-40" onClick={() => setIsDropdownOpen(false)}></div>
+                      <div className="absolute top-full left-0 mt-2 w-full bg-[#1a1a1d] border border-outline-variant/30 rounded-xl shadow-2xl z-50 overflow-hidden animate-slide-up-fade custom-scrollbar max-h-[240px] overflow-y-auto">
+                        {tracks.map(t => (
+                          <div 
+                            key={t.id}
+                            className={`px-4 py-3 hover:bg-primary/20 cursor-pointer transition-colors text-[14px] flex items-center gap-3 ${selectedTrackId === t.id ? 'bg-primary/10 text-primary font-bold' : 'text-on-surface'}`}
+                            onClick={() => { setSelectedTrackId(t.id); setIsDropdownOpen(false); }}
+                          >
+                            <div 
+                              className="w-7 h-7 rounded bg-cover bg-center shrink-0 border border-outline-variant/50"
+                              style={{ backgroundImage: `url('${t.cover_url || "/cover-placeholder.jpg"}')` }}
+                            ></div>
+                            <span className="truncate">{t.title}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
               <div className="flex flex-col gap-1.5">

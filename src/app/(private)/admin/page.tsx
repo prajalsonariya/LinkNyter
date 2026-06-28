@@ -171,11 +171,11 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div className="flex-1 ml-64 overflow-y-auto bg-surface relative h-screen">
+    <div className="flex-1 overflow-y-auto bg-surface relative h-screen md:ml-64 pb-32 md:pb-0 pt-20 md:pt-0">
       {/* Background gradients */}
       <div className="fixed top-0 left-1/4 w-[800px] h-[500px] bg-primary/5 blur-[120px] rounded-full pointer-events-none -z-10" />
       
-      <div className="max-w-6xl mx-auto px-12 py-16">
+      <div className="max-w-6xl mx-auto px-4 md:px-12 py-8 md:py-16">
         
         <header className="mb-12">
           <h1 className="font-display-lg text-4xl font-bold text-primary tracking-tight mb-2">
@@ -236,8 +236,8 @@ export default function AdminDashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           
           {/* Top Countries */}
-          <div className="lg:col-span-2 bg-surface-container/30 border border-outline-variant/20 p-8 rounded-3xl">
-            <div className="flex items-center justify-between mb-8">
+          <div className="lg:col-span-2 bg-surface-container/30 border border-outline-variant/20 p-4 md:p-8 rounded-3xl">
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">
               <h2 className="font-display-sm text-2xl font-bold text-on-surface flex items-center gap-3">
                 <Globe className="w-6 h-6 text-primary" />
                 Audience Demographics
@@ -377,8 +377,8 @@ export default function AdminDashboard() {
 
         <div className="grid grid-cols-1 gap-8 mt-8">
           {/* Recent Musicians */}
-          <div className="bg-surface-container/30 border border-outline-variant/20 p-8 rounded-3xl">
-            <div className="flex items-center justify-between mb-8">
+          <div className="bg-surface-container/30 border border-outline-variant/20 p-4 md:p-8 rounded-3xl">
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">
               <h2 className="font-display-sm text-2xl font-bold text-on-surface">
                 Recently Joined Musicians
               </h2>
@@ -430,8 +430,8 @@ export default function AdminDashboard() {
           </div>
 
           {/* Deleted Users View */}
-          <div className="bg-surface-container/30 border border-error/20 p-8 rounded-3xl mt-8">
-            <div className="flex items-center justify-between mb-8">
+          <div className="bg-surface-container/30 border border-error/20 p-4 md:p-8 rounded-3xl mt-8">
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">
               <div className="flex items-center gap-3">
                 <AlertCircle className="w-6 h-6 text-error" />
                 <h2 className="font-display-sm text-2xl font-bold text-error flex items-center gap-3">
@@ -443,7 +443,7 @@ export default function AdminDashboard() {
               </div>
               <button 
                 onClick={() => setShowDeletedUsers(!showDeletedUsers)}
-                className="px-6 py-2 border border-error/30 text-error hover:bg-error/10 rounded-xl font-label-caps text-label-caps transition-colors"
+                className="px-6 py-2 border border-error/30 text-error hover:bg-error/10 rounded-xl font-label-caps text-label-caps transition-colors w-full md:w-auto"
               >
                 {showDeletedUsers ? "Hide Deleted Users" : "See Deleted Users"}
               </button>

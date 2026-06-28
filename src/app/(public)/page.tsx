@@ -143,9 +143,9 @@ export default function Homepage() {
         </section>
 
         {/* Section 3: 4-Column Feature Grid */}
-        <section id="features" className="scroll-mt-[20vh] px-margin-mobile md:px-margin-desktop py-24 max-w-container-max mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-gutter">
-            <div className="p-8 border border-outline-variant/20 flex flex-col gap-6 hover:bg-surface-container-low transition-colors duration-300 group">
+        <section id="features" className="scroll-mt-[20vh] px-margin-mobile md:px-margin-desktop py-24 max-w-container-max mx-auto overflow-hidden">
+          <div className="flex md:grid md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-gutter overflow-x-auto snap-x snap-mandatory pb-4 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden -mx-margin-mobile px-margin-mobile md:mx-0 md:px-0">
+            <div className="w-[85vw] shrink-0 snap-center snap-always md:w-auto p-8 border border-outline-variant/20 flex flex-col gap-6 hover:bg-surface-container-low transition-colors duration-300 group">
               <span className="material-symbols-outlined text-primary text-4xl group-hover:scale-110 transition-transform">graphic_eq</span>
               <div>
                 <h3 className="font-headline-md text-headline-md text-on-surface mb-3">Audio Playback</h3>
@@ -153,7 +153,7 @@ export default function Homepage() {
               </div>
             </div>
 
-            <div className="p-8 border border-outline-variant/20 flex flex-col gap-6 hover:bg-surface-container-low transition-colors duration-300 group">
+            <div className="w-[85vw] shrink-0 snap-center snap-always md:w-auto p-8 border border-outline-variant/20 flex flex-col gap-6 hover:bg-surface-container-low transition-colors duration-300 group">
               <span className="material-symbols-outlined text-primary text-4xl group-hover:scale-110 transition-transform">encrypted</span>
               <div>
                 <h3 className="font-headline-md text-headline-md text-on-surface mb-3">The &quot;Don&apos;t Steal My Music&quot; Switch</h3>
@@ -161,7 +161,7 @@ export default function Homepage() {
               </div>
             </div>
 
-            <div className="p-8 border border-outline-variant/20 flex flex-col gap-6 hover:bg-surface-container-low transition-colors duration-300 group">
+            <div className="w-[85vw] shrink-0 snap-center snap-always md:w-auto p-8 border border-outline-variant/20 flex flex-col gap-6 hover:bg-surface-container-low transition-colors duration-300 group">
               <span className="material-symbols-outlined text-primary text-4xl group-hover:scale-110 transition-transform">analytics</span>
               <div>
                 <h3 className="font-headline-md text-headline-md text-on-surface mb-3">The &quot;Did They Actually Listen?&quot; Tracker</h3>
@@ -169,7 +169,7 @@ export default function Homepage() {
               </div>
             </div>
 
-            <div className="p-8 border border-outline-variant/20 flex flex-col gap-6 hover:bg-surface-container-low transition-colors duration-300 group">
+            <div className="w-[85vw] shrink-0 snap-center snap-always md:w-auto p-8 border border-outline-variant/20 flex flex-col gap-6 hover:bg-surface-container-low transition-colors duration-300 group">
               <span className="material-symbols-outlined text-primary text-4xl group-hover:scale-110 transition-transform">person_apron</span>
               <div>
                 <h3 className="font-headline-md text-headline-md text-on-surface mb-3">All Your Links in One Place</h3>

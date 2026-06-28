@@ -73,12 +73,12 @@ export default function ProfilePage() {
   };
 
   return (
-    <main className="flex-1 ml-64 overflow-y-auto custom-scrollbar relative z-10">
-      <header className="sticky top-0 w-full z-40 flex justify-between items-center px-margin-desktop h-20 bg-surface/60 backdrop-blur-xl">
+    <main className="flex-1 overflow-y-auto custom-scrollbar relative z-10 md:ml-64 pb-32 md:pb-0 pt-20 md:pt-0">
+      <header className="sticky top-0 w-full z-40 hidden md:flex justify-between items-center px-margin-desktop h-20 bg-surface/60 backdrop-blur-xl">
         <h2 className="font-headline-md text-headline-md text-on-surface font-semibold">Artist Profile</h2>
       </header>
 
-      <div className="p-margin-desktop max-w-3xl mx-auto space-y-10 animate-fade-in">
+      <div className="p-4 md:p-margin-desktop max-w-3xl mx-auto space-y-8 md:space-y-10 animate-fade-in">
         {/* Artist Identity */}
         <section className="space-y-6">
           <div className="flex items-center gap-3 mb-2">
@@ -86,7 +86,7 @@ export default function ProfilePage() {
             <h3 className="font-headline-md text-headline-md font-semibold text-on-surface">Artist Identity</h3>
           </div>
           
-          <div className="bg-surface-container-lowest border border-outline-variant/30 rounded-2xl p-8 space-y-6">
+          <div className="bg-surface-container-lowest border border-outline-variant/30 rounded-2xl p-4 md:p-8 space-y-6">
             <div className="space-y-2">
               <label className="block font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest">Artist Name</label>
               <input 
@@ -114,13 +114,15 @@ export default function ProfilePage() {
 
         {/* Social Links */}
         <section className="space-y-6">
-          <div className="flex items-center gap-3 mb-2">
-            <Share2 className="w-7 h-7 text-primary" />
-            <h3 className="font-headline-md text-headline-md font-semibold text-on-surface">Social Links</h3>
+          <div>
+            <div className="flex items-center gap-3 mb-2">
+              <Share2 className="w-7 h-7 text-primary" />
+              <h3 className="font-headline-md text-headline-md font-semibold text-on-surface">Social Links</h3>
+            </div>
+            <p className="text-body-sm text-on-surface-variant">These will appear on your public track pages so listeners can find you elsewhere.</p>
           </div>
-          <p className="text-body-sm text-on-surface-variant -mt-4">These will appear on your public track pages so listeners can find you elsewhere.</p>
           
-          <div className="bg-surface-container-lowest border border-outline-variant/30 rounded-2xl p-8 space-y-5">
+          <div className="bg-surface-container-lowest border border-outline-variant/30 rounded-2xl p-4 md:p-8 space-y-5">
             {[
               { key: 'instagram', label: 'Instagram', placeholder: 'https://instagram.com/yourhandle', icon: <InstagramIcon className="w-5 h-5" /> },
               { key: 'twitter', label: 'X (Twitter)', placeholder: 'https://x.com/yourhandle', icon: <TwitterIcon className="w-5 h-5" /> },
@@ -166,7 +168,7 @@ export default function ProfilePage() {
             <h3 className="font-headline-md text-headline-md font-semibold text-error">Danger Zone</h3>
           </div>
           
-          <div className="bg-error/5 border border-error/20 rounded-2xl p-8 space-y-6">
+          <div className="bg-error/5 border border-error/20 rounded-2xl p-4 md:p-8 space-y-6">
             <div>
               <h4 className="font-bold text-on-surface mb-2">Delete Account</h4>
               <p className="text-body-sm text-on-surface-variant max-w-2xl">

@@ -29,7 +29,7 @@ export default function LrcSyncPage() {
   const selectedTrack = tracks.find(t => t.id === selectedTrackId);
 
   return (
-    <div className="flex-1 ml-64 w-[calc(100%-256px)] flex flex-col h-screen overflow-hidden">
+    <div className="flex-1 md:ml-64 w-full md:w-[calc(100%-256px)] flex flex-col h-screen overflow-y-auto md:overflow-hidden pb-32 md:pb-0 pt-20 md:pt-0">
       {selectedTrack ? (
         <LrcSyncStudio 
           track={selectedTrack} 
