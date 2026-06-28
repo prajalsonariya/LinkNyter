@@ -4,17 +4,22 @@ import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Users, Music, PlayCircle, Globe, Laptop, Smartphone, AlertCircle, Download, Eye, EyeOff, Activity, Monitor, Compass } from "lucide-react";
+import { toast } from "sonner";
+
+interface AnalyticsData {
+  topCountries: { name: string; count: number }[];
+  deviceTypes: { name: string; count: number }[];
+  topOs: { name: string; count: number }[];
+  topBrowsers: { name: string; count: number }[];
+}
 
 interface AdminStats {
   totalUsers: number;
   totalTracks: number;
   totalSessions: number;
   activeUsers: number;
-  topCountries: { name: string; count: number }[];
-  deviceTypes: { name: string; count: number }[];
-  topOs: { name: string; count: number }[];
-  topBrowsers: { name: string; count: number }[];
-  topBrowsers: { name: string; count: number }[];
+  audienceData: AnalyticsData;
+  musicianData: AnalyticsData;
   recentUsers: { name: string; email: string; created_at: string }[];
   deletedAccounts: { email: string; deleted_at: string }[];
 }
@@ -29,6 +34,7 @@ export default function AdminDashboard() {
   const [isPasswordAuthed, setIsPasswordAuthed] = useState(false);
   const [passwordInput, setPasswordInput] = useState("");
   const [showDeletedUsers, setShowDeletedUsers] = useState(false);
+  const [activeTab, setActiveTab] = useState<'musicians' | 'audience'>('musicians');
 
   useEffect(() => {
     if (status === "loading") return;
@@ -123,6 +129,9 @@ export default function AdminDashboard() {
     );
   }
 
+  const activeData = activeTab === 'musicians' ? stats.musicianData : stats.audienceData;
+  const totalRelevantSessions = activeTab === 'musicians' ? stats.totalUsers : stats.totalSessions;
+
   const calculatePercentage = (count: number, total: number) => {
     if (total === 0) return 0;
     return Math.round((count / total) * 100);
@@ -200,6 +209,17 @@ export default function AdminDashboard() {
           </div>
 
           <div className="bg-surface-container/50 border border-outline-variant/30 p-6 rounded-3xl relative overflow-hidden group">
+            <div className="absolute -right-4 -top-4 w-24 h-24 bg-[#8b5cf6]/10 rounded-full blur-2xl group-hover:bg-[#8b5cf6]/20 transition-all duration-500"></div>
+            <div className="flex items-center gap-4 mb-4">
+              <div className="w-12 h-12 bg-[#8b5cf6]/10 rounded-xl flex items-center justify-center text-[#8b5cf6]">
+                <Activity className="w-6 h-6" />
+              </div>
+              <h3 className="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest">Active Users</h3>
+            </div>
+            <p className="text-4xl font-display-lg font-bold text-on-surface">{stats.activeUsers}</p>
+          </div>
+
+          <div className="bg-surface-container/50 border border-outline-variant/30 p-6 rounded-3xl relative overflow-hidden group">
             <div className="absolute -right-4 -top-4 w-24 h-24 bg-[#0ea5e9]/10 rounded-full blur-2xl group-hover:bg-[#0ea5e9]/20 transition-all duration-500"></div>
             <div className="flex items-center gap-4 mb-4">
               <div className="w-12 h-12 bg-[#0ea5e9]/10 rounded-xl flex items-center justify-center text-[#0ea5e9]">
@@ -220,36 +240,43 @@ export default function AdminDashboard() {
             </div>
             <p className="text-4xl font-display-lg font-bold text-on-surface">{stats.totalSessions}</p>
           </div>
-
-          <div className="bg-surface-container/50 border border-outline-variant/30 p-6 rounded-3xl relative overflow-hidden group">
-            <div className="absolute -right-4 -top-4 w-24 h-24 bg-[#8b5cf6]/10 rounded-full blur-2xl group-hover:bg-[#8b5cf6]/20 transition-all duration-500"></div>
-            <div className="flex items-center gap-4 mb-4">
-              <div className="w-12 h-12 bg-[#8b5cf6]/10 rounded-xl flex items-center justify-center text-[#8b5cf6]">
-                <Activity className="w-6 h-6" />
-              </div>
-              <h3 className="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest">Active Users</h3>
-            </div>
-            <p className="text-4xl font-display-lg font-bold text-on-surface">{stats.activeUsers}</p>
-          </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* TABS */}
+        <div className="flex gap-4 border-b border-outline-variant/30 mb-8 mt-16 overflow-x-auto custom-scrollbar pb-2">
+          <button 
+            onClick={() => setActiveTab('musicians')} 
+            className={`whitespace-nowrap px-6 py-3 font-label-caps text-label-caps tracking-widest rounded-t-xl transition-colors flex items-center gap-2 ${activeTab === 'musicians' ? 'bg-primary/10 text-primary border-b-2 border-primary' : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high'}`}
+          >
+            <Users className="w-4 h-4" />
+            Musicians Analytics
+          </button>
+          <button 
+            onClick={() => setActiveTab('audience')} 
+            className={`whitespace-nowrap px-6 py-3 font-label-caps text-label-caps tracking-widest rounded-t-xl transition-colors flex items-center gap-2 ${activeTab === 'audience' ? 'bg-[#10b981]/10 text-[#10b981] border-b-2 border-[#10b981]' : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high'}`}
+          >
+            <Globe className="w-4 h-4" />
+            Audience Analytics
+          </button>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 animate-fade-in" key={activeTab}>
           
           {/* Top Countries */}
           <div className="lg:col-span-2 bg-surface-container/30 border border-outline-variant/20 p-4 md:p-8 rounded-3xl">
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">
               <h2 className="font-display-sm text-2xl font-bold text-on-surface flex items-center gap-3">
-                <Globe className="w-6 h-6 text-primary" />
-                Audience Demographics
+                <Globe className={`w-6 h-6 ${activeTab === 'musicians' ? 'text-primary' : 'text-[#10b981]'}`} />
+                {activeTab === 'musicians' ? 'Musician Demographics' : 'Audience Demographics'}
               </h2>
             </div>
             
             <div className="space-y-6">
-              {stats.topCountries.length === 0 ? (
+              {activeData.topCountries.length === 0 ? (
                 <p className="text-on-surface-variant">No demographic data available yet.</p>
               ) : (
-                stats.topCountries.map((c, i) => {
-                  const percentage = calculatePercentage(c.count, stats.totalSessions);
+                activeData.topCountries.map((c, i) => {
+                  const percentage = calculatePercentage(c.count, totalRelevantSessions);
                   return (
                     <div key={i} className="flex flex-col gap-2">
                       <div className="flex items-center justify-between">
@@ -258,7 +285,7 @@ export default function AdminDashboard() {
                       </div>
                       <div className="h-2 w-full bg-surface-container-high rounded-full overflow-hidden">
                         <div 
-                          className="h-full bg-primary rounded-full transition-all duration-1000" 
+                          className={`h-full rounded-full transition-all duration-1000 ${activeTab === 'musicians' ? 'bg-primary' : 'bg-[#10b981]'}`}
                           style={{ width: `${percentage}%` }}
                         ></div>
                       </div>
@@ -277,11 +304,11 @@ export default function AdminDashboard() {
             </h2>
             
             <div className="space-y-6">
-              {stats.deviceTypes.length === 0 ? (
+              {activeData.deviceTypes.length === 0 ? (
                 <p className="text-on-surface-variant">No device data available yet.</p>
               ) : (
-                stats.deviceTypes.map((d, i) => {
-                  const percentage = calculatePercentage(d.count, stats.totalSessions);
+                activeData.deviceTypes.map((d, i) => {
+                  const percentage = calculatePercentage(d.count, totalRelevantSessions);
                   const isMobile = d.name.toLowerCase() === 'mobile' || d.name.toLowerCase() === 'tablet';
                   
                   return (
@@ -309,7 +336,7 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8 animate-fade-in" key={`${activeTab}-os`}>
           {/* Operating Systems */}
           <div className="bg-surface-container/30 border border-outline-variant/20 p-8 rounded-3xl">
             <h2 className="font-display-sm text-2xl font-bold text-on-surface mb-8 flex items-center gap-3">
@@ -318,11 +345,11 @@ export default function AdminDashboard() {
             </h2>
             
             <div className="space-y-6">
-              {stats.topOs?.length === 0 ? (
+              {activeData.topOs?.length === 0 ? (
                 <p className="text-on-surface-variant">No OS data available yet.</p>
               ) : (
-                stats.topOs?.map((o, i) => {
-                  const percentage = calculatePercentage(o.count, stats.totalSessions);
+                activeData.topOs?.map((o, i) => {
+                  const percentage = calculatePercentage(o.count, totalRelevantSessions);
                   return (
                     <div key={i} className="flex flex-col gap-2">
                       <div className="flex items-center justify-between">
@@ -350,11 +377,11 @@ export default function AdminDashboard() {
             </h2>
             
             <div className="space-y-6">
-              {stats.topBrowsers?.length === 0 ? (
+              {activeData.topBrowsers?.length === 0 ? (
                 <p className="text-on-surface-variant">No browser data available yet.</p>
               ) : (
-                stats.topBrowsers?.map((b, i) => {
-                  const percentage = calculatePercentage(b.count, stats.totalSessions);
+                activeData.topBrowsers?.map((b, i) => {
+                  const percentage = calculatePercentage(b.count, totalRelevantSessions);
                   return (
                     <div key={i} className="flex flex-col gap-2">
                       <div className="flex items-center justify-between">
@@ -375,119 +402,120 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 gap-8 mt-8">
-          {/* Recent Musicians */}
-          <div className="bg-surface-container/30 border border-outline-variant/20 p-4 md:p-8 rounded-3xl">
-            <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">
-              <h2 className="font-display-sm text-2xl font-bold text-on-surface">
-                Recently Joined Musicians
-              </h2>
-              <button 
-                onClick={downloadCSV}
-                className="flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary hover:bg-primary/20 rounded-xl font-label-caps text-label-caps transition-all active:scale-95"
-              >
-                <Download className="w-4 h-4" />
-                Download CSV
-              </button>
-            </div>
-            
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse">
-                <thead>
-                  <tr className="border-b border-outline-variant/20">
-                    <th className="pb-4 font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest">Name</th>
-                    <th className="pb-4 font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest">Email</th>
-                    <th className="pb-4 font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest">Joined On</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-outline-variant/10">
-                  {stats.recentUsers.map((user, i) => (
-                    <tr key={i} className="group hover:bg-surface-container-low transition-colors">
-                      <td className="py-4 px-2 font-medium text-on-surface">{user.name || "Unknown"}</td>
-                      <td className="py-4 px-2 text-on-surface-variant flex items-center gap-2">
-                        {revealedEmails.has(user.email) ? user.email : maskEmail(user.email)}
-                        <button 
-                          onClick={() => toggleEmail(user.email)} 
-                          className="text-on-surface-variant/50 hover:text-primary transition-colors p-1"
-                          title={revealedEmails.has(user.email) ? "Hide Email" : "Reveal Email"}
-                        >
-                          {revealedEmails.has(user.email) ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                        </button>
-                      </td>
-                      <td className="py-4 px-2 text-on-surface-variant">{new Date(user.created_at).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}</td>
-                    </tr>
-                  ))}
-                  {stats.recentUsers.length === 0 && (
-                    <tr>
-                      <td colSpan={3} className="py-8 text-center text-on-surface-variant">
-                        No musicians found.
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          {/* Deleted Users View */}
-          <div className="bg-surface-container/30 border border-error/20 p-4 md:p-8 rounded-3xl mt-8">
-            <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">
-              <div className="flex items-center gap-3">
-                <AlertCircle className="w-6 h-6 text-error" />
-                <h2 className="font-display-sm text-2xl font-bold text-error flex items-center gap-3">
-                  Deleted Accounts
-                  <span className="text-[14px] font-label-caps tracking-widest bg-error/10 text-error px-3 py-1 rounded-full border border-error/20">
-                    {stats.deletedAccounts?.length || 0} Total
-                  </span>
+        {activeTab === 'musicians' && (
+          <div className="grid grid-cols-1 gap-8 mt-8 animate-fade-in">
+            {/* Recent Musicians */}
+            <div className="bg-surface-container/30 border border-outline-variant/20 p-4 md:p-8 rounded-3xl">
+              <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">
+                <h2 className="font-display-sm text-2xl font-bold text-on-surface">
+                  Recently Joined Musicians
                 </h2>
+                <button 
+                  onClick={downloadCSV}
+                  className="flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary hover:bg-primary/20 rounded-xl font-label-caps text-label-caps transition-all active:scale-95"
+                >
+                  <Download className="w-4 h-4" />
+                  Download CSV
+                </button>
               </div>
-              <button 
-                onClick={() => setShowDeletedUsers(!showDeletedUsers)}
-                className="px-6 py-2 border border-error/30 text-error hover:bg-error/10 rounded-xl font-label-caps text-label-caps transition-colors w-full md:w-auto"
-              >
-                {showDeletedUsers ? "Hide Deleted Users" : "See Deleted Users"}
-              </button>
-            </div>
-            
-            {showDeletedUsers && (
-              <div className="overflow-x-auto animate-fade-in">
+              
+              <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse">
                   <thead>
-                    <tr className="border-b border-error/20">
-                      <th className="pb-4 font-label-caps text-label-caps text-error uppercase tracking-widest">Email</th>
-                      <th className="pb-4 font-label-caps text-label-caps text-error uppercase tracking-widest">Deleted On</th>
+                    <tr className="border-b border-outline-variant/20">
+                      <th className="pb-4 font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest">Name</th>
+                      <th className="pb-4 font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest">Email</th>
+                      <th className="pb-4 font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest">Joined On</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-error/10">
-                    {stats.deletedAccounts?.map((account, i) => (
-                      <tr key={i} className="group hover:bg-error/5 transition-colors">
+                  <tbody className="divide-y divide-outline-variant/10">
+                    {stats.recentUsers.map((user, i) => (
+                      <tr key={i} className="group hover:bg-surface-container-low transition-colors">
+                        <td className="py-4 px-2 font-medium text-on-surface">{user.name || "Unknown"}</td>
                         <td className="py-4 px-2 text-on-surface-variant flex items-center gap-2">
-                          {revealedEmails.has(`del_${account.email}`) ? account.email : maskEmail(account.email)}
+                          {revealedEmails.has(user.email) ? user.email : maskEmail(user.email)}
                           <button 
-                            onClick={() => toggleEmail(`del_${account.email}`)} 
-                            className="text-on-surface-variant/50 hover:text-error transition-colors p-1"
-                            title={revealedEmails.has(`del_${account.email}`) ? "Hide Email" : "Reveal Email"}
+                            onClick={() => toggleEmail(user.email)} 
+                            className="text-on-surface-variant/50 hover:text-primary transition-colors p-1"
+                            title={revealedEmails.has(user.email) ? "Hide Email" : "Reveal Email"}
                           >
-                            {revealedEmails.has(`del_${account.email}`) ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                            {revealedEmails.has(user.email) ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                           </button>
                         </td>
-                        <td className="py-4 px-2 text-on-surface-variant">{new Date(account.deleted_at).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}</td>
+                        <td className="py-4 px-2 text-on-surface-variant">{new Date(user.created_at).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}</td>
                       </tr>
                     ))}
-                    {(!stats.deletedAccounts || stats.deletedAccounts.length === 0) && (
+                    {stats.recentUsers.length === 0 && (
                       <tr>
-                        <td colSpan={2} className="py-8 text-center text-on-surface-variant">
-                          No deleted accounts found.
+                        <td colSpan={3} className="py-8 text-center text-on-surface-variant">
+                          No musicians found.
                         </td>
                       </tr>
                     )}
                   </tbody>
                 </table>
               </div>
-            )}
-          </div>
+            </div>
 
-        </div>
+            {/* Deleted Users View */}
+            <div className="bg-surface-container/30 border border-error/20 p-4 md:p-8 rounded-3xl mt-8">
+              <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">
+                <div className="flex items-center gap-3">
+                  <AlertCircle className="w-6 h-6 text-error" />
+                  <h2 className="font-display-sm text-2xl font-bold text-error flex items-center gap-3">
+                    Deleted Accounts
+                    <span className="text-[14px] font-label-caps tracking-widest bg-error/10 text-error px-3 py-1 rounded-full border border-error/20">
+                      {stats.deletedAccounts?.length || 0} Total
+                    </span>
+                  </h2>
+                </div>
+                <button 
+                  onClick={() => setShowDeletedUsers(!showDeletedUsers)}
+                  className="px-6 py-2 border border-error/30 text-error hover:bg-error/10 rounded-xl font-label-caps text-label-caps transition-colors w-full md:w-auto"
+                >
+                  {showDeletedUsers ? "Hide Deleted Users" : "See Deleted Users"}
+                </button>
+              </div>
+              
+              {showDeletedUsers && (
+                <div className="overflow-x-auto animate-fade-in">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="border-b border-error/20">
+                        <th className="pb-4 font-label-caps text-label-caps text-error uppercase tracking-widest">Email</th>
+                        <th className="pb-4 font-label-caps text-label-caps text-error uppercase tracking-widest">Deleted On</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-error/10">
+                      {stats.deletedAccounts?.map((account, i) => (
+                        <tr key={i} className="group hover:bg-error/5 transition-colors">
+                          <td className="py-4 px-2 text-on-surface-variant flex items-center gap-2">
+                            {revealedEmails.has(`del_${account.email}`) ? account.email : maskEmail(account.email)}
+                            <button 
+                              onClick={() => toggleEmail(`del_${account.email}`)} 
+                              className="text-on-surface-variant/50 hover:text-error transition-colors p-1"
+                              title={revealedEmails.has(`del_${account.email}`) ? "Hide Email" : "Reveal Email"}
+                            >
+                              {revealedEmails.has(`del_${account.email}`) ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                            </button>
+                          </td>
+                          <td className="py-4 px-2 text-on-surface-variant">{new Date(account.deleted_at).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}</td>
+                        </tr>
+                      ))}
+                      {(!stats.deletedAccounts || stats.deletedAccounts.length === 0) && (
+                        <tr>
+                          <td colSpan={2} className="py-8 text-center text-on-surface-variant">
+                            No deleted accounts found.
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

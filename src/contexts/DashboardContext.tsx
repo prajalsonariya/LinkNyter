@@ -50,6 +50,19 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     fetchTracks();
+
+    // Log musician session once per day
+    if (session?.user?.email) {
+      const today = new Date().toISOString().split('T')[0];
+      const lastIngest = localStorage.getItem('last_musician_ingest');
+      if (lastIngest !== today) {
+        fetch('/api/analytics/musician-ingest', { method: 'POST' })
+          .then(res => {
+            if (res.ok) localStorage.setItem('last_musician_ingest', today);
+          })
+          .catch(console.error);
+      }
+    }
   }, [session]);
 
   const handleGlobalDrag = (e: React.DragEvent) => {
