@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
+import { supabaseAdmin } from '@/lib/supabase-admin';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 
@@ -11,12 +11,12 @@ export async function GET(req: Request) {
     }
 
     // 1. Fetch total users (musicians)
-    const { count: userCount, error: usersError } = await supabase
+    const { count: userCount, error: usersError } = await supabaseAdmin
       .from('profiles')
       .select('*', { count: 'exact', head: true });
 
     // 2. Fetch total tracks and active users (uploaders)
-    const { data: allTracks, error: tracksError } = await supabase
+    const { data: allTracks, error: tracksError } = await supabaseAdmin
       .from('tracks')
       .select('user_email');
       
@@ -25,27 +25,31 @@ export async function GET(req: Request) {
     const activeUsersCount = activeUsersSet.size;
 
     // 3. Fetch all playback sessions for high level analytics
-    const { data: sessions, error: sessionsError } = await supabase
+    const { data: sessions, error: sessionsError } = await supabaseAdmin
       .from('playback_sessions')
       .select('country, device_type, os, total_listen_time_seconds, started_at')
       .order('started_at', { ascending: false });
 
     // 4. Fetch recent musicians
-    const { data: recentUsers } = await supabase
+    const { data: recentUsers } = await supabaseAdmin
       .from('profiles')
       .select('name, email, created_at')
       .order('created_at', { ascending: false })
       .limit(5);
 
     // 5. Fetch deleted accounts
-    const { data: deletedAccounts, error: deletedAccountsError } = await supabase
+    const { data: deletedAccounts, error: deletedAccountsError } = await supabaseAdmin
       .from('deleted_accounts')
       .select('email, deleted_at')
       .order('deleted_at', { ascending: false });
 
-    if (usersError || tracksError || sessionsError || deletedAccountsError) {
-      console.error(usersError || tracksError || sessionsError || deletedAccountsError);
+    if (usersError || tracksError) {
+      console.error(usersError || tracksError);
       return NextResponse.json({ error: 'Database error' }, { status: 500 });
+    }
+    
+    if (deletedAccountsError) {
+      console.warn("Could not fetch deleted_accounts (missing SUPABASE_SERVICE_ROLE_KEY or table does not exist):", deletedAccountsError);
     }
 
     // Aggregate sessions data
