@@ -134,21 +134,10 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
       </aside>
 
       {/* Mobile Top App Bar */}
-      <header className="flex md:hidden fixed top-0 w-full bg-surface/80 backdrop-blur-xl text-primary border-b border-outline-variant/20 justify-between items-center px-4 h-16 z-50">
-        <div className="flex items-center gap-4">
-          {/* <button className="hover:opacity-80 transition-opacity active:scale-95 transition-transform">
-            <Menu className="w-6 h-6" />
-          </button> */}
-          <div className="flex items-center gap-1.5">
-            <img src="/logo.svg" alt="LinkNyter Logo" className="h-6 w-auto" />
-            <h1 className="font-display-lg text-[24px] tracking-tighter text-primary font-bold">LinkNyter</h1>
-          </div>
-        </div>
-        <div className="w-8 h-8 rounded-full border border-primary-container p-0.5 overflow-hidden">
-          <div 
-            className="w-full h-full rounded-full bg-cover bg-center" 
-            style={{ backgroundImage: `url('${session?.user?.image || "/cover-placeholder.jpg"}')` }} 
-          />
+      <header className="flex md:hidden fixed top-0 w-full bg-surface/80 backdrop-blur-xl text-primary border-b border-outline-variant/20 justify-center items-center px-4 h-16 z-50">
+        <div className="flex items-center gap-1.5">
+          <img src="/logo.svg" alt="LinkNyter Logo" className="h-6 w-auto" />
+          <h1 className="font-display-lg text-[24px] tracking-tighter text-primary font-bold">LinkNyter</h1>
         </div>
       </header>
 

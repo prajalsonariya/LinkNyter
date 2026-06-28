@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { useSession } from "next-auth/react";
-import { Play, Pause, Search, Bell, Trash2, Upload, Hourglass, Lock, FileUp, ArrowLeft } from "lucide-react";
+import { Play, Pause, Trash2, Upload, Hourglass, Lock, FileUp, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import { useDashboard } from "@/contexts/DashboardContext";
 import { TrackItem } from "@/components/TrackItem";
@@ -277,25 +277,8 @@ export default function DashboardPage() {
   return (
     <>
       <main className="flex-1 overflow-y-auto custom-scrollbar relative z-10 md:ml-64 md:mr-80 pb-32 pt-20 md:pt-0 md:pb-0">
-        <header className="sticky top-0 w-full z-40 hidden md:flex justify-between items-center px-margin-desktop h-20 bg-surface/60 backdrop-blur-xl">
+        <header className="sticky top-0 w-full z-40 hidden md:flex items-center px-margin-desktop h-20 bg-surface/60 backdrop-blur-xl">
           <h2 className="font-headline-md text-headline-md text-on-surface font-semibold">Artist Dashboard</h2>
-          <div className="flex items-center gap-6">
-            <div className="relative group">
-              <input className="bg-surface-container border border-outline-variant rounded-full px-6 py-2 w-64 text-body-sm focus:outline-none focus:border-primary transition-all text-on-surface" placeholder="Search library..." type="text" />
-              <Search className="text-on-surface-variant absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5" />
-            </div>
-            <div className="flex items-center gap-4">
-              <button className="p-2 text-on-surface-variant hover:text-primary transition-all">
-                <Bell className="w-6 h-6" />
-              </button>
-              <div className="w-10 h-10 rounded-full border-2 border-primary-container p-0.5">
-                <div 
-                  className="w-full h-full rounded-full bg-cover bg-center" 
-                  style={{ backgroundImage: `url('${session?.user?.image || "/cover-placeholder.jpg"}')` }} 
-                />
-              </div>
-            </div>
-          </div>
         </header>
 
         <div className="p-4 md:p-margin-desktop max-w-4xl mx-auto space-y-8 md:space-y-12">
