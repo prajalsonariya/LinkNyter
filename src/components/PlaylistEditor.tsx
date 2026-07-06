@@ -171,6 +171,17 @@ export function PlaylistEditor({ playlist, allTracks, onUpdate, onDelete }: { pl
             <a href={`/manage-links?playlistId=${playlist.id}`} className="px-6 py-2 border border-outline-variant hover:bg-surface-container-high transition-colors font-label-caps text-label-caps text-on-surface rounded flex items-center gap-2">
               Manage Links
             </a>
+            <button 
+              onClick={() => {
+                if (window.confirm("Are you sure you want to delete this playlist? This action cannot be undone.")) {
+                  onDelete();
+                }
+              }} 
+              className="px-6 py-2 border border-error/50 hover:bg-error/10 text-error transition-colors font-label-caps text-label-caps rounded flex items-center gap-2 md:ml-auto"
+            >
+              <Trash2 className="w-4 h-4" />
+              Delete Playlist
+            </button>
           </div>
         </div>
       </div>

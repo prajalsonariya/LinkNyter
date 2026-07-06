@@ -190,6 +190,28 @@ export default function DashboardPage() {
     }
   };
 
+  const handleDeletePlaylist = async (targetId?: string) => {
+    const playlistIdToDelete = targetId || selectedPlaylist?.id;
+    if (!playlistIdToDelete) return;
+
+    setIsDeleting(true);
+    try {
+      const res = await fetch(`/api/playlists/${playlistIdToDelete}`, { method: "DELETE" });
+      if (res.ok) {
+        setPlaylists(playlists.filter(p => p.id !== playlistIdToDelete));
+        if (selectedPlaylist?.id === playlistIdToDelete) setSelectedPlaylist(null);
+        toast.success("Playlist deleted");
+      } else {
+        const data = await res.json();
+        toast.error(data.error || "Failed to delete playlist");
+      }
+    } catch (e: any) {
+      toast.error(e.message);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   const toggleDownloads = async (trackId: string, allowDownloads: boolean) => {
     try {
       const res = await fetch(`/api/track/${trackId}`, {
@@ -258,7 +280,7 @@ export default function DashboardPage() {
                     setPlaylists(playlists.map(p => p.id === updated.id ? updated : p));
                     setSelectedPlaylist(updated);
                   }} 
-                  onDelete={() => {}} 
+                  onDelete={() => handleDeletePlaylist(selectedPlaylist.id)} 
                 />
               </div>
             ) : selectedTrack ? (
@@ -383,6 +405,7 @@ export default function DashboardPage() {
                             const fullTrack = tracks.find(t => t.id === trackId);
                             if (fullTrack) { setSelectedTrack(fullTrack); setSelectedPlaylist(null); }
                           }}
+                          onDelete={handleDeletePlaylist}
                           selectedTrackId={selectedTrack?.id}
                         />
                       </div>
@@ -467,6 +490,7 @@ export default function DashboardPage() {
                       const fullTrack = tracks.find(t => t.id === trackId);
                       if (fullTrack) { setSelectedTrack(fullTrack); setSelectedPlaylist(null); }
                     }}
+                    onDelete={handleDeletePlaylist}
                     selectedTrackId={selectedTrack?.id}
                   />
                 ))}

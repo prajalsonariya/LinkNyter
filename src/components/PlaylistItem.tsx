@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { ChevronDown, ChevronRight, Check } from "lucide-react";
+import { ChevronDown, ChevronRight, Check, Trash2 } from "lucide-react";
 import { extractDominantColor } from "@/lib/color";
 import { toast } from "sonner";
 
@@ -14,6 +14,7 @@ interface PlaylistItemProps {
   onToggleExpand: () => void;
   onPlaylistDrop: (e: React.DragEvent, playlist: any) => void;
   onTrackSelect?: (trackId: string) => void;
+  onDelete?: (playlistId: string) => void;
   selectedTrackId?: string;
 }
 
@@ -26,6 +27,7 @@ export function PlaylistItem({
   onToggleExpand,
   onPlaylistDrop,
   onTrackSelect,
+  onDelete,
   selectedTrackId,
 }: PlaylistItemProps) {
   const [accent, setAccent] = useState("139, 92, 246");
@@ -121,7 +123,7 @@ export function PlaylistItem({
       />
 
       {/* Main row */}
-      <div className="relative z-10 flex items-center gap-2 cursor-pointer">
+      <div className="relative z-10 flex items-center gap-2 cursor-pointer group">
         <button
           onClick={(e) => {
             e.stopPropagation();
@@ -150,6 +152,22 @@ export function PlaylistItem({
             </span>
           </div>
         </div>
+
+        {/* Delete Playlist Button */}
+        {onDelete && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              if (window.confirm("Are you sure you want to delete this playlist? This action cannot be undone.")) {
+                onDelete(playlist.id);
+              }
+            }}
+            title="Delete Playlist"
+            className="p-1.5 opacity-0 group-hover:opacity-100 hover:bg-error/20 rounded-full text-error/60 hover:text-error transition-all shrink-0"
+          >
+            <Trash2 className="w-4 h-4" />
+          </button>
+        )}
 
         {/* Copy link button */}
         <button
