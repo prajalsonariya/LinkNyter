@@ -3,7 +3,7 @@ export default function PrivacyPage() {
     <div className="min-h-screen bg-background pt-32 pb-24 px-margin-mobile md:px-margin-desktop text-on-background">
       <div className="max-w-3xl mx-auto">
         <h1 className="font-display-lg text-[40px] md:text-display-lg font-bold mb-4 text-on-surface tracking-tighter">Privacy Policy</h1>
-        <p className="font-body-md text-on-surface-variant mb-12 uppercase tracking-widest font-medium">Last Updated: June 25, 2026</p>
+        <p className="font-body-md text-on-surface-variant mb-12 uppercase tracking-widest font-medium">Last Updated: July 6, 2026</p>
 
         <div className="space-y-12 font-body-lg text-body-lg text-on-surface-variant leading-relaxed">
           <p>
@@ -15,7 +15,7 @@ export default function PrivacyPage() {
             <p className="mb-4">To provide our core utility, LinkNyter collects only the minimal technical data required to authenticate your account and route your audio assets.</p>
             <ul className="list-disc pl-5 space-y-3">
               <li><strong className="text-on-surface">Account Information:</strong> When you log in via Google OAuth, we receive your email address, name, and profile avatar to create your personal creator profile.</li>
-              <li><strong className="text-on-surface">Track Metadata:</strong> We collect and store text based information that you explicitly type into the application dashboard, including song titles, track descriptions, and your linked social media profile handles.</li>
+              <li><strong className="text-on-surface">Track & Playlist Metadata:</strong> We collect and store text based information that you explicitly type into the application dashboard, including song titles, track descriptions, playlist configurations, synced LRC lyrics, and your linked social media profile handles.</li>
               <li><strong className="text-on-surface">Authentication Tokens:</strong> We securely store encrypted OAuth refresh tokens provided by Google to maintain your cloud integration.</li>
             </ul>
           </section>
@@ -41,7 +41,7 @@ export default function PrivacyPage() {
 
           <section>
             <h2 className="font-headline-lg text-headline-lg text-on-surface font-semibold mb-6">4. Analytics, Telemetry, and Listener Tracking</h2>
-            <p className="mb-4">LinkNyter employs advanced telemetry to provide creators with detailed playback analytics isolated by individual custom tracking links. When a public listener opens a tracking link, we collect specific behavioral and session metrics.</p>
+            <p className="mb-4">LinkNyter employs advanced telemetry to provide creators with detailed playback analytics isolated by individual custom tracking links. When a public listener opens a tracking link for a track or playlist, we collect specific behavioral and session metrics.</p>
             <ul className="list-disc pl-5 space-y-3">
               <li><strong className="text-on-surface">Link-Level Attribution:</strong> We track real-time playback events, play counts, and unique listener interactions mapped directly to the specific custom tracking links you generate.</li>
               <li><strong className="text-on-surface">Behavioral Metrics:</strong> We calculate total completion percentage, track abandonment rates, and specific user interface interactions (such as downloads) to provide aggregated deep-dive analytics on a per-link and per-track basis.</li>
@@ -62,7 +62,8 @@ export default function PrivacyPage() {
             <h2 className="font-headline-lg text-headline-lg text-on-surface font-semibold mb-6">6. Data Retention and Deletion</h2>
             <p className="mb-4">You maintain complete control over your metadata and assets at all times.</p>
             <ul className="list-disc pl-5 space-y-3">
-              <li>If you delete a track from your LinkNyter dashboard, the corresponding row of text metadata and all associated playback analytics are instantly and permanently purged from our database.</li>
+              <li>If you delete a track or a playlist from your LinkNyter dashboard, the corresponding row of text metadata and all associated playback analytics are instantly and permanently purged from our database.</li>
+              <li>If you delete your entire LinkNyter account, all your music metadata, custom URLs, syncing data, and analytics will be wiped immediately and permanently.</li>
               <li>You can revoke LinkNyter API access at any moment directly through your personal Google Account security settings, immediately disconnecting the platform from your storage.</li>
             </ul>
           </section>

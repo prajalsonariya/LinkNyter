@@ -3,7 +3,7 @@ export default function TermsPage() {
     <div className="min-h-screen bg-background pt-32 pb-24 px-margin-mobile md:px-margin-desktop text-on-background">
       <div className="max-w-3xl mx-auto">
         <h1 className="font-display-lg text-[40px] md:text-display-lg font-bold mb-4 text-on-surface tracking-tighter">Terms and Conditions</h1>
-        <p className="font-body-md text-on-surface-variant mb-12 uppercase tracking-widest font-medium">Last Updated: June 25, 2026</p>
+        <p className="font-body-md text-on-surface-variant mb-12 uppercase tracking-widest font-medium">Last Updated: July 6, 2026</p>
 
         <div className="space-y-12 font-body-lg text-body-lg text-on-surface-variant leading-relaxed">
           <p>
@@ -29,7 +29,7 @@ export default function TermsPage() {
 
           <section>
             <h2 className="font-headline-lg text-headline-lg text-on-surface font-semibold mb-6">3. Intellectual Property and Content Ownership</h2>
-            <p className="mb-4">You retain full ownership, copyright, and intellectual property rights to all audio files, track metadata, cover art, and description text that you process through the Platform.</p>
+            <p className="mb-4">You retain full ownership, copyright, and intellectual property rights to all audio files, track metadata, playlist configurations, synced LRC lyrics, cover art, and description text that you process through the Platform.</p>
             <ul className="list-disc pl-5 space-y-3">
               <li><strong className="text-on-surface">No Rights Transferred:</strong> LinkNyter claims no ownership over your files or creative works.</li>
               <li><strong className="text-on-surface">Limited Processing License:</strong> By uploading assets, you grant LinkNyter a strictly limited, non-exclusive, worldwide license to access, retrieve, chunk, and transmit your data for the sole purpose of rendering your public listening page and executing proxy audio streams to authorized listeners.</li>
@@ -45,7 +45,7 @@ export default function TermsPage() {
               <li>Violates local, state, national, or international laws.</li>
             </ul>
             <p>
-              The Platform reserves the right to immediately terminate user account access and delete associated text metadata if a user is found to be distributing pirated or unauthorized material.
+              The Platform reserves the right to immediately terminate user account access and delete associated text metadata if a user is found to be distributing pirated or unauthorized material, including unauthorized synced lyrics, tracks, or playlist covers.
             </p>
           </section>
 
