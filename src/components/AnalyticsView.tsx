@@ -351,7 +351,7 @@ export function AnalyticsView({ tracks, playlists }: { tracks: any[], playlists?
                       <td className="py-4 px-4">
                         <div className="flex items-center gap-4">
                           <div className="w-10 h-10 rounded bg-outline-variant overflow-hidden shrink-0">
-                            <img className="w-full h-full object-cover" src={playlist.cover_art_url || "/cover-placeholder.jpg"} alt={playlist.title} />
+                            <img className="w-full h-full object-cover" src={playlist.cover_art_url || "/playlist-cover.png"} alt={playlist.title} />
                           </div>
                           <span className="font-body-lg text-on-surface group-hover:text-primary transition-colors">{playlist.title}</span>
                         </div>

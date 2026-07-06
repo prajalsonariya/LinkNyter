@@ -181,9 +181,9 @@ export function ManageLinksView({ tracks, playlists }: { tracks: any[], playlist
                               onClick={() => { setSelectedPlaylistId(p.id); setIsDropdownOpen(false); }}
                             >
                               <div 
-                                className="w-7 h-7 rounded bg-cover bg-center shrink-0 border border-outline-variant/50"
-                                style={{ backgroundImage: `url('${p.cover_art_url || "/cover-placeholder.jpg"}')` }}
-                              ></div>
+                                className="w-8 h-8 rounded shrink-0 bg-cover bg-center border border-outline-variant/30"
+                                style={{ backgroundImage: `url('${p.cover_art_url || "/playlist-cover.png"}')` }}
+                              />
                               <span className="truncate">{p.title}</span>
                             </div>
                           ))

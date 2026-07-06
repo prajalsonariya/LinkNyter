@@ -178,7 +178,7 @@ export default function PlaylistPlayerPage({ params }: { params: Promise<{ slug:
 
   useEffect(() => {
     if (!track && !playlist) return;
-    const coverToUse = track?.cover_url || playlist?.cover_art_url || "/cover-placeholder.jpg";
+    const coverToUse = track?.cover_url || playlist?.cover_art_url || "/playlist-cover.png";
     
     const img = new Image();
     img.crossOrigin = "anonymous";
@@ -193,7 +193,7 @@ export default function PlaylistPlayerPage({ params }: { params: Promise<{ slug:
 
   useEffect(() => {
     if (!track && !playlist) return;
-    const coverToUse = track?.cover_url || playlist?.cover_art_url || "/cover-placeholder.jpg";
+    const coverToUse = track?.cover_url || playlist?.cover_art_url || "/playlist-cover.png";
     
     setBgHistory(prev => {
       const last = prev[prev.length - 1];

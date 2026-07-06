@@ -78,6 +78,8 @@ export default function DashboardPage() {
   const [isCoverDragActive, setIsCoverDragActive] = useState(false);
   const coverInputRef = useRef<HTMLInputElement>(null);
 
+  const [itemToDelete, setItemToDelete] = useState<{ id: string, type: 'track' | 'playlist', name: string } | null>(null);
+
   useEffect(() => {
     if (selectedTrack) {
       setEditTitle(selectedTrack.title);
@@ -169,46 +171,50 @@ export default function DashboardPage() {
     }
   };
 
-  const handleDeleteTrack = async (targetId?: string) => {
+  const handleDeleteTrack = (targetId?: string) => {
     const trackIdToDelete = targetId || selectedTrack?.id;
     if (!trackIdToDelete) return;
-    const confirm = window.confirm("Are you sure you want to delete this track?");
-    if (!confirm) return;
-
-    setIsDeleting(true);
-    try {
-      const res = await fetch(`/api/track/${trackIdToDelete}`, { method: "DELETE" });
-      if (res.ok) {
-        setTracks(tracks.filter(t => t.id !== trackIdToDelete));
-        if (selectedTrack?.id === trackIdToDelete) setSelectedTrack(null);
-        toast.success("Track deleted");
-      }
-    } catch (e: any) {
-      toast.error(e.message);
-    } finally {
-      setIsDeleting(false);
-    }
+    const track = tracks.find(t => t.id === trackIdToDelete);
+    setItemToDelete({ id: trackIdToDelete, type: 'track', name: track?.title || "Track" });
   };
 
-  const handleDeletePlaylist = async (targetId?: string) => {
+  const handleDeletePlaylist = (targetId?: string) => {
     const playlistIdToDelete = targetId || selectedPlaylist?.id;
     if (!playlistIdToDelete) return;
+    const playlist = playlists.find(p => p.id === playlistIdToDelete);
+    setItemToDelete({ id: playlistIdToDelete, type: 'playlist', name: playlist?.title || "Playlist" });
+  };
 
+  const executeDelete = async () => {
+    if (!itemToDelete) return;
     setIsDeleting(true);
+    
     try {
-      const res = await fetch(`/api/playlists/${playlistIdToDelete}`, { method: "DELETE" });
-      if (res.ok) {
-        setPlaylists(playlists.filter(p => p.id !== playlistIdToDelete));
-        if (selectedPlaylist?.id === playlistIdToDelete) setSelectedPlaylist(null);
-        toast.success("Playlist deleted");
-      } else {
-        const data = await res.json();
-        toast.error(data.error || "Failed to delete playlist");
+      if (itemToDelete.type === 'track') {
+        const res = await fetch(`/api/track/${itemToDelete.id}`, { method: "DELETE" });
+        if (res.ok) {
+          setTracks(tracks.filter(t => t.id !== itemToDelete.id));
+          if (selectedTrack?.id === itemToDelete.id) setSelectedTrack(null);
+          toast.success("Track deleted");
+        } else {
+          toast.error("Failed to delete track");
+        }
+      } else if (itemToDelete.type === 'playlist') {
+        const res = await fetch(`/api/playlists/${itemToDelete.id}`, { method: "DELETE" });
+        if (res.ok) {
+          setPlaylists(playlists.filter(p => p.id !== itemToDelete.id));
+          if (selectedPlaylist?.id === itemToDelete.id) setSelectedPlaylist(null);
+          toast.success("Playlist deleted");
+        } else {
+          const data = await res.json();
+          toast.error(data.error || "Failed to delete playlist");
+        }
       }
     } catch (e: any) {
       toast.error(e.message);
     } finally {
       setIsDeleting(false);
+      setItemToDelete(null);
     }
   };
 
@@ -530,6 +536,39 @@ export default function DashboardPage() {
 
         </div>
       </aside>
+
+      {/* Item Deletion Modal */}
+      {itemToDelete && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm animate-fade-in">
+          <div className="bg-surface-container-high border border-outline-variant/30 rounded-2xl p-8 max-w-md w-full shadow-2xl animate-slide-up-fade">
+            <h3 className="text-[24px] font-headline-md font-bold text-error mb-4 flex items-center gap-2">
+              <Trash2 className="w-6 h-6" />
+              Delete {itemToDelete.type === 'track' ? 'Track' : 'Playlist'}
+            </h3>
+            
+            <p className="text-[14px] text-on-surface-variant mb-4 leading-relaxed">
+              You are about to <span className="font-bold text-on-surface">permanently delete</span> <strong className="text-on-surface">{itemToDelete.name}</strong>. This action cannot be undone.
+            </p>
+            
+            <div className="flex justify-end gap-3 mt-8">
+              <button 
+                onClick={() => setItemToDelete(null)}
+                disabled={isDeleting}
+                className="px-5 py-2.5 rounded-xl text-[12px] font-bold uppercase tracking-widest text-on-surface-variant hover:bg-surface-variant/50 transition-colors disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={executeDelete}
+                disabled={isDeleting}
+                className="px-5 py-2.5 rounded-xl text-[12px] font-bold uppercase tracking-widest bg-error hover:bg-error/90 text-on-error shadow-lg shadow-error/20 transition-all disabled:opacity-50 flex items-center gap-2"
+              >
+                {isDeleting ? "Deleting..." : "Delete"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

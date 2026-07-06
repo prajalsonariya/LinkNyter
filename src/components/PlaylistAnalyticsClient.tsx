@@ -179,7 +179,7 @@ export function PlaylistAnalyticsClient({ playlist, sessions: initialSessions, t
           <div className="absolute -inset-1 bg-primary/20 blur-xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
           <img 
             className="w-64 h-64 object-cover rounded-lg relative z-10 border border-outline-variant/20 shadow-2xl" 
-            src={playlist.cover_art_url || "/cover-placeholder.jpg"} 
+            src={playlist.cover_art_url || "/playlist-cover.png"} 
             alt={playlist.title} 
           />
         </div>

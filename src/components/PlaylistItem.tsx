@@ -48,17 +48,11 @@ export function PlaylistItem({
     return t?.cover_url || "/cover-placeholder.jpg";
   });
 
-  const mainCover = allTrackCovers[0] ?? null;
-
-  // Extract dominant color from first track cover
+  // Extract dominant color from playlist cover
   useEffect(() => {
-    if (!mainCover || mainCover === "/cover-placeholder.jpg") {
-      setAccent("139, 92, 246");
-      return;
-    }
     const img = new Image();
     img.crossOrigin = "anonymous";
-    img.src = mainCover;
+    img.src = playlist.cover_art_url || "/playlist-cover.png";
     img.onload = async () => {
       try {
         const [r, g, b] = await extractDominantColor(img);
@@ -67,33 +61,12 @@ export function PlaylistItem({
         setAccent("139, 92, 246");
       }
     };
-  }, [mainCover]);
+  }, [playlist.cover_art_url]);
 
-  // 2x2 grid cover if >= 4 tracks, otherwise single image
   const renderCover = () => {
-    if (pTracks.length === 0) {
-      return (
-        <img
-          src="/cover-placeholder.jpg"
-          className="w-11 h-11 rounded-lg object-cover shrink-0 border border-white/5"
-          alt="Cover"
-        />
-      );
-    }
-
-    if (pTracks.length >= 4) {
-      return (
-        <div className="w-11 h-11 rounded-lg overflow-hidden shrink-0 border border-white/10 grid grid-cols-2 grid-rows-2">
-          {allTrackCovers.slice(0, 4).map((url, i) => (
-            <img key={i} src={url} className="w-full h-full object-cover" alt="" />
-          ))}
-        </div>
-      );
-    }
-
     return (
       <img
-        src={allTrackCovers[0]}
+        src={playlist.cover_art_url || "/playlist-cover.png"}
         className="w-11 h-11 rounded-lg object-cover shrink-0 border border-white/5"
         alt="Cover"
       />
@@ -158,9 +131,7 @@ export function PlaylistItem({
           <button
             onClick={(e) => {
               e.stopPropagation();
-              if (window.confirm("Are you sure you want to delete this playlist? This action cannot be undone.")) {
-                onDelete(playlist.id);
-              }
+              onDelete(playlist.id);
             }}
             title="Delete Playlist"
             className="p-1.5 opacity-0 group-hover:opacity-100 hover:bg-error/20 rounded-full text-error/60 hover:text-error transition-all shrink-0"
