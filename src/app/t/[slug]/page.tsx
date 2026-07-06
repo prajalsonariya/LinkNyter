@@ -6,151 +6,8 @@ import { Download, RotateCcw, RotateCw } from "lucide-react";
 import { InstagramIcon, TwitterIcon, YouTubeIcon, SpotifyIcon, AppleMusicIcon, GlobeIcon } from "@/components/SocialIcons";
 import Link from "next/link";
 
-const TwoLineLyrics = ({ lrcData, isPlaying, audioRef, accent, lrcTiming = "600ms" }: { lrcData: string, isPlaying: boolean, audioRef: React.RefObject<HTMLAudioElement | null>, accent: string, lrcTiming?: string }) => {
-  const [currentMillisecond, setCurrentMillisecond] = useState(0);
-
-  useEffect(() => {
-    let rafId: number;
-    const updateRaf = () => {
-      if (audioRef.current && isPlaying) {
-        setCurrentMillisecond(audioRef.current.currentTime * 1000);
-      }
-      rafId = requestAnimationFrame(updateRaf);
-    };
-    if (isPlaying) {
-      rafId = requestAnimationFrame(updateRaf);
-    }
-    return () => cancelAnimationFrame(rafId);
-  }, [isPlaying, audioRef]);
-
-  useEffect(() => {
-    if (!isPlaying) {
-      const handleTime = () => {
-        if (audioRef.current) setCurrentMillisecond(audioRef.current.currentTime * 1000);
-      };
-      const audioEl = audioRef.current;
-      audioEl?.addEventListener('timeupdate', handleTime);
-      return () => audioEl?.removeEventListener('timeupdate', handleTime);
-    }
-  }, [isPlaying, audioRef]);
-
-  const parsed = useMemo(() => {
-    const rawLines = lrcData.split("\n");
-    const arr = [];
-    const lrcRegex = /^\[(\d+):(\d+)\.(\d+)\](.*)/;
-    for (const line of rawLines) {
-      const match = line.trim().match(lrcRegex);
-      if (match) {
-        const mins = parseInt(match[1], 10);
-        const secs = parseInt(match[2], 10);
-        const ms = parseInt(match[3], 10);
-        arr.push({
-          ms: (mins * 60 + secs) * 1000 + ms * 10,
-          text: match[4].trim() || "..."
-        });
-      }
-    }
-    
-    if (arr.length > 0 && arr[0].ms > 0) {
-      arr.unshift({ ms: 0, text: "..." });
-    } else if (arr.length === 0) {
-      arr.push({ ms: 0, text: "..." });
-    }
-    
-    return arr;
-  }, [lrcData]);
-
-  let activeIndex = 0;
-  for (let i = 0; i < parsed.length; i++) {
-    if (currentMillisecond >= parsed[i].ms) {
-      activeIndex = i;
-    } else {
-      break;
-    }
-  }
-
-  if (parsed.length === 0) return null;
-
-  return (
-    <div 
-      className="relative w-full h-[6rem] md:h-[7rem] overflow-hidden flex flex-col justify-center items-center pointer-events-none select-none"
-      style={{ 
-        maskImage: 'linear-gradient(to bottom, transparent 0%, black 25%, black 75%, transparent 100%)', 
-        WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 25%, black 75%, transparent 100%)' 
-      }}
-    >
-      {parsed.map((line, i) => {
-        const offset = i - activeIndex;
-
-        if (offset < -2 || offset > 2) return null;
-
-        const isActive = offset === 0;
-
-        let translateY = "0px";
-        let opacity = 0;
-        let scale = 0.75;
-        
-        if (offset < -1) {
-          translateY = "-2rem";
-          opacity = 0;
-          scale = 0.7;
-        } else if (offset === -1) {
-          translateY = "0.5rem";
-          opacity = 0.4;
-          scale = 0.75;
-        } else if (offset === 0) {
-          translateY = "3.2rem";
-          opacity = 1; 
-          scale = 1;
-        } else if (offset > 0) {
-          translateY = "6rem";
-          opacity = 0;
-          scale = 0.8;
-        }
-
-        let durationClass = "duration-[600ms]";
-        let durationMs = 600;
-        if (lrcTiming === "400ms") { durationClass = "duration-[400ms]"; durationMs = 400; }
-        if (lrcTiming === "1000ms") { durationClass = "duration-[1000ms]"; durationMs = 1000; }
-
-        let innerOpacity = 1;
-        let innerDuration = "0ms";
-        let innerDelay = "0ms";
-        
-        if (offset === -1) {
-          innerOpacity = 0;
-          innerDuration = `${durationMs / 2}ms`;
-          innerDelay = `${durationMs}ms`;
-        } else if (offset < -1) {
-          innerOpacity = 0;
-        }
-
-        return (
-          <div
-            key={i}
-            className={`absolute top-0 left-0 w-full text-center transition-all ${durationClass} ease-[cubic-bezier(0.2,0.8,0.2,1)] will-change-transform origin-center`}
-            style={{
-              transform: `translateY(${translateY}) scale(${scale})`,
-              opacity: opacity,
-              textShadow: isActive ? `0 0 30px rgba(${accent}, 0.8)` : 'none'
-            }}
-          >
-            <div 
-              className="text-[20px] md:text-[24px] font-bold text-white px-4 transition-opacity ease-linear"
-              style={{
-                opacity: innerOpacity,
-                transitionDuration: innerDuration,
-                transitionDelay: innerDelay
-              }}
-            >
-              {line.text}
-            </div>
-          </div>
-        );
-      })}
-    </div>
-  );
-};
+import TwoLineLyrics from "@/components/TwoLineLyrics";
+import { BioDescription } from "@/components/BioDescription";
 
 function extractDominantColor(imgElement: HTMLImageElement): Promise<[number, number, number]> {
   return new Promise((resolve) => {
@@ -222,6 +79,24 @@ export default function PlayerPage({ params }: { params: Promise<{ slug: string 
   useEffect(() => {
     async function loadTrack() {
       const resolvedParams = await params;
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const trackingRef = urlParams.get('ref');
+
+      if (trackingRef) {
+        const { data: linkData, error: linkError } = await supabase
+          .from('tracking_links')
+          .select('id')
+          .eq('custom_slug', trackingRef)
+          .single();
+          
+        if (linkError || !linkData) {
+          setTrack(null);
+          setLoading(false);
+          return;
+        }
+      }
+
       const { data: trackData } = await supabase
         .from('tracks').select('*').eq('slug', resolvedParams.slug).single();
       if (trackData) {
@@ -423,12 +298,16 @@ export default function PlayerPage({ params }: { params: Promise<{ slug: string 
     <div className="relative min-h-screen flex flex-col overflow-x-hidden" style={{ backgroundColor: '#060607', color: '#e3e2e7', fontFamily: "'Geist', sans-serif" }}>
 
       <div className="fixed inset-0 z-0">
-        <div className="absolute inset-0 bg-cover bg-center opacity-30 blur-3xl scale-125" style={{ backgroundImage: `url('${coverSrc}')` }} />
+        <div className="absolute inset-0 opacity-40 blur-3xl scale-125">
+          <img src={`/_next/image?url=${encodeURIComponent(coverSrc)}&w=1080&q=75`} alt="" className="w-full h-full object-cover" />
+        </div>
         <div className="absolute top-[-20%] right-[-10%] w-[70vw] h-[70vw] pointer-events-none" style={{ background: `radial-gradient(circle, rgba(${accent}, 0.12) 0%, rgba(${accent}, 0) 70%)`, filter: 'blur(120px)' }} />
         <div className="absolute bottom-[-30%] left-[-10%] w-[80vw] h-[80vw] pointer-events-none" style={{ background: `radial-gradient(circle, rgba(${accent}, 0.08) 0%, rgba(${accent}, 0) 70%)`, filter: 'blur(150px)' }} />
+        {/* Dark Overlay for better legibility */}
+        <div className="absolute inset-0 bg-black/40 z-10 pointer-events-none" />
       </div>
 
-      <nav className="fixed top-0 left-0 w-full h-20 flex items-center justify-between px-4 md:px-12 z-50">
+      <nav className="absolute top-0 left-0 w-full h-20 flex items-center justify-between px-4 md:px-12 z-50">
         <Link href="/" className="flex items-center gap-1.5 md:gap-2 hover:opacity-80 transition-opacity">
           <img src="/logo.svg" alt="LinkNyter Logo" className="h-8 md:h-10 w-auto" />
           <span className="text-headline-md font-bold tracking-tight text-white/90">LinkNyter</span>
@@ -436,63 +315,47 @@ export default function PlayerPage({ params }: { params: Promise<{ slug: string 
       </nav>
 
       <main className="relative z-10 flex-1 flex flex-col items-center justify-start pt-[max(6rem,calc(50vh-300px))] px-4 md:px-12 pb-12 min-h-[100dvh]">
-        <div className={`w-full max-w-7xl grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-start mx-auto`}>
+        <div className="w-full max-w-[1200px] grid grid-cols-1 lg:grid-cols-[auto_1fr] gap-10 lg:gap-12 xl:gap-16 items-stretch mx-auto">
           
-          <div className={`relative group mx-auto w-full ${track.lrc_data ? 'max-w-[200px] sm:max-w-[240px]' : 'max-w-[280px] sm:max-w-[320px]'} md:max-w-[500px] transition-all duration-500`}>
-            <div className="absolute inset-0 bg-white/5 blur-2xl rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
-            <div className="relative aspect-square rounded-2xl overflow-hidden border border-white/5" style={{ boxShadow: '0 40px 100px -20px rgba(0,0,0,0.8)' }}>
+          <div className="relative mx-auto w-full max-w-[320px] sm:max-w-[380px] lg:max-w-[400px] xl:max-w-[500px] transition-all duration-500">
+            <div className="absolute inset-0 bg-white/5 blur-2xl rounded-2xl opacity-0 transition-opacity duration-1000" />
+            <div className="relative aspect-square rounded-2xl overflow-hidden border border-white/5 transition-all duration-1000" style={{ boxShadow: '0 40px 100px -20px rgba(0,0,0,0.8)' }}>
               <img
                 ref={imgRef}
                 alt={track.title}
-                className="w-full h-full object-cover"
-                src={coverSrc}
+                className="w-full h-full object-cover animate-fade-in"
+                src={`/_next/image?url=${encodeURIComponent(coverSrc)}&w=1080&q=75`}
                 onError={(e) => { e.currentTarget.src = "/cover-placeholder.jpg" }}
               />
+              {/* MOBILE ONLY: Track Title on Cover Art */}
+              <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/80 pointer-events-none lg:hidden" />
+              <div className="absolute bottom-0 left-0 w-full p-6 sm:p-8 flex flex-col justify-end lg:hidden">
+                <h1 className="text-2xl sm:text-3xl font-bold tracking-tighter text-white mb-1.5 leading-tight drop-shadow-lg">{track.title}</h1>
+                <p className="text-body-lg font-medium tracking-tight opacity-90 drop-shadow-md" style={{ color: `rgb(${accent})` }}>
+                  {artistName}
+                </p>
+              </div>
             </div>
           </div>
 
-          <div className={`flex flex-col w-full max-w-[500px] mx-auto lg:mx-0 ${track.lrc_data ? 'min-h-full' : ''}`}>
+          <div className="flex flex-col w-full max-w-xl mx-auto lg:mx-0 min-h-full">
             <div className="flex flex-col gap-4 lg:gap-6">
-              <section className={`space-y-4 order-2 lg:order-1 ${track.lrc_data ? 'text-left' : 'text-center lg:text-left'}`}>
+              {/* DESKTOP ONLY: Track Title & Description */}
+              <section className={`hidden lg:block space-y-4 order-2 lg:order-1 ${track.lrc_data ? 'text-left' : 'text-center lg:text-left'}`}>
                 <div>
                   <h1 className="text-3xl sm:text-[36px] md:text-display-lg font-bold tracking-tighter text-white mb-2 leading-tight">{track.title}</h1>
                   <p className="text-headline-md font-medium tracking-tight opacity-90" style={{ color: `rgb(${accent})` }}>
                     {artistName}
                   </p>
                 </div>
-                <div 
-                  className={`flex flex-col cursor-pointer group w-full ${track.lrc_data ? 'items-start' : 'items-center lg:items-start mx-auto lg:mx-0'}`}
-                  onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
-                >
-                  <div className={`relative transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] overflow-hidden w-full max-w-lg ${isDescriptionExpanded ? 'max-h-[800px]' : 'max-h-[28px]'}`}>
-                    
-                    <div className={`transition-opacity duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] ${isDescriptionExpanded || ((track.description || track.artist_bio || "A secure, private stream hosted on LinkNyter.").length <= 50) ? 'opacity-100' : 'opacity-0'}`}>
-                      <p className="text-body-lg text-white/40 leading-relaxed font-light">
-                        {track.description || track.artist_bio || "A secure, private stream hosted on LinkNyter."}
-                      </p>
-                      {((track.description || track.artist_bio || "A secure, private stream hosted on LinkNyter.").length > 50) && (
-                        <span className="text-white/60 text-[13px] font-medium mt-2 inline-block group-hover:text-white transition-colors">
-                          Show less
-                        </span>
-                      )}
-                    </div>
-                    
-                    {((track.description || track.artist_bio || "A secure, private stream hosted on LinkNyter.").length > 50) && (
-                      <div className={`absolute top-0 left-0 w-full transition-opacity duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] ${isDescriptionExpanded ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
-                        <p className="text-body-lg text-white/40 leading-relaxed font-light">
-                          {(track.description || track.artist_bio || "A secure, private stream hosted on LinkNyter.").slice(0, 50).trim()}
-                          <span className="text-white/60 text-[14px] font-medium ml-1 group-hover:text-white transition-colors">
-                            ...more
-                          </span>
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                </div>
+                <BioDescription 
+                  text={track.description || track.artist_bio} 
+                  className={track.lrc_data ? 'items-start' : 'items-start mx-auto lg:mx-0'} 
+                />
               </section>
 
               {track.lrc_data && (
-                <div className="order-1 lg:order-2 w-full">
+                <div className="order-1 lg:order-2 w-full mt-auto mb-0">
                   <TwoLineLyrics 
                     lrcData={track.lrc_data} 
                     isPlaying={isPlaying} 
@@ -502,9 +365,17 @@ export default function PlayerPage({ params }: { params: Promise<{ slug: string 
                   />
                 </div>
               )}
+
+              {/* MOBILE ONLY BIO - Displayed regardless of lyrics */}
+              <div className={`lg:hidden w-full pb-0 order-3 ${track.lrc_data ? 'mt-4 mb-0' : 'mt-auto mb-0'}`}>
+                <BioDescription 
+                  text={track.description || track.artist_bio} 
+                  className="items-start mx-auto" 
+                />
+              </div>
             </div>
 
-            <section className={`w-full mt-8 lg:mt-8 space-y-8 ${track.lrc_data ? 'lg:mt-auto' : ''}`}>
+            <section className={`w-full lg:mt-auto space-y-6 lg:space-y-8 pt-4 lg:pt-8`}>
               <div className="space-y-3">
                 <div 
                   className="relative py-6 md:py-4 w-full cursor-pointer group/rail flex items-center" 

@@ -54,8 +54,11 @@ export async function DELETE(req: Request) {
       await supabase.from('tracking_links').delete().in('track_id', trackIds);
     }
 
-    // 4. Delete the tracks
-    await supabase.from('tracks').delete().eq('user_email', userEmail);
+    // 2. Delete all tracks
+    await supabaseAdmin.from('tracks').delete().eq('user_email', userEmail);
+    // (Playlists and Playback sessions and Links will cascade delete if foreign keys are set up, 
+    // but we can be explicit just in case)
+    await supabaseAdmin.from('playlists').delete().eq('user_email', userEmail);
 
     // 5. Log the deleted account BEFORE deleting the profile (so authenticated RLS might allow it)
     let logError = null;

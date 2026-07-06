@@ -12,6 +12,7 @@ export async function GET(req: Request) {
 
     const { searchParams } = new URL(req.url);
     const trackId = searchParams.get('track_id');
+    const playlistId = searchParams.get('playlist_id');
 
     // First fetch user tracks
     const { data: tracks, error: tracksError } = await supabase
@@ -19,20 +20,27 @@ export async function GET(req: Request) {
       .select('id')
       .eq('user_email', session.user.email);
 
-    if (tracksError || !tracks || tracks.length === 0) {
-      return NextResponse.json([]);
-    }
+    const { data: playlists, error: playlistsError } = await supabase
+      .from('playlists')
+      .select('id')
+      .eq('user_email', session.user.email);
 
-    const trackIds = tracks.map(t => t.id);
+    const trackIds = tracks?.map(t => t.id) || [];
+    const playlistIds = playlists?.map(p => p.id) || [];
 
     let query = supabase
       .from('tracking_links')
       .select('*')
-      .in('track_id', trackIds)
       .order('created_at', { ascending: false });
 
-    if (trackId) {
+    if (playlistId) {
+      if (!playlistIds.includes(playlistId)) return NextResponse.json({ error: 'Unauthorized playlist' }, { status: 403 });
+      query = query.eq('playlist_id', playlistId);
+    } else if (trackId) {
+      if (!trackIds.includes(trackId)) return NextResponse.json({ error: 'Unauthorized track' }, { status: 403 });
       query = query.eq('track_id', trackId);
+    } else {
+      query = query.or(`track_id.in.(${trackIds.join(',') || '00000000-0000-0000-0000-000000000000'}),playlist_id.in.(${playlistIds.join(',') || '00000000-0000-0000-0000-000000000000'})`);
     }
 
     const { data: links, error: linksError } = await query;
@@ -54,18 +62,28 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { track_id, reference_name } = await req.json();
+    const { track_id, playlist_id, reference_name } = await req.json();
 
-    // Verify track ownership
-    const { data: track, error: trackError } = await supabase
-      .from('tracks')
-      .select('id')
-      .eq('id', track_id)
-      .eq('user_email', session.user.email)
-      .single();
-
-    if (trackError || !track) {
-      return NextResponse.json({ error: 'Unauthorized or track not found' }, { status: 403 });
+    if (playlist_id) {
+      const { data: playlist, error: playlistError } = await supabase
+        .from('playlists')
+        .select('id')
+        .eq('id', playlist_id)
+        .eq('user_email', session.user.email)
+        .single();
+      
+      if (playlistError || !playlist) return NextResponse.json({ error: 'Unauthorized or not found' }, { status: 403 });
+    } else if (track_id) {
+      const { data: track, error: trackError } = await supabase
+        .from('tracks')
+        .select('id')
+        .eq('id', track_id)
+        .eq('user_email', session.user.email)
+        .single();
+      
+      if (trackError || !track) return NextResponse.json({ error: 'Unauthorized or not found' }, { status: 403 });
+    } else {
+      return NextResponse.json({ error: 'Must provide track_id or playlist_id' }, { status: 400 });
     }
 
     // Generate an anonymous 8-character alphanumeric slug
@@ -74,7 +92,8 @@ export async function POST(req: Request) {
     const { data: newLink, error: insertError } = await supabase
       .from('tracking_links')
       .insert({
-        track_id,
+        track_id: track_id || null,
+        playlist_id: playlist_id || null,
         reference_name: reference_name.trim(),
         custom_slug: slug
       })
@@ -106,21 +125,36 @@ export async function DELETE(req: Request) {
     // Verify ownership via a join
     const { data: link, error: linkError } = await supabase
       .from('tracking_links')
-      .select('id, track_id')
+      .select('id, track_id, playlist_id')
       .eq('id', linkId)
       .single();
 
     if (linkError || !link) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
-    const { data: track, error: trackError } = await supabase
-      .from('tracks')
-      .select('id')
-      .eq('id', link.track_id)
-      .eq('user_email', session.user.email)
-      .single();
+    if (link.track_id) {
+      const { data: track, error: trackError } = await supabase
+        .from('tracks')
+        .select('id')
+        .eq('id', link.track_id)
+        .eq('user_email', session.user.email)
+        .single();
 
-    if (trackError || !track) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
+      if (trackError || !track) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
+      }
+    } else if (link.playlist_id) {
+      const { data: playlist, error: playlistError } = await supabase
+        .from('playlists')
+        .select('id')
+        .eq('id', link.playlist_id)
+        .eq('user_email', session.user.email)
+        .single();
+
+      if (playlistError || !playlist) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
+      }
+    } else {
+      return NextResponse.json({ error: 'Invalid link' }, { status: 400 });
     }
 
     const { error: deleteError } = await supabase

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
+import { supabaseAdmin } from '@/lib/supabase-admin';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '../../auth/[...nextauth]/route';
 import { google } from 'googleapis';
@@ -15,7 +16,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     }
 
     // Verify ownership and get current cover_url for cleanup
-    const { data: track, error: fetchError } = await supabase
+    const { data: track, error: fetchError } = await supabaseAdmin
       .from('tracks')
       .select('user_email, cover_url')
       .eq('id', trackId)
@@ -66,7 +67,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
       }
     }
 
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from('tracks')
       .update(updateData)
       .eq('id', trackId)
@@ -93,7 +94,7 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
     }
 
     // Verify ownership and get google drive file IDs
-    const { data: track, error: fetchError } = await supabase
+    const { data: track, error: fetchError } = await supabaseAdmin
       .from('tracks')
       .select('user_email, google_drive_file_id, cover_url')
       .eq('id', trackId)
@@ -141,7 +142,7 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
     }
 
     // 3. Delete from Supabase
-    const { error: deleteError } = await supabase
+    const { error: deleteError } = await supabaseAdmin
       .from('tracks')
       .delete()
       .eq('id', trackId);

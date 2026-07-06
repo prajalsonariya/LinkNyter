@@ -8,7 +8,7 @@ export async function POST(req: Request) {
     if (!text) return NextResponse.json({ success: true });
 
     const payload = JSON.parse(text);
-    const { session_id, track_id, tracking_ref, events, downloads, social_clicks } = payload;
+    const { session_id, track_id, playlist_id, tracking_ref, events, downloads, social_clicks } = payload;
 
     if (!track_id || !session_id) {
       return NextResponse.json({ error: 'Missing track_id or session_id' }, { status: 400 });
@@ -108,6 +108,7 @@ export async function POST(req: Request) {
       .upsert({
         id: session_id,
         track_id,
+        playlist_id,
         tracking_link_id,
         total_listen_time_seconds: Math.round(totalListenTimeSeconds),
         completion_percentage: maxAudioTimestamp, // Storing max audio time here for now

@@ -13,6 +13,7 @@ export async function GET(req: Request) {
 
     const { searchParams } = new URL(req.url);
     const timeframe = searchParams.get('timeframe') || '30D'; // 7D, 30D, ALL
+    const playlistId = searchParams.get('playlistId');
 
     // 1. Fetch user's tracks
     const { data: tracks, error: tracksError } = await supabase
@@ -30,8 +31,18 @@ export async function GET(req: Request) {
     let query = supabase
       .from('playback_sessions')
       .select('*, tracking_links(reference_name, custom_slug)')
-      .in('track_id', trackIds)
       .order('started_at', { ascending: false });
+
+    if (playlistId) {
+      // Validate user owns this playlist
+      const { data: playlistCheck } = await supabase.from('playlists').select('user_email').eq('id', playlistId).single();
+      if (playlistCheck?.user_email !== session.user.email) {
+        return NextResponse.json({ error: 'Unauthorized playlist' }, { status: 403 });
+      }
+      query = query.eq('playlist_id', playlistId);
+    } else {
+      query = query.in('track_id', trackIds);
+    }
 
     let startDate: Date | null = null;
     if (timeframe === '7D') {
@@ -120,11 +131,38 @@ export async function GET(req: Request) {
     const downloads = sessions?.filter(s => s.download_clicked).length || 0;
     const socialClicks = sessions?.filter(s => s.social_links_clicked).length || 0;
 
+    // Fetch playlist aggregate stats (total streams per playlist)
+    let playlistStats: Record<string, number> = {};
+    if (!playlistId) {
+      const { data: playlists } = await supabase
+        .from('playlists')
+        .select('id')
+        .eq('user_email', session.user.email);
+        
+      const playlistIds = (playlists || []).map(p => p.id);
+      
+      if (playlistIds.length > 0) {
+        const { data: pStats } = await supabase
+          .from('playback_sessions')
+          .select('playlist_id')
+          .in('playlist_id', playlistIds);
+        
+        if (pStats) {
+          pStats.forEach(s => {
+            if (s.playlist_id) {
+              playlistStats[s.playlist_id] = (playlistStats[s.playlist_id] || 0) + 1;
+            }
+          });
+        }
+      }
+    }
+
     return NextResponse.json({
       timeline,
       devices: { mobile: mobileCount, desktop: desktopCount },
       geo: { countries: topCountries, cities: topCities },
       sessions: sessions || [],
+      playlistStats,
       metrics: {
         totalOpens,
         avgListenTime,

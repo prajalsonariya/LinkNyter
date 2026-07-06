@@ -5,11 +5,11 @@ import { AreaChart, Area, XAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Ce
 import { TrendingUp, Loader2, Smartphone, Monitor } from "lucide-react";
 import { useRouter, useSearchParams } from 'next/navigation';
 
-export function AnalyticsView({ tracks }: { tracks: any[] }) {
+export function AnalyticsView({ tracks, playlists }: { tracks: any[], playlists?: any[] }) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const tabParam = searchParams.get('tab') as 'overview' | 'content' | null;
-  const activeTab = tabParam === 'content' ? 'content' : 'overview';
+  const tabParam = searchParams.get('tab') as 'overview' | 'content' | 'playlists' | null;
+  const activeTab = tabParam === 'content' ? 'content' : tabParam === 'playlists' ? 'playlists' : 'overview';
   
   const [timeframe, setTimeframe] = useState<'7D' | '30D' | 'ALL'>('30D');
   const [totalStreams, setTotalStreams] = useState(0);
@@ -18,6 +18,7 @@ export function AnalyticsView({ tracks }: { tracks: any[] }) {
     devices: { mobile: number, desktop: number },
     geo?: { countries: any[], cities: any[] },
     sessions?: any[],
+    playlistStats?: Record<string, number>,
     metrics?: { totalOpens: number, avgListenTime: number, downloads: number, socialClicks: number }
   }>({ 
     timeline: [], 
@@ -108,6 +109,13 @@ export function AnalyticsView({ tracks }: { tracks: any[] }) {
           >
             Tracks
             {activeTab === 'content' && <div className="absolute bottom-0 left-0 w-full h-0.5 bg-primary rounded-t-full shadow-[0_0_10px_rgba(139,92,246,0.5)]" />}
+          </button>
+          <button 
+            onClick={() => router.push('?tab=playlists', { scroll: false })}
+            className={`pb-4 font-label-caps text-sm uppercase tracking-wider transition-all relative ${activeTab === 'playlists' ? 'text-primary font-bold' : 'text-on-surface-variant hover:text-on-surface'}`}
+          >
+            Playlists
+            {activeTab === 'playlists' && <div className="absolute bottom-0 left-0 w-full h-0.5 bg-primary rounded-t-full shadow-[0_0_10px_rgba(139,92,246,0.5)]" />}
           </button>
         </div>
       </header>
@@ -310,6 +318,50 @@ export function AnalyticsView({ tracks }: { tracks: any[] }) {
                     </td>
                   </tr>
                 ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      )}
+
+      {activeTab === 'playlists' && (
+        <section className="bg-surface-container-low/50 backdrop-blur-xl border border-outline-variant/50 rounded-2xl p-4 md:p-6 mb-6">
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider">All Playlists</h3>
+            <span className="text-xs text-on-surface-variant">{playlists?.length || 0} playlists</span>
+          </div>
+          
+          <div className="w-full overflow-x-auto custom-scrollbar">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="border-b border-outline-variant/30">
+                  <th className="pb-3 px-4 font-label-caps text-xs text-on-surface-variant uppercase tracking-wider">Playlist</th>
+                  <th className="pb-3 px-4 font-label-caps text-xs text-on-surface-variant uppercase tracking-wider text-right">Streams</th>
+                </tr>
+              </thead>
+              <tbody>
+                {(playlists || []).map((playlist) => {
+                  const streams = analyticsData.playlistStats?.[playlist.id] || 0;
+                  return (
+                    <tr 
+                      key={playlist.id} 
+                      onClick={() => router.push(`/analytics/playlist/${playlist.id}`)}
+                      className="border-b border-outline-variant/10 hover:bg-surface-container-high transition-colors group cursor-pointer"
+                    >
+                      <td className="py-4 px-4">
+                        <div className="flex items-center gap-4">
+                          <div className="w-10 h-10 rounded bg-outline-variant overflow-hidden shrink-0">
+                            <img className="w-full h-full object-cover" src={playlist.cover_art_url || "/cover-placeholder.jpg"} alt={playlist.title} />
+                          </div>
+                          <span className="font-body-lg text-on-surface group-hover:text-primary transition-colors">{playlist.title}</span>
+                        </div>
+                      </td>
+                      <td className="py-4 px-4 text-right font-body-md text-on-surface-variant group-hover:text-primary transition-colors">
+                        {streams}
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>

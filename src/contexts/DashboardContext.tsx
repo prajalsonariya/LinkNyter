@@ -8,8 +8,12 @@ import { supabase } from "@/lib/supabase";
 interface DashboardContextType {
   tracks: any[];
   setTracks: React.Dispatch<React.SetStateAction<any[]>>;
+  playlists: any[];
+  setPlaylists: React.Dispatch<React.SetStateAction<any[]>>;
   selectedTrack: any | null;
   setSelectedTrack: React.Dispatch<React.SetStateAction<any | null>>;
+  selectedPlaylist: any | null;
+  setSelectedPlaylist: React.Dispatch<React.SetStateAction<any | null>>;
   isUploading: boolean;
   uploadProgress: number;
   dragActive: boolean;
@@ -19,6 +23,7 @@ interface DashboardContextType {
   handleGlobalDrop: (e: React.DragEvent) => void;
   handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   fetchTracks: () => Promise<void>;
+  fetchPlaylists: () => Promise<void>;
 }
 
 const DashboardContext = createContext<DashboardContextType | undefined>(undefined);
@@ -26,7 +31,9 @@ const DashboardContext = createContext<DashboardContextType | undefined>(undefin
 export function DashboardProvider({ children }: { children: React.ReactNode }) {
   const { data: session } = useSession();
   const [tracks, setTracks] = useState<any[]>([]);
+  const [playlists, setPlaylists] = useState<any[]>([]);
   const [selectedTrack, setSelectedTrack] = useState<any | null>(null);
+  const [selectedPlaylist, setSelectedPlaylist] = useState<any | null>(null);
   
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -48,8 +55,23 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const fetchPlaylists = async () => {
+    if (!session?.user?.email) return;
+    try {
+      const { data, error } = await supabase
+        .from('playlists')
+        .select('*, playlist_tracks(track_id, track_order, tracks(title, artist, cover_url))')
+        .eq('user_email', session.user.email)
+        .order('created_at', { ascending: false });
+      if (data) setPlaylists(data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   useEffect(() => {
     fetchTracks();
+    fetchPlaylists();
 
     // Log musician session once per day
     if (session?.user?.email) {
@@ -69,18 +91,19 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
     e.preventDefault();
     e.stopPropagation();
     
-    // Check if dragging an image, if so, don't show the global audio drop overlay
-    let isImage = false;
+    // Only show global drag overlay if an audio file (or unknown file) is dragged
+    let isAudioFile = false;
     if (e.dataTransfer.items && e.dataTransfer.items.length > 0) {
       for (let i = 0; i < e.dataTransfer.items.length; i++) {
-        if (e.dataTransfer.items[i].kind === 'file' && e.dataTransfer.items[i].type.startsWith('image/')) {
-          isImage = true;
+        const item = e.dataTransfer.items[i];
+        if (item.kind === 'file' && (!item.type || item.type.startsWith('audio/'))) {
+          isAudioFile = true;
           break;
         }
       }
     }
 
-    if (isImage) {
+    if (!isAudioFile) {
       setDragActive(false);
       return;
     }
@@ -196,9 +219,11 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <DashboardContext.Provider value={{ 
-        tracks, setTracks, selectedTrack, setSelectedTrack, 
+        tracks, setTracks, playlists, setPlaylists, 
+        selectedTrack, setSelectedTrack, selectedPlaylist, setSelectedPlaylist, 
         isUploading, uploadProgress, dragActive, setDragActive, 
-        inputRef, handleGlobalDrag, handleGlobalDrop, handleChange, fetchTracks 
+        inputRef, handleGlobalDrag, handleGlobalDrop, handleChange, 
+        fetchTracks, fetchPlaylists 
       }}>
       {children}
     </DashboardContext.Provider>

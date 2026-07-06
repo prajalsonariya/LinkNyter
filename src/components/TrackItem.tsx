@@ -57,6 +57,10 @@ export function TrackItem({
       className={`relative p-4 rounded-xl border ${isSelected ? 'border-primary' : 'border-outline-variant/30'} bg-surface/40 backdrop-blur-xl hover:bg-surface/60 transition-all group overflow-hidden shadow-lg ${isSelected ? 'active-glow' : ''}`}
       onClick={onSelect}
       style={{ cursor: 'pointer' }}
+      draggable
+      onDragStart={(e) => {
+        e.dataTransfer.setData("application/json", JSON.stringify(track));
+      }}
     >
       {/* Ambient glassmorphic glow based on cover art */}
       <div 

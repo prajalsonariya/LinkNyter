@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { google } from 'googleapis';
 import { supabase } from '@/lib/supabase';
+import { supabaseAdmin } from '@/lib/supabase-admin';
 
 export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -19,7 +20,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
     if (fetchRes.status === 404) {
       // Lazy cleanup: If the cover art is missing from Drive, clear it from the database
       console.warn(`Cover image missing from Drive: ${fileId}. Resetting in database...`);
-      await supabase.from('tracks').update({ cover_url: '' }).eq('cover_url', `/api/cover/${fileId}`);
+      await supabaseAdmin.from('tracks').update({ cover_url: '' }).eq('cover_url', `/api/cover/${fileId}`);
       return new NextResponse('Image not found or inaccessible', { status: 404 });
     }
 

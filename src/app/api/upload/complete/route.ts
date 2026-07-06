@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { google } from 'googleapis';
 import { supabase } from '@/lib/supabase';
+import { supabaseAdmin } from '@/lib/supabase-admin';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '../../auth/[...nextauth]/route';
 
@@ -34,7 +35,7 @@ export async function POST(req: Request) {
     const slug = crypto.randomUUID().substring(0, 8); // Short slug for sharing
 
     // Save to Supabase
-    const { data, error } = await supabase.from('tracks').insert({
+    const { data, error } = await supabaseAdmin.from('tracks').insert({
       title,
       google_drive_file_id: driveFileId,
       slug,

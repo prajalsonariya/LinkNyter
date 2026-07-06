@@ -11,28 +11,47 @@ import { InstagramIcon, TwitterIcon, YouTubeIcon, SpotifyIcon, AppleMusicIcon, G
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 
-export function TrackAnalyticsClient({ track, sessions: initialSessions }: { track: any, sessions: any[] }) {
+export function TrackAnalyticsClient({ track, sessions: initialSessions, trackingLinks }: { track: any, sessions: any[], trackingLinks?: any[] }) {
   const { data: session } = useSession();
 
   const [selectedLinkFilter, setSelectedLinkFilter] = useState<string>('all');
   const [isCopied, setIsCopied] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
+  const [trackDuration, setTrackDuration] = useState<number>(0);
 
   useEffect(() => {
     setIsMounted(true);
   }, []);
+
+  useEffect(() => {
+    if (track?.id) {
+      const audio = new Audio(`/api/stream/${track.id}`);
+      audio.onloadedmetadata = () => {
+        setTrackDuration(audio.duration);
+      };
+    }
+  }, [track?.id]);
   
-  // Extract all unique tracking links from sessions
+  // Extract all unique tracking links from sessions, and merge with explicitly passed trackingLinks
   const availableLinks = useMemo(() => {
     const links = new Map<string, string>();
     links.set('open', 'Public Link');
+    
+    // Add explicitly passed links first
+    if (trackingLinks) {
+      trackingLinks.forEach(link => {
+        links.set(link.id, link.reference_name);
+      });
+    }
+
+    // Fallback/merge from sessions (in case trackingLinks is omitted)
     initialSessions.forEach(s => {
-      if (s.tracking_link_id && s.tracking_links) {
+      if (s.tracking_link_id && s.tracking_links && !links.has(s.tracking_link_id)) {
         links.set(s.tracking_link_id, s.tracking_links.reference_name);
       }
     });
     return Array.from(links.entries());
-  }, [initialSessions]);
+  }, [initialSessions, trackingLinks]);
 
   // Filter sessions based on selection
   const sessions = useMemo(() => {
@@ -45,9 +64,14 @@ export function TrackAnalyticsClient({ track, sessions: initialSessions }: { tra
     let url = `${window.location.origin}/t/${track.slug}`;
     
     if (selectedLinkFilter !== 'all' && selectedLinkFilter !== 'open') {
-      const selectedSession = initialSessions.find(s => s.tracking_link_id === selectedLinkFilter);
-      if (selectedSession && selectedSession.tracking_links?.custom_slug) {
-        url = `${url}?ref=${selectedSession.tracking_links.custom_slug}`;
+      const explicitLink = trackingLinks?.find(l => l.id === selectedLinkFilter);
+      if (explicitLink && explicitLink.custom_slug) {
+        url = `${url}?ref=${explicitLink.custom_slug}`;
+      } else {
+        const selectedSession = initialSessions.find(s => s.tracking_link_id === selectedLinkFilter);
+        if (selectedSession && selectedSession.tracking_links?.custom_slug) {
+          url = `${url}?ref=${selectedSession.tracking_links.custom_slug}`;
+        }
       }
     }
     
@@ -181,7 +205,7 @@ export function TrackAnalyticsClient({ track, sessions: initialSessions }: { tra
   // Retention Heatmap Calculation
   const heatmap = useMemo(() => {
     const bars = 26;
-    const maxTime = Math.max(...sessions.map(s => s.completion_percentage || 0), 1); // Avoid 0
+    const maxTime = trackDuration > 0 ? trackDuration : Math.max(...sessions.map(s => s.completion_percentage || 0), 1); // Avoid 0
     const segment = maxTime / bars;
     const retentions = [];
     
@@ -197,7 +221,7 @@ export function TrackAnalyticsClient({ track, sessions: initialSessions }: { tra
       });
     }
     return { retentions, maxTime };
-  }, [sessions, totalOpens]);
+  }, [sessions, totalOpens, trackDuration]);
 
   // Visual classes equivalent to .glass-card and .active-glow
   const glassCardClass = "bg-[#121214] border border-[#222226] transition-all hover:border-[#333338] hover:-translate-y-[2px] shadow-lg hover:shadow-[0_10px_30px_-10px_rgba(0,0,0,0.5)]";
