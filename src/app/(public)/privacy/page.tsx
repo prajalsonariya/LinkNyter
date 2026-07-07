@@ -7,71 +7,66 @@ export default function PrivacyPage() {
 
         <div className="space-y-12 font-body-lg text-body-lg text-on-surface-variant leading-relaxed">
           <p>
-            LinkNyter (&quot;we,&quot; &quot;our,&quot; or &quot;the Platform&quot;) operates as a presentation and proxy streaming service for independent creators. This Privacy Policy outlines our data handling practices and explains how your personal information and cloud storage files are managed when you use the Service.
+            This Privacy Policy explains how LinkNyter handles your data. We believe in keeping things simple: you own your data, your files stay in your cloud, and we only collect what we need to make the service work.
           </p>
 
           <section>
-            <h2 className="font-headline-lg text-headline-lg text-on-surface font-semibold mb-6">1. Information We Collect</h2>
-            <p className="mb-4">To provide our core utility, LinkNyter collects only the minimal technical data required to authenticate your account and route your audio assets.</p>
+            <h2 className="font-headline-lg text-headline-lg text-on-surface font-semibold mb-6">1. What We Collect</h2>
+            <p className="mb-4">We only collect the technical data necessary to run your account and stream your music.</p>
             <ul className="list-disc pl-5 space-y-3">
-              <li><strong className="text-on-surface">Account Information:</strong> When you log in via Google OAuth, we receive your email address, name, and profile avatar to create your personal creator profile.</li>
-              <li><strong className="text-on-surface">Track & Playlist Metadata:</strong> We collect and store text based information that you explicitly type into the application dashboard, including song titles, track descriptions, playlist configurations, and your linked social media profile handles.</li>
-              <li><strong className="text-on-surface">Authentication Tokens:</strong> We securely store encrypted OAuth refresh tokens provided by Google to maintain your cloud integration.</li>
+              <li><strong className="text-on-surface">Account Basics:</strong> When you log in with Google, we securely receive your email, name, and profile picture to set up your account.</li>
+              <li><strong className="text-on-surface">What You Type:</strong> We store the text you enter into the dashboard, like song titles, track descriptions, playlist setups, and your social media links.</li>
+              <li><strong className="text-on-surface">Access Tokens:</strong> We securely store Google authentication tokens so the app can stay connected to your Drive.</li>
             </ul>
           </section>
 
           <section>
-            <h2 className="font-headline-lg text-headline-lg text-on-surface font-semibold mb-6">2. Google Drive Access and Zero Custody Storage Model</h2>
-            <p className="mb-4">LinkNyter operates on a non custodial data model. We do not own, manage, or maintain separate cloud servers to host your audio files or cover art.</p>
+            <h2 className="font-headline-lg text-headline-lg text-on-surface font-semibold mb-6">2. Google Drive & File Storage</h2>
+            <p className="mb-4">LinkNyter doesn&apos;t store your audio files. We use a non-custodial model, which means your files stay entirely under your control.</p>
             <ul className="list-disc pl-5 space-y-3">
-              <li><strong className="text-on-surface">Application Scope:</strong> Our access is strictly restricted via Google API permissions to the specific application folder created inside your personal Google Drive account. We cannot view, read, modify, or delete any other files or folders in your personal storage.</li>
-              <li><strong className="text-on-surface">File Ownership:</strong> Your audio files and image assets are uploaded directly to your designated Google Drive storage folder. LinkNyter does not store or retain copies of your audio files on our internal infrastructure.</li>
-              <li><strong className="text-on-surface">No Admin Access:</strong> The platform administrator has no technical means to view, download, or access the contents of your private Google Drive folder. Your files remain entirely under your personal custody and control.</li>
+              <li><strong className="text-on-surface">Restricted Access:</strong> We only request access to the specific &quot;LinkNyter&quot; folder created in your Google Drive. We physically cannot see, read, or edit any other files in your account.</li>
+              <li><strong className="text-on-surface">File Ownership:</strong> Your music and artwork go directly to your Drive. We never keep copies of your raw files on our servers.</li>
+              <li><strong className="text-on-surface">Total Control:</strong> You have complete custody of your files at all times.</li>
             </ul>
           </section>
 
           <section>
-            <h2 className="font-headline-lg text-headline-lg text-on-surface font-semibold mb-6">3. How Data is Processed via Proxy Streaming</h2>
-            <p className="mb-4">When a public listener accesses a shared track link:</p>
+            <h2 className="font-headline-lg text-headline-lg text-on-surface font-semibold mb-6">3. How Streaming Works</h2>
+            <p className="mb-4">When a listener clicks play on your track:</p>
             <ul className="list-disc pl-5 space-y-3">
-              <li>Our server infrastructure acts as a temporary streaming proxy. It securely fetches the audio data directly from your Google Drive account and processes it into streaming packets for the listener&apos;s client.</li>
-              <li>This data processing happens entirely in volatile memory. Your raw files are not permanently written, cached, or saved onto our server disks during this streaming process.</li>
+              <li>Our servers act as a temporary middleman. They fetch the audio directly from your Google Drive and stream it to the listener&apos;s browser.</li>
+              <li>This happens entirely in temporary memory. We don&apos;t save or cache your files to our hard drives during this process.</li>
             </ul>
           </section>
 
           <section>
-            <h2 className="font-headline-lg text-headline-lg text-on-surface font-semibold mb-6">4. Analytics and Playback Statistics</h2>
-            <p className="mb-4">LinkNyter provides creators with playback analytics for their custom links. When a public listener opens a link for a track or playlist, we collect basic listening metrics.</p>
+            <h2 className="font-headline-lg text-headline-lg text-on-surface font-semibold mb-6">4. Analytics and Stats</h2>
+            <p className="mb-4">We provide basic analytics so you can see how your music is performing.</p>
             <ul className="list-disc pl-5 space-y-3">
-              <li><strong className="text-on-surface">Link-Level Attribution:</strong> We track playback events, play counts, and interactions mapped directly to the custom links you generate.</li>
-              <li><strong className="text-on-surface">Behavioral Metrics:</strong> We calculate playback retention and interactions (such as downloads and social media clicks) to provide aggregated analytics on a per-link, per-track, and per-playlist basis.</li>
-              <li><strong className="text-on-surface">Session Data:</strong> We utilize anonymized, temporary session identifiers to aggregate playback statistics. This data is strictly partitioned and only accessible via your authenticated creator dashboard.</li>
+              <li><strong className="text-on-surface">Link Tracking:</strong> We track plays, downloads, and social link clicks for the tracks, playlists, and custom links you create.</li>
+              <li><strong className="text-on-surface">Anonymous Sessions:</strong> We use temporary, anonymous session IDs to count unique listeners and track listening duration (retention). This data is completely anonymous and only visible to you.</li>
             </ul>
           </section>
 
           <section>
-            <h2 className="font-headline-lg text-headline-lg text-on-surface font-semibold mb-6">5. Custom Links and Reference Data</h2>
-            <p className="mb-4">The Platform provides a &quot;Manage Links&quot; utility allowing creators to generate custom URLs for specific recipients or campaigns.</p>
+            <h2 className="font-headline-lg text-headline-lg text-on-surface font-semibold mb-6">5. Custom Links</h2>
+            <p className="mb-4">If you use the &quot;Manage Links&quot; feature to create custom URLs for specific campaigns or people, any reference name you type in is stored securely in our database. We only use this to show it to you in your dashboard.</p>
+          </section>
+
+          <section>
+            <h2 className="font-headline-lg text-headline-lg text-on-surface font-semibold mb-6">6. Deleting Your Data</h2>
+            <p className="mb-4">You are in control of your data.</p>
             <ul className="list-disc pl-5 space-y-3">
-              <li><strong className="text-on-surface">Reference Data:</strong> If you input personal information (such as a recipient&apos;s name or corporate affiliation) into the link generation tool as a &quot;Reference Name,&quot; this text is stored securely in our database.</li>
-              <li><strong className="text-on-surface">Data Processing:</strong> We do not process this reference data for any purpose other than displaying it within your private dashboard for campaign management.</li>
+              <li>If you delete a track or playlist in the app, all its text data and analytics are instantly and permanently deleted from our database.</li>
+              <li>If you delete your LinkNyter account, we immediately wipe all your music metadata, custom URLs, and analytics forever.</li>
+              <li>You can revoke LinkNyter&apos;s access to your Google Drive at any time from your Google Account security settings.</li>
             </ul>
           </section>
 
           <section>
-            <h2 className="font-headline-lg text-headline-lg text-on-surface font-semibold mb-6">6. Data Retention and Deletion</h2>
-            <p className="mb-4">You maintain complete control over your metadata and assets at all times.</p>
-            <ul className="list-disc pl-5 space-y-3">
-              <li>If you delete a track or a playlist from your LinkNyter dashboard, the corresponding row of text metadata and all associated playback analytics are instantly and permanently purged from our database.</li>
-              <li>If you delete your entire LinkNyter account, all your music metadata, custom URLs, syncing data, and analytics will be wiped immediately and permanently.</li>
-              <li>You can revoke LinkNyter API access at any moment directly through your personal Google Account security settings, immediately disconnecting the platform from your storage.</li>
-            </ul>
-          </section>
-
-          <section>
-            <h2 className="font-headline-lg text-headline-lg text-on-surface font-semibold mb-6">7. Third Party Sharing</h2>
+            <h2 className="font-headline-lg text-headline-lg text-on-surface font-semibold mb-6">7. Third Parties</h2>
             <p>
-              We do not sell, rent, lease, or trade your personal information, analytics data, metadata, or metrics to third party advertising companies or data brokers. Data is processed exclusively to maintain the live playback interface and populate your private creator dashboard.
+              We do not sell, rent, or trade your personal information or analytics to advertisers or data brokers. Your data is used exclusively to keep the app running and to show you your stats.
             </p>
           </section>
         </div>

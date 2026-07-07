@@ -7,82 +7,82 @@ export default function TermsPage() {
 
         <div className="space-y-12 font-body-lg text-body-lg text-on-surface-variant leading-relaxed">
           <p>
-            Welcome to LinkNyter (&quot;the Service,&quot; &quot;the Platform&quot;). By accessing or using our website, dashboard, and proxy streaming services, you agree to be bound by these Terms and Conditions. If you do not agree to these terms, you must immediately discontinue your use of the Platform.
+            Welcome to LinkNyter. By using our website and streaming tools, you agree to these Terms and Conditions. We&apos;ve tried to keep them as straightforward and human-readable as possible.
           </p>
 
           <section>
-            <h2 className="font-headline-lg text-headline-lg text-on-surface font-semibold mb-6">1. Description of Service</h2>
+            <h2 className="font-headline-lg text-headline-lg text-on-surface font-semibold mb-6">1. What LinkNyter Is</h2>
             <p>
-              LinkNyter provides a specialized, non-custodial presentation and proxy streaming interface that integrates with your personal Google Drive storage. The Service functions exclusively as a visual and technical wrapper to display, stream, and manage access to audio files hosted within your own cloud account. LinkNyter does not provide data storage infrastructure for your audio or image assets.
+              LinkNyter is an interface that connects to your Google Drive to help you share your music. We don&apos;t provide data storage—your files stay safely in your own cloud account. We just provide the tools to stream and present them beautifully.
             </p>
           </section>
 
           <section>
-            <h2 className="font-headline-lg text-headline-lg text-on-surface font-semibold mb-6">2. User Accounts and Authentication</h2>
-            <p className="mb-4">To utilize the Service, you must authenticate your identity via Google OAuth. You are entirely responsible for:</p>
+            <h2 className="font-headline-lg text-headline-lg text-on-surface font-semibold mb-6">2. Your Account</h2>
+            <p className="mb-4">You log in using your Google account. You are responsible for:</p>
             <ul className="list-disc pl-5 space-y-3">
-              <li>Maintaining the security of your Google account credentials.</li>
-              <li>All activities, uploads, and modifications performed under your LinkNyter account session.</li>
-              <li>Ensuring that your personal Google Drive account maintains sufficient storage capacity to receive and serve your uploaded assets.</li>
+              <li>Keeping your Google account secure.</li>
+              <li>Anything that happens under your LinkNyter account.</li>
+              <li>Making sure your Google Drive has enough space to host your music.</li>
             </ul>
           </section>
 
           <section>
-            <h2 className="font-headline-lg text-headline-lg text-on-surface font-semibold mb-6">3. Intellectual Property and Content Ownership</h2>
-            <p className="mb-4">You (the Creator/Musician) retain full ownership, copyright, and intellectual property rights to all audio files, track metadata, playlist configurations, cover art, and description text that you process through the Platform.</p>
+            <h2 className="font-headline-lg text-headline-lg text-on-surface font-semibold mb-6">3. You Own Your Music</h2>
+            <p className="mb-4">You (the Creator) keep full ownership and copyright of all your music, artwork, and text.</p>
             <ul className="list-disc pl-5 space-y-3">
-              <li><strong className="text-on-surface">No Rights Transferred:</strong> LinkNyter claims no ownership over your files or creative works.</li>
-              <li><strong className="text-on-surface">Limited Processing License:</strong> By uploading assets, you grant LinkNyter a strictly limited, non-exclusive, worldwide license to access, retrieve, chunk, and transmit your data for the sole purpose of rendering your public listening page and executing proxy audio streams to authorized listeners.</li>
+              <li><strong className="text-on-surface">No Rights Transferred:</strong> We claim zero ownership over your files or creative works.</li>
+              <li><strong className="text-on-surface">Permission to Stream:</strong> By using LinkNyter, you give us permission to access and stream your files solely so we can make your music playable for your listeners.</li>
             </ul>
           </section>
 
           <section>
-            <h2 className="font-headline-lg text-headline-lg text-on-surface font-semibold mb-6">4. Acceptable Use and Restrictions</h2>
-            <p className="mb-4">You are solely responsible for the legality of the content you distribute through LinkNyter. You explicitly agree that you will not upload, share, or transmit any audio files or material that:</p>
+            <h2 className="font-headline-lg text-headline-lg text-on-surface font-semibold mb-6">4. Rules of the Road</h2>
+            <p className="mb-4">You are responsible for what you share. You agree not to use LinkNyter to upload or share anything that:</p>
             <ul className="list-disc pl-5 space-y-3 mb-6">
-              <li>Infringes upon the intellectual property, copyright, trademark, or privacy rights of any third party.</li>
-              <li>Contains malicious software code, viruses, or scripts designed to disrupt the Service or Google API infrastructure.</li>
-              <li>Violates local, state, national, or international laws.</li>
+              <li>Infringes on someone else&apos;s copyright, trademark, or privacy.</li>
+              <li>Contains viruses or malicious code.</li>
+              <li>Breaks the law.</li>
             </ul>
             <p>
-              The Platform reserves the right to immediately terminate user account access and delete associated text metadata if a user is found to be distributing pirated or unauthorized material, including unauthorized tracks or playlist covers.
+              If we find out you are using LinkNyter to distribute pirated music or unauthorized content, we reserve the right to delete your account and links immediately.
             </p>
           </section>
 
           <section>
-            <h2 className="font-headline-lg text-headline-lg text-on-surface font-semibold mb-6">5. Custom Links and Reference Data</h2>
+            <h2 className="font-headline-lg text-headline-lg text-on-surface font-semibold mb-6">5. Custom Links</h2>
             <p>
-              The Service allows you to generate custom URLs (&quot;Custom Links&quot;) designated for specific campaigns or individuals. You agree not to input sensitive personal data or regulated Personally Identifiable Information (PII) into the Platform&apos;s link generation reference fields. LinkNyter acts exclusively as a data processor in this regard and bears no liability for your distribution practices.
+              You can generate Custom Links for specific campaigns or people. Please don&apos;t type sensitive personal information (like passwords or social security numbers) into the link reference fields. LinkNyter just stores the text you give us to help you manage your links.
             </p>
           </section>
 
           <section>
-            <h2 className="font-headline-lg text-headline-lg text-on-surface font-semibold mb-6">6. Acceptable Use of Analytics</h2>
+            <h2 className="font-headline-lg text-headline-lg text-on-surface font-semibold mb-6">6. Using Analytics</h2>
             <p>
-              The analytics provided within the dashboard are for your personal evaluation of your audio assets. You are strictly prohibited from utilizing the Platform&apos;s analytics tools for harassment or attempting to identify individual listeners.
+              The analytics we provide are strictly to help you understand how your music is performing. You agree not to use our analytics tools to harass anyone or attempt to uncover the personal identities of your listeners.
             </p>
           </section>
 
           <section>
-            <h2 className="font-headline-lg text-headline-lg text-on-surface font-semibold mb-6">7. Google Drive API Policy Compliance</h2>
+            <h2 className="font-headline-lg text-headline-lg text-on-surface font-semibold mb-6">7. Google&apos;s Rules Apply Too</h2>
             <p>
-              Because LinkNyter relies directly on third-party cloud APIs to fetch and route data, your use of the Service is simultaneously governed by the Google Terms of Service and Google Drive Additional Terms of Service. LinkNyter is not liable for service disruptions, bandwidth throttling, account suspensions, or download quotas enforced on your cloud account by Google.
+              Because LinkNyter connects directly to your Google Drive, you also have to follow Google&apos;s Terms of Service. We aren&apos;t responsible if Google throttles your bandwidth or suspends your account for breaking their rules.
             </p>
           </section>
 
           <section>
-            <h2 className="font-headline-lg text-headline-lg text-on-surface font-semibold mb-6">8. Limitation of Liability and Disclaimer of Warranties</h2>
-            <p className="mb-4">LinkNyter is provided on an &quot;as-is&quot; and &quot;as-available&quot; basis without warranties of any kind, either express or implied.</p>
+            <h2 className="font-headline-lg text-headline-lg text-on-surface font-semibold mb-6">8. Things Out of Our Control</h2>
+            <p className="mb-4">LinkNyter is provided &quot;as-is&quot; without any warranties.</p>
             <ul className="list-disc pl-5 space-y-3 mb-6">
-              <li>We do not guarantee that the Service will be uninterrupted, completely secure, or entirely error-free.</li>
-              <li>LinkNyter acts solely as a presentation middleman and shall not be held liable for any loss of data, file corruption, backend API failures, or financial damages arising from your use of the platform or dependencies on third-party storage providers.</li>
+              <li>We work hard to keep the service running smoothly, but we can&apos;t guarantee it will be 100% bug-free or secure all the time.</li>
+              <li>Since we don&apos;t store your files, we aren&apos;t responsible for any lost data or Google Drive outages.</li>
             </ul>
           </section>
 
           <section>
-            <h2 className="font-headline-lg text-headline-lg text-on-surface font-semibold mb-6">9. Modifications to Service and Terms</h2>
+            <h2 className="font-headline-lg text-headline-lg text-on-surface font-semibold mb-6">9. Changes to These Terms</h2>
             <p>
-              We reserve the right to modify, update, or temporarily discontinue sections of this free Service at any time to accommodate changing cloud API frameworks or operational server constraints. Continued use of the Platform following any modifications constitutes formal acceptance of the updated Terms and Conditions.
+              We might update these terms occasionally as the platform grows. If you keep using LinkNyter after we make changes, it means you agree to the new terms.
             </p>
           </section>
         </div>
