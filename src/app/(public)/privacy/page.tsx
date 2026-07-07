@@ -40,18 +40,18 @@ export default function PrivacyPage() {
           </section>
 
           <section>
-            <h2 className="font-headline-lg text-headline-lg text-on-surface font-semibold mb-6">4. Analytics, Telemetry, and Listener Tracking</h2>
-            <p className="mb-4">LinkNyter employs advanced telemetry to provide creators with detailed playback analytics isolated by individual custom tracking links. When a public listener opens a tracking link for a track or playlist, we collect specific behavioral and session metrics.</p>
+            <h2 className="font-headline-lg text-headline-lg text-on-surface font-semibold mb-6">4. Analytics and Playback Statistics</h2>
+            <p className="mb-4">LinkNyter provides creators with playback analytics for their custom links. When a public listener opens a link for a track or playlist, we collect basic listening metrics.</p>
             <ul className="list-disc pl-5 space-y-3">
-              <li><strong className="text-on-surface">Link-Level Attribution:</strong> We track real-time playback events, play counts, and unique listener interactions mapped directly to the specific custom tracking links you generate.</li>
-              <li><strong className="text-on-surface">Behavioral Metrics:</strong> We calculate total completion percentage, track abandonment rates, and specific user interface interactions (such as downloads) to provide aggregated deep-dive analytics on a per-link and per-track basis.</li>
-              <li><strong className="text-on-surface">Session and Technical Data:</strong> We utilize anonymized session identifiers and basic technical parameters to differentiate unique listeners and aggregate temporal playback statistics. This data is strictly partitioned and only accessible via your authenticated creator dashboard.</li>
+              <li><strong className="text-on-surface">Link-Level Attribution:</strong> We track playback events, play counts, and interactions mapped directly to the custom links you generate.</li>
+              <li><strong className="text-on-surface">Behavioral Metrics:</strong> We calculate playback retention and interactions (such as downloads and social media clicks) to provide aggregated analytics on a per-link, per-track, and per-playlist basis.</li>
+              <li><strong className="text-on-surface">Session Data:</strong> We utilize anonymized, temporary session identifiers to aggregate playback statistics. This data is strictly partitioned and only accessible via your authenticated creator dashboard.</li>
             </ul>
           </section>
 
           <section>
-            <h2 className="font-headline-lg text-headline-lg text-on-surface font-semibold mb-6">5. Custom Tracking Links and Recipient Data</h2>
-            <p className="mb-4">The Platform provides a &quot;Manage Links&quot; utility allowing creators to generate isolated, trackable URLs for specific recipients or campaigns.</p>
+            <h2 className="font-headline-lg text-headline-lg text-on-surface font-semibold mb-6">5. Custom Links and Reference Data</h2>
+            <p className="mb-4">The Platform provides a &quot;Manage Links&quot; utility allowing creators to generate custom URLs for specific recipients or campaigns.</p>
             <ul className="list-disc pl-5 space-y-3">
               <li><strong className="text-on-surface">Reference Data:</strong> If you input personal information (such as a recipient&apos;s name or corporate affiliation) into the link generation tool as a &quot;Reference Name,&quot; this text is stored securely in our database.</li>
               <li><strong className="text-on-surface">Data Processing:</strong> We do not process this reference data for any purpose other than displaying it within your private dashboard for campaign management.</li>
@@ -71,7 +71,7 @@ export default function PrivacyPage() {
           <section>
             <h2 className="font-headline-lg text-headline-lg text-on-surface font-semibold mb-6">7. Third Party Sharing</h2>
             <p>
-              We do not sell, rent, lease, or trade your personal information, telemetry data, metadata, or tracking metrics to third party advertising companies or data brokers. Data is processed exclusively to maintain the live playback interface and populate your private creator dashboard.
+              We do not sell, rent, lease, or trade your personal information, analytics data, metadata, or metrics to third party advertising companies or data brokers. Data is processed exclusively to maintain the live playback interface and populate your private creator dashboard.
             </p>
           </section>
         </div>

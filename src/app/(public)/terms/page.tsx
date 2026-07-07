@@ -50,16 +50,16 @@ export default function TermsPage() {
           </section>
 
           <section>
-            <h2 className="font-headline-lg text-headline-lg text-on-surface font-semibold mb-6">5. Custom Tracking Links and Data Processing</h2>
+            <h2 className="font-headline-lg text-headline-lg text-on-surface font-semibold mb-6">5. Custom Links and Reference Data</h2>
             <p>
-              The Service allows you to generate custom URLs (&quot;Tracking Links&quot;) designated for specific campaigns or individuals. You are solely responsible for ensuring you have the lawful right and necessary consent to track the engagement of the recipients to whom you distribute these links. Furthermore, you agree not to input sensitive personal data or regulated Personally Identifiable Information (PII) into the Platform&apos;s link generation reference fields. LinkNyter acts exclusively as a data processor in this regard and bears no liability for your distribution or tracking practices.
+              The Service allows you to generate custom URLs (&quot;Custom Links&quot;) designated for specific campaigns or individuals. You agree not to input sensitive personal data or regulated Personally Identifiable Information (PII) into the Platform&apos;s link generation reference fields. LinkNyter acts exclusively as a data processor in this regard and bears no liability for your distribution practices.
             </p>
           </section>
 
           <section>
-            <h2 className="font-headline-lg text-headline-lg text-on-surface font-semibold mb-6">6. Prohibited Use of Analytics</h2>
+            <h2 className="font-headline-lg text-headline-lg text-on-surface font-semibold mb-6">6. Acceptable Use of Analytics</h2>
             <p>
-              The telemetry and analytics provided within the dashboard are for your personal or internal business evaluation of your audio assets. You are strictly prohibited from utilizing the Platform&apos;s analytics tools for malicious surveillance, harassment, doxxing, or reverse-engineering the identity of your listeners beyond the aggregated metrics provided by the Service.
+              The analytics provided within the dashboard are for your personal evaluation of your audio assets. You are strictly prohibited from utilizing the Platform&apos;s analytics tools for harassment or attempting to identify individual listeners.
             </p>
           </section>
 
