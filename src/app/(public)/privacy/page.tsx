@@ -7,7 +7,7 @@ export default function PrivacyPage() {
 
         <div className="space-y-12 font-body-lg text-body-lg text-on-surface-variant leading-relaxed">
           <p>
-            LinkNyter (&quot;we,&quot; &quot;our,&quot; or &quot;the Platform&quot;) operates as a specialized presentation and proxy streaming interface for independent musicians. This Privacy Policy outlines our strict data handling practices and explains how your personal information and cloud storage files are managed when you use our service.
+            LinkNyter (&quot;we,&quot; &quot;our,&quot; or &quot;the Platform&quot;) operates as a presentation and proxy streaming service for independent creators. This Privacy Policy outlines our data handling practices and explains how your personal information and cloud storage files are managed when you use the Service.
           </p>
 
           <section>
@@ -25,7 +25,7 @@ export default function PrivacyPage() {
             <p className="mb-4">LinkNyter operates on a non custodial data model. We do not own, manage, or maintain separate cloud servers to host your audio files or cover art.</p>
             <ul className="list-disc pl-5 space-y-3">
               <li><strong className="text-on-surface">Application Scope:</strong> Our access is strictly restricted via Google API permissions to the specific application folder created inside your personal Google Drive account. We cannot view, read, modify, or delete any other files or folders in your personal storage.</li>
-              <li><strong className="text-on-surface">File Ownership:</strong> Your raw audio files and image assets fly directly into your personal Google Drive storage bucket. LinkNyter does not store copies of your raw binary audio files on our infrastructure.</li>
+              <li><strong className="text-on-surface">File Ownership:</strong> Your audio files and image assets are uploaded directly to your designated Google Drive storage folder. LinkNyter does not store or retain copies of your audio files on our internal infrastructure.</li>
               <li><strong className="text-on-surface">No Admin Access:</strong> The platform administrator has no technical means to view, download, or access the contents of your private Google Drive folder. Your files remain entirely under your personal custody and control.</li>
             </ul>
           </section>
@@ -34,7 +34,7 @@ export default function PrivacyPage() {
             <h2 className="font-headline-lg text-headline-lg text-on-surface font-semibold mb-6">3. How Data is Processed via Proxy Streaming</h2>
             <p className="mb-4">When a public listener accesses a shared track link:</p>
             <ul className="list-disc pl-5 space-y-3">
-              <li>Our server infrastructure acts as a temporary streaming proxy. It fetches the audio binary directly from your personal Google Drive server in the background and converts it into small data packets for the listener browser.</li>
+              <li>Our server infrastructure acts as a temporary streaming proxy. It securely fetches the audio data directly from your Google Drive account and processes it into streaming packets for the listener&apos;s client.</li>
               <li>This data processing happens entirely in volatile memory. Your raw files are not permanently written, cached, or saved onto our server disks during this streaming process.</li>
             </ul>
           </section>
