@@ -15,7 +15,7 @@ export default function PrivacyPage() {
             <p className="mb-4">To provide our core utility, LinkNyter collects only the minimal technical data required to authenticate your account and route your audio assets.</p>
             <ul className="list-disc pl-5 space-y-3">
               <li><strong className="text-on-surface">Account Information:</strong> When you log in via Google OAuth, we receive your email address, name, and profile avatar to create your personal creator profile.</li>
-              <li><strong className="text-on-surface">Track & Playlist Metadata:</strong> We collect and store text based information that you explicitly type into the application dashboard, including song titles, track descriptions, playlist configurations, synced LRC lyrics, and your linked social media profile handles.</li>
+              <li><strong className="text-on-surface">Track & Playlist Metadata:</strong> We collect and store text based information that you explicitly type into the application dashboard, including song titles, track descriptions, playlist configurations, and your linked social media profile handles.</li>
               <li><strong className="text-on-surface">Authentication Tokens:</strong> We securely store encrypted OAuth refresh tokens provided by Google to maintain your cloud integration.</li>
             </ul>
           </section>

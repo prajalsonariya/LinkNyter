@@ -29,7 +29,7 @@ export default function TermsPage() {
 
           <section>
             <h2 className="font-headline-lg text-headline-lg text-on-surface font-semibold mb-6">3. Intellectual Property and Content Ownership</h2>
-            <p className="mb-4">You retain full ownership, copyright, and intellectual property rights to all audio files, track metadata, playlist configurations, synced LRC lyrics, cover art, and description text that you process through the Platform.</p>
+            <p className="mb-4">You (the Creator/Musician) retain full ownership, copyright, and intellectual property rights to all audio files, track metadata, playlist configurations, cover art, and description text that you process through the Platform.</p>
             <ul className="list-disc pl-5 space-y-3">
               <li><strong className="text-on-surface">No Rights Transferred:</strong> LinkNyter claims no ownership over your files or creative works.</li>
               <li><strong className="text-on-surface">Limited Processing License:</strong> By uploading assets, you grant LinkNyter a strictly limited, non-exclusive, worldwide license to access, retrieve, chunk, and transmit your data for the sole purpose of rendering your public listening page and executing proxy audio streams to authorized listeners.</li>
@@ -45,7 +45,7 @@ export default function TermsPage() {
               <li>Violates local, state, national, or international laws.</li>
             </ul>
             <p>
-              The Platform reserves the right to immediately terminate user account access and delete associated text metadata if a user is found to be distributing pirated or unauthorized material, including unauthorized synced lyrics, tracks, or playlist covers.
+              The Platform reserves the right to immediately terminate user account access and delete associated text metadata if a user is found to be distributing pirated or unauthorized material, including unauthorized tracks or playlist covers.
             </p>
           </section>
 
