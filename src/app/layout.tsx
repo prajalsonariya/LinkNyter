@@ -2,8 +2,24 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "LinkNyter | Professional Audio Delivery",
-  description: "Secure, high-performance web-streaming links for listeners.",
+  title: "LinkNyter",
+  description: "Secure, high-performance web-streaming links for listeners and audio professionals.",
+  applicationName: "LinkNyter",
+  authors: [{ name: "LinkNyter" }],
+  keywords: ["LinkNyter", "audio delivery", "audio streaming", "music sharing", "secure audio links", "Link Nyter"],
+  robots: "index, follow",
+  openGraph: {
+    type: "website",
+    url: "https://linknyter.com",
+    title: "LinkNyter",
+    description: "Secure, high-performance web-streaming links for listeners.",
+    siteName: "LinkNyter",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "LinkNyter",
+    description: "Secure, high-performance web-streaming links for listeners.",
+  },
 };
 
 import { Providers } from "@/components/Providers";
