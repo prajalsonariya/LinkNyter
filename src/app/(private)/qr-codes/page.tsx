@@ -84,10 +84,14 @@ export default function QrCodesPage() {
       const file = new File([blob], `${selectedItem.title || 'qr-code'}-linknyter.png`, { type: 'image/png' });
 
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        const resolvedSlug = itemType === 'track' ? selectedItem.slug : selectedItem.custom_slug;
+        const origin = typeof window !== 'undefined' ? window.location.origin : 'https://linknyter.com';
+        const itemUrl = `${origin}/${itemType === 'track' ? 't' : 'p'}/${resolvedSlug || selectedItem.id}`;
+
         await navigator.share({
           files: [file],
           title: `Listen to ${selectedItem.title || 'this'}`,
-          text: `Check out ${selectedItem.title || 'this'} on LinkNyter!`,
+          text: `Check out ${selectedItem.title || 'this'} on LinkNyter!\n\n${itemUrl}`,
         });
         toast.success("Shared successfully!");
       } else {
