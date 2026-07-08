@@ -91,7 +91,7 @@ export function AnalyticsView({ tracks, playlists }: { tracks: any[], playlists?
       {/* Header Section with Tabs */}
       <header className="mb-10">
         <div className="mb-8">
-          <span className="font-label-caps text-label-caps text-primary mb-2 block tracking-[0.2em] uppercase">Studio Insights</span>
+          <span className="font-label-caps text-label-caps text-primary mb-2 block tracking-[0.2em] uppercase">Studio Stats</span>
           <h2 className="font-display-lg text-display-lg text-on-surface">Analytics</h2>
         </div>
         
@@ -127,7 +127,7 @@ export function AnalyticsView({ tracks, playlists }: { tracks: any[], playlists?
         {/* Total Streams */}
         <div className="bg-surface-container-low/50 backdrop-blur-xl border border-outline-variant/50 rounded-xl p-4 md:p-6 flex flex-col justify-between h-36 md:h-40 transition-all hover:border-outline-variant hover:-translate-y-0.5">
           <div className="flex justify-between items-start">
-            <span className="font-label-caps text-[10px] md:text-label-caps text-on-surface-variant uppercase">Total Streams</span>
+            <span className="font-label-caps text-[10px] md:text-label-caps text-on-surface-variant uppercase">Total Plays</span>
             <div className="flex items-center text-primary gap-1">
               <TrendingUp className="w-4 h-4 md:w-[18px] md:h-[18px]" />
             </div>
@@ -137,7 +137,7 @@ export function AnalyticsView({ tracks, playlists }: { tracks: any[], playlists?
 
         {/* Total Unique Opens */}
         <div className="bg-surface-container-low/50 backdrop-blur-xl border border-outline-variant/50 rounded-xl p-4 md:p-6 flex flex-col justify-between h-36 md:h-40 transition-all hover:border-outline-variant hover:-translate-y-0.5">
-          <span className="font-label-caps text-[10px] md:text-label-caps text-on-surface-variant uppercase">Tracked Opens</span>
+          <span className="font-label-caps text-[10px] md:text-label-caps text-on-surface-variant uppercase">Link Visits</span>
           <div className="text-2xl md:text-4xl font-headline-lg font-black text-on-surface">{metrics.totalOpens.toLocaleString()}</div>
         </div>
 
@@ -169,7 +169,7 @@ export function AnalyticsView({ tracks, playlists }: { tracks: any[], playlists?
       {/* Hero Section (Chart) */}
       <section className="bg-surface-container-low/50 backdrop-blur-xl border border-outline-variant/50 rounded-2xl p-4 md:p-8 mb-6">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
-          <h3 className="font-headline-md text-on-surface">Streams Over Time</h3>
+          <h3 className="font-headline-md text-on-surface">Plays Over Time</h3>
           <div className="flex bg-surface-container-lowest rounded-lg p-1 border border-outline-variant/50">
             <button 
               onClick={() => setTimeframe('7D')}
@@ -242,7 +242,7 @@ export function AnalyticsView({ tracks, playlists }: { tracks: any[], playlists?
 
       {/* Device Breakdown Section in Overview */}
       <section className="bg-surface-container-low/50 backdrop-blur-xl border border-outline-variant/50 rounded-2xl p-4 md:p-8 flex flex-col items-center max-w-md mx-auto mb-6">
-        <h3 className="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider w-full text-left mb-6">Device Breakdown</h3>
+        <h3 className="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider w-full text-left mb-6">Devices</h3>
         {totalDevices === 0 ? (
           <div className="h-[200px] flex items-center justify-center text-on-surface-variant text-sm">No device data</div>
         ) : (

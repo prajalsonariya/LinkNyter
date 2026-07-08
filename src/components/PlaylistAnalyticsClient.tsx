@@ -208,7 +208,7 @@ export function PlaylistAnalyticsClient({ playlist, sessions: initialSessions, t
       <div className="grid grid-cols-2 gap-4 md:gap-6 mb-12">
         <div className={`${glassCardClass} p-4 md:p-6 rounded-xl flex flex-col justify-between h-36 md:h-40`}>
           <div>
-            <span className="font-label-caps text-outline tracking-wider text-[10px]">TOTAL STREAMS</span>
+            <span className="font-label-caps text-outline tracking-wider text-[10px]">TOTAL PLAYS</span>
             <h3 className="font-headline-lg text-headline-lg mt-1">{totalOpens}</h3>
           </div>
           <div className="h-8 w-full flex items-end gap-1">
@@ -315,7 +315,7 @@ export function PlaylistAnalyticsClient({ playlist, sessions: initialSessions, t
                   
                   <div className="flex items-center gap-6">
                     <div className="flex flex-col items-end">
-                      <span className="text-[10px] font-label-caps tracking-widest text-outline uppercase">Streams</span>
+                      <span className="text-[10px] font-label-caps tracking-widest text-outline uppercase">Plays</span>
                       <span className="font-bold text-on-surface text-lg">{trackOpens}</span>
                     </div>
                     <div className="flex flex-col items-end">

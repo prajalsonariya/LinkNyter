@@ -499,7 +499,7 @@ export function LrcSyncStudio({ track, onSaveSuccess }: LrcSyncStudioProps) {
               <div className="h-px flex-1 bg-outline-variant/20"></div>
             </div>
             <h2 className="font-headline-lg text-[32px] font-bold text-on-surface mb-2">LRC Sync Studio</h2>
-            <p className="text-on-surface-variant font-body-lg text-[16px] opacity-80">Paste your track lyrics below. Ensure each sentence is on a new line for precise synchronization.</p>
+            <p className="text-on-surface-variant font-body-lg text-[16px] opacity-80">Paste your lyrics below. Make sure each line is on a new row so you can sync them perfectly.</p>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-gutter flex-1 lg:min-h-0 mb-8 lg:mb-0">
@@ -569,15 +569,19 @@ export function LrcSyncStudio({ track, onSaveSuccess }: LrcSyncStudioProps) {
                   <ul className="space-y-4 text-on-surface-variant text-[14px] leading-relaxed mt-4">
                     <li className="flex gap-3">
                       <span className="text-primary">•</span>
-                      <span>Use square brackets for section labels like <code className="text-primary bg-primary/5 px-1 rounded">[Chorus]</code>. These are ignored in timing but help navigation.</span>
+                      <span>Label sections like <code className="text-primary bg-primary/5 px-1 rounded">[Chorus]</code>. They aren't timed.</span>
                     </li>
                     <li className="flex gap-3">
                       <span className="text-primary">•</span>
-                      <span>Keep lines short. Long sentences might be cut off on smaller mobile player screens.</span>
+                      <span>Keep lines short for mobile screens.</span>
                     </li>
                     <li className="flex gap-3">
                       <span className="text-primary">•</span>
-                      <span>Syncing works by tapping the spacebar. Ready your rhythm before the next step.</span>
+                      <span>Tap the screen to sync each line.</span>
+                    </li>
+                    <li className="flex gap-3 pt-4 border-t border-outline-variant/10 items-start">
+                      <span className="material-symbols-outlined text-primary text-[18px] mt-0.5">bolt</span>
+                      <span><strong className="text-on-surface font-semibold">Timing Tip:</strong> Tap the screen just a beat before the lyrics hit for best results.</span>
                     </li>
                   </ul>
                 </details>
@@ -591,15 +595,19 @@ export function LrcSyncStudio({ track, onSaveSuccess }: LrcSyncStudioProps) {
                   <ul className="space-y-4 text-on-surface-variant text-[14px] leading-relaxed">
                     <li className="flex gap-3">
                       <span className="text-primary">•</span>
-                      <span>Use square brackets for section labels like <code className="text-primary bg-primary/5 px-1 rounded">[Chorus]</code>. These are ignored in timing but help navigation.</span>
+                      <span>Label sections like <code className="text-primary bg-primary/5 px-1 rounded">[Chorus]</code>. They aren't timed.</span>
                     </li>
                     <li className="flex gap-3">
                       <span className="text-primary">•</span>
-                      <span>Keep lines short. Long sentences might be cut off on smaller mobile player screens.</span>
+                      <span>Keep lines short for mobile screens.</span>
                     </li>
                     <li className="flex gap-3">
                       <span className="text-primary">•</span>
-                      <span>Syncing works by tapping the spacebar. Ready your rhythm before the next step.</span>
+                      <span>Press Spacebar to sync each line.</span>
+                    </li>
+                    <li className="flex gap-3 pt-4 border-t border-outline-variant/10 items-start">
+                      <span className="material-symbols-outlined text-primary text-[18px] mt-0.5">bolt</span>
+                      <span><strong className="text-on-surface font-semibold">Timing Tip:</strong> Press Spacebar just a beat before the lyrics hit for best results.</span>
                     </li>
                   </ul>
                 </div>
@@ -631,7 +639,7 @@ export function LrcSyncStudio({ track, onSaveSuccess }: LrcSyncStudioProps) {
               disabled={rawLyrics.trim().length === 0} 
               className="bg-primary hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed text-on-primary px-8 py-3.5 rounded-full font-bold flex items-center gap-3 transition-all transform active:scale-95 group relative overflow-hidden shadow-[0_0_20px_rgba(139,92,246,0.3)]"
             >
-              <span className="relative z-10">Start Sync Performance</span>
+              <span className="relative z-10">Start Syncing</span>
               <span className="material-symbols-outlined relative z-10 group-hover:translate-x-1 transition-transform">bolt</span>
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
             </button>
@@ -779,7 +787,7 @@ export function LrcSyncStudio({ track, onSaveSuccess }: LrcSyncStudioProps) {
                 {/* Center Side (Play/Pause) */}
                 <div className="flex flex-col shrink-0 justify-center items-center gap-2 md:gap-3 px-1 md:px-4">
                   <div className="hidden md:flex flex-col items-center">
-                    <span className="text-[10px] text-on-surface-variant uppercase tracking-tighter">Current Step</span>
+                    <span className="text-[10px] text-on-surface-variant uppercase tracking-tighter">Progress</span>
                     <span className="text-[14px] font-bold text-primary whitespace-nowrap">Line {activeIndex < lines.length ? activeIndex : lines.length} / {lines.length}</span>
                   </div>
                   <button 
@@ -836,8 +844,8 @@ export function LrcSyncStudio({ track, onSaveSuccess }: LrcSyncStudioProps) {
               <div className="flex items-center gap-4 mb-2">
                 <span className="px-3 py-1 bg-primary/20 text-primary rounded-full text-[12px] font-semibold tracking-widest uppercase">Step 3</span>
               </div>
-              <h2 className="text-[24px] md:text-[32px] font-bold text-on-surface">Fine-Tuning & Export</h2>
-              <p className="text-on-surface-variant text-[14px] md:text-[16px] opacity-80 mt-1">Perfect your timing. Adjust timestamps directly or use the quick actions.</p>
+              <h2 className="text-[24px] md:text-[32px] font-bold text-on-surface">Review & Save</h2>
+              <p className="text-on-surface-variant text-[14px] md:text-[16px] opacity-80 mt-1">Fine-tune your lyric timing here. You can adjust the timestamps directly if any lines feel off.</p>
             </div>
             <div className="hidden md:flex items-center gap-4">
               <button 
@@ -854,7 +862,7 @@ export function LrcSyncStudio({ track, onSaveSuccess }: LrcSyncStudioProps) {
                 }}
                 className="px-6 py-2 border border-outline-variant hover:bg-surface-container-high rounded-xl text-[12px] font-bold tracking-widest uppercase transition-colors"
               >
-                Retry Performance
+                Restart Sync
               </button>
               <button 
                 onClick={() => {
@@ -875,7 +883,7 @@ export function LrcSyncStudio({ track, onSaveSuccess }: LrcSyncStudioProps) {
                 className="px-8 py-3 bg-primary hover:bg-primary/90 disabled:opacity-50 text-on-primary rounded-xl text-[12px] font-bold tracking-widest uppercase shadow-[0_0_15px_rgba(139,92,246,0.3)] transition-all flex items-center gap-2"
               >
                 <Save className="w-4 h-4" />
-                {isSaving ? "Saving..." : "Save & Publish"}
+                {isSaving ? "Saving..." : "Save Lyrics"}
               </button>
             </div>
           </div>

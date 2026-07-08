@@ -10,6 +10,10 @@ export default function ProfilePage() {
   const [artistName, setArtistName] = useState("");
   const [artistBio, setArtistBio] = useState("");
   const [socialLinks, setSocialLinks] = useState({ instagram: "", twitter: "", youtube: "", spotify: "", apple_music: "", website: "" });
+  const [initialArtistName, setInitialArtistName] = useState("");
+  const [initialArtistBio, setInitialArtistBio] = useState("");
+  const [initialSocialLinks, setInitialSocialLinks] = useState({ instagram: "", twitter: "", youtube: "", spotify: "", apple_music: "", website: "" });
+
   const [isSavingProfile, setIsSavingProfile] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteConfirmationText, setDeleteConfirmationText] = useState("");
@@ -20,9 +24,18 @@ export default function ProfilePage() {
       .then(res => res.json())
       .then(data => {
         if (data.profile) {
-          setArtistName(data.profile.name || "");
-          setArtistBio(data.profile.bio || "");
-          setSocialLinks(data.profile.social_links || { instagram: "", twitter: "", youtube: "", spotify: "", apple_music: "", website: "" });
+          const name = data.profile.name || "";
+          const bio = data.profile.bio || "";
+          const links = data.profile.social_links || { instagram: "", twitter: "", youtube: "", spotify: "", apple_music: "", website: "" };
+          
+          setArtistName(name);
+          setInitialArtistName(name);
+          
+          setArtistBio(bio);
+          setInitialArtistBio(bio);
+          
+          setSocialLinks(links);
+          setInitialSocialLinks(links);
         }
       })
       .catch(err => console.error("Failed to load profile:", err));
@@ -38,6 +51,9 @@ export default function ProfilePage() {
       });
       if (res.ok) {
         toast.success("Profile saved successfully!");
+        setInitialArtistName(artistName);
+        setInitialArtistBio(artistBio);
+        setInitialSocialLinks(socialLinks);
       } else {
         const data = await res.json();
         toast.error("Failed to save profile: " + data.error);
@@ -154,8 +170,8 @@ export default function ProfilePage() {
         <div className="flex justify-end">
           <button 
             onClick={handleSaveProfile} 
-            disabled={isSavingProfile}
-            className="px-8 py-3 bg-primary text-on-primary rounded-full font-label-caps text-label-caps hover:opacity-90 transition-all disabled:opacity-50 shadow-lg shadow-primary/20"
+            disabled={isSavingProfile || (artistName === initialArtistName && artistBio === initialArtistBio && JSON.stringify(socialLinks) === JSON.stringify(initialSocialLinks))}
+            className="px-8 py-3 bg-primary text-on-primary rounded-full font-label-caps text-label-caps hover:opacity-90 transition-all disabled:bg-surface-variant disabled:text-on-surface-variant disabled:shadow-none disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-primary/20"
           >
             {isSavingProfile ? 'Saving...' : 'Save Profile'}
           </button>

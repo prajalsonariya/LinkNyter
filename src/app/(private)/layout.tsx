@@ -8,6 +8,7 @@ import { DashboardProvider, useDashboard } from "@/contexts/DashboardContext";
 
 function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const brandHref = pathname === '/dashboard' ? '/' : '/dashboard';
   const { data: session } = useSession();
   const { 
     dragActive, isUploading, uploadProgress, 
@@ -29,7 +30,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
           <img src="/logo.svg" alt="LinkNyter Logo" className="h-12 md:h-14 w-auto" />
           <h1 className="font-display-lg text-display-lg font-bold text-primary tracking-tighter">LinkNyter</h1>
         </div>
-        <p className="text-on-surface-variant max-w-md text-body-lg">A secure, zero-cost presentation and delivery layer for your audio files.</p>
+        <p className="text-on-surface-variant max-w-md text-body-lg">The easiest way to share, stream, and present your music directly from your Google Drive.</p>
         <button 
           onClick={() => signIn('google')}
           className="bg-primary text-on-primary font-label-caps text-label-caps py-4 px-8 rounded-full hover:opacity-90 transition-all"
@@ -60,13 +61,13 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
 
       {/* Left Sidebar (Desktop Only) */}
       <aside className="hidden md:flex fixed left-0 top-0 h-screen w-64 border-r border-outline-variant bg-surface/80 backdrop-blur-xl flex-col py-margin-desktop px-gutter z-50">
-        <div className="mb-10">
-          <div className="flex items-center gap-1.5 mb-2">
-            <img src="/logo.svg" alt="LinkNyter Logo" className="h-8 md:h-10 w-auto" />
-            <h1 className="font-display-lg text-[32px] font-bold text-primary tracking-tighter">LinkNyter</h1>
+        <Link href={brandHref} className="mb-10 flex items-start gap-2 group cursor-pointer">
+          <img src="/logo.svg" alt="LinkNyter Logo" className="h-8 md:h-10 w-auto mt-0.5" />
+          <div className="flex flex-col">
+            <h1 className="font-display-lg text-[32px] font-bold text-primary tracking-tighter leading-none">LinkNyter</h1>
+            <p className="font-label-caps text-[10px] md:text-[11px] text-on-surface-variant uppercase tracking-widest mt-1">Creator Studio</p>
           </div>
-          <p className="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest">Creator Studio</p>
-        </div>
+        </Link>
         
         <nav className="flex-1 space-y-2">
           <Link href="/dashboard" className={`flex items-center gap-3 py-3 px-4 rounded transition-all w-full ${pathname === '/dashboard' ? 'text-primary font-bold border-r-2 border-primary bg-surface-container-high active:scale-95 duration-100' : 'text-on-surface-variant font-body-sm hover:bg-surface-container-high'}`}>
@@ -75,7 +76,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
           </Link>
           <Link href="/manage-links" className={`flex items-center gap-3 py-3 px-4 rounded transition-all w-full ${pathname === '/manage-links' ? 'text-primary font-bold border-r-2 border-primary bg-surface-container-high active:scale-95 duration-100' : 'text-on-surface-variant font-body-sm hover:bg-surface-container-high'}`}>
             <LinkIcon className="w-5 h-5" />
-            <span className="font-label-caps text-label-caps">Manage Links</span>
+            <span className="font-label-caps text-label-caps">Share Links</span>
           </Link>
           <Link href="/analytics" className={`flex items-center gap-3 py-3 px-4 rounded transition-all w-full ${pathname === '/analytics' ? 'text-primary font-bold border-r-2 border-primary bg-surface-container-high active:scale-95 duration-100' : 'text-on-surface-variant font-body-sm hover:bg-surface-container-high'}`}>
             <BarChart2 className="w-5 h-5" />
@@ -83,7 +84,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
           </Link>
           <Link href="/lrc-sync" className={`flex items-center gap-3 py-3 px-4 rounded transition-all w-full ${pathname === '/lrc-sync' ? 'text-primary font-bold border-r-2 border-primary bg-surface-container-high active:scale-95 duration-100' : 'text-on-surface-variant font-body-sm hover:bg-surface-container-high'}`}>
             <ListMusic className="w-5 h-5" />
-            <span className="font-label-caps text-label-caps">LRC Sync</span>
+            <span className="font-label-caps text-label-caps">Sync Lyrics</span>
           </Link>
           <Link href="/profile" className={`flex items-center gap-3 py-3 px-4 rounded transition-all w-full ${pathname === '/profile' ? 'text-primary font-bold border-r-2 border-primary bg-surface-container-high active:scale-95 duration-100' : 'text-on-surface-variant font-body-sm hover:bg-surface-container-high'}`}>
             <User className="w-5 h-5" />
@@ -135,10 +136,10 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
 
       {/* Mobile Top App Bar */}
       <header className="flex md:hidden fixed top-0 w-full bg-surface/80 backdrop-blur-xl text-primary border-b border-outline-variant/20 justify-center items-center px-4 h-16 z-50">
-        <div className="flex items-center gap-1.5">
+        <Link href={brandHref} className="flex items-center gap-1.5 cursor-pointer">
           <img src="/logo.svg" alt="LinkNyter Logo" className="h-6 w-auto" />
           <h1 className="font-display-lg text-[24px] tracking-tighter text-primary font-bold">LinkNyter</h1>
-        </div>
+        </Link>
       </header>
 
       {/* Main Content Rendered Here */}
@@ -153,7 +154,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
         </Link>
         <Link href="/manage-links" className={`flex flex-col items-center justify-center transition-colors active:scale-90 transition-transform duration-200 ${pathname === '/manage-links' ? 'text-primary' : 'text-on-surface-variant hover:text-primary-fixed-dim'}`}>
           <LinkIcon className="w-6 h-6" />
-          <span className="font-label-caps text-[10px] tracking-widest mt-1">Links</span>
+          <span className="font-label-caps text-[10px] tracking-widest mt-1">Share Links</span>
           {pathname === '/manage-links' && <div className="absolute -bottom-1 w-1 h-1 bg-primary rounded-full shadow-[0_0_10px_#8B5CF6]"></div>}
         </Link>
         <Link href="/analytics" className={`flex flex-col items-center justify-center transition-colors active:scale-90 transition-transform duration-200 ${pathname === '/analytics' ? 'text-primary' : 'text-on-surface-variant hover:text-primary-fixed-dim'}`}>
@@ -163,7 +164,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
         </Link>
         <Link href="/lrc-sync" className={`flex flex-col items-center justify-center transition-colors active:scale-90 transition-transform duration-200 ${pathname === '/lrc-sync' ? 'text-primary' : 'text-on-surface-variant hover:text-primary-fixed-dim'}`}>
           <ListMusic className="w-6 h-6" />
-          <span className="font-label-caps text-[10px] tracking-widest mt-1">Studio</span>
+          <span className="font-label-caps text-[10px] tracking-widest mt-1">Sync Lyrics</span>
           {pathname === '/lrc-sync' && <div className="absolute -bottom-1 w-1 h-1 bg-primary rounded-full shadow-[0_0_10px_#8B5CF6]"></div>}
         </Link>
         <Link href="/profile" className={`flex flex-col items-center justify-center transition-colors active:scale-90 transition-transform duration-200 ${pathname === '/profile' ? 'text-primary' : 'text-on-surface-variant hover:text-primary-fixed-dim'}`}>

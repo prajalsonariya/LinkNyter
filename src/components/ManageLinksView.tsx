@@ -103,7 +103,7 @@ export function ManageLinksView({ tracks, playlists }: { tracks: any[], playlist
       {/* Header Section */}
       <div className="flex flex-col gap-2">
         <h2 className="font-headline-lg text-headline-lg text-on-surface">Manage Links</h2>
-        <p className="text-on-surface-variant font-body-lg text-body-lg max-w-2xl">Create and monitor custom distribution links for your tracks and playlists to track engagement and pitching performance across different platforms.</p>
+        <p className="text-on-surface-variant font-body-lg text-body-lg max-w-2xl">Create unique links for your tracks and playlists. Use them to share your music with labels, blogs, or fans and see exactly who is listening.</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
@@ -115,7 +115,7 @@ export function ManageLinksView({ tracks, playlists }: { tracks: any[], playlist
               <div className="p-1 bg-primary/10 rounded-lg flex items-center justify-center w-[36px] h-[36px]">
                 <img src="/logo.svg" alt="LinkNyter Logo" className="w-7 h-7 object-contain" />
               </div>
-              <h3 className="font-headline-md text-headline-md text-on-surface">Create New Link</h3>
+              <h3 className="font-headline-md text-headline-md text-on-surface">Create Link</h3>
             </div>
             
             <div className="flex bg-[#121317] p-1 rounded-lg border border-outline-variant/20">
@@ -194,10 +194,10 @@ export function ManageLinksView({ tracks, playlists }: { tracks: any[], playlist
                 </div>
               </div>
               <div className="flex flex-col gap-1.5">
-                <label className="text-label-caps font-label-caps text-outline uppercase tracking-wider">Recipient / Purpose</label>
+                <label className="text-label-caps font-label-caps text-outline uppercase tracking-wider">Link Name/Recipient</label>
                 <input 
                   className="w-full bg-[#121317] border border-outline-variant/30 rounded-lg py-3 px-4 text-on-surface focus:border-primary focus:ring-0 placeholder:text-surface-variant" 
-                  placeholder="e.g., Warner Bros Pitch" 
+                  placeholder="e.g., Warner Bros Pitch, Person's name" 
                   type="text"
                   value={newLinkName}
                   onChange={e => setNewLinkName(e.target.value)}
@@ -209,7 +209,7 @@ export function ManageLinksView({ tracks, playlists }: { tracks: any[], playlist
                 disabled={!newLinkName.trim() || (targetType === 'track' && selectedTrackId === 'ALL') || (targetType === 'playlist' && selectedPlaylistId === 'ALL') || isGenerating}
                 type="submit"
               >
-                <span>{isGenerating ? 'Generating...' : 'Generate Tracking Link'}</span>
+                <span>{isGenerating ? 'Generating...' : 'Generate Link'}</span>
                 {!isGenerating && <Plus className="w-5 h-5" />}
               </button>
             </form>
@@ -217,7 +217,7 @@ export function ManageLinksView({ tracks, playlists }: { tracks: any[], playlist
 
           {/* Quick Stats Mini-Panel */}
           <div className="bg-primary/5 border border-primary/20 backdrop-blur-xl p-6 rounded-xl">
-            <p className="text-label-caps font-label-caps text-primary/80 uppercase mb-4">Link Ecosystem</p>
+            <p className="text-label-caps font-label-caps text-primary/80 uppercase mb-4">Link Stats</p>
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <p className="text-2xl font-bold text-on-surface">{links.length}</p>
@@ -232,7 +232,7 @@ export function ManageLinksView({ tracks, playlists }: { tracks: any[], playlist
           <div className="bg-[#1a1a1d]/70 backdrop-blur-xl border border-[#333338] rounded-xl overflow-hidden flex flex-col h-auto md:h-[700px]">
             {/* Filter Bar */}
             <div className="p-6 border-b border-outline-variant/10 bg-[#121317]/50">
-              <h3 className="font-headline-md text-headline-md text-on-surface">Active Distribution Links</h3>
+              <h3 className="font-headline-md text-headline-md text-on-surface">Active Links</h3>
             </div>
 
             {/* List of Links */}

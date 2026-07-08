@@ -41,9 +41,9 @@ export default function LrcSyncPage() {
         <div className="flex-1 flex flex-col items-center justify-center p-8 overflow-y-auto">
           <div className="max-w-2xl w-full text-center space-y-8">
             <div>
-              <h2 className="font-display-lg text-[32px] font-bold text-on-surface mb-4">Select a Track to Sync</h2>
+              <h2 className="font-display-lg text-[32px] font-bold text-on-surface mb-4">Select a track to sync lyrics</h2>
               <p className="text-body-lg text-on-surface-variant max-w-lg mx-auto">
-                Choose a track from your library to begin synchronizing lyrics using the LRC Sync Studio.
+                Pick a track from your library to start syncing its lyrics line-by-line.
               </p>
             </div>
             

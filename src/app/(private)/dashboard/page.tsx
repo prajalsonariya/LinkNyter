@@ -258,7 +258,7 @@ export default function DashboardPage() {
     <>
       <main className="flex-1 overflow-y-auto custom-scrollbar relative z-10 md:ml-64 md:mr-80 pb-32 pt-20 md:pt-0 md:pb-0">
         <header className="sticky top-0 w-full z-40 hidden md:flex items-center px-margin-desktop h-20 bg-surface/60 backdrop-blur-xl">
-          <h2 className="font-headline-md text-headline-md text-on-surface font-semibold">Artist Dashboard</h2>
+          <h2 className="font-headline-md text-headline-md text-on-surface font-semibold">Music Library</h2>
         </header>
 
         <div className="p-4 md:p-margin-desktop max-w-4xl mx-auto space-y-8 md:space-y-12">
@@ -266,7 +266,7 @@ export default function DashboardPage() {
           {!selectedTrack && !selectedPlaylist && (
             <section className="flex md:hidden flex-col gap-1 mb-4">
               <span className="text-label-caps font-label-caps text-primary tracking-widest">CREATOR STUDIO</span>
-              <h2 className="font-display-sm text-[28px] font-bold text-on-surface">Upload Your Sound</h2>
+              <h2 className="font-display-sm text-[28px] font-bold text-on-surface">Upload your music</h2>
             </section>
           )}
 
@@ -333,11 +333,11 @@ export default function DashboardPage() {
                     </div>
                     <div className="space-y-2">
                       <h3 className="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest">Artist Name</h3>
-                      <input className="w-full bg-surface-container-lowest border border-outline-variant focus:border-primary rounded-lg px-4 py-4 font-body-lg text-on-surface placeholder:text-outline-variant outline-none transition-all" type="text" placeholder="Leave blank to use profile name" value={editArtist} onChange={(e) => setEditArtist(e.target.value)} />
+                      <input className="w-full bg-surface-container-lowest border border-outline-variant focus:border-primary rounded-lg px-4 py-4 font-body-lg text-on-surface placeholder:text-outline-variant outline-none transition-all" type="text" placeholder="Defaults to your artist name" value={editArtist} onChange={(e) => setEditArtist(e.target.value)} />
                     </div>
                     <div className="space-y-2">
                       <h3 className="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest">Description</h3>
-                      <textarea className="w-full bg-surface-container-lowest border border-outline-variant focus:border-primary rounded-lg px-4 py-4 font-body-lg text-on-surface placeholder:text-outline-variant outline-none transition-all resize-none" placeholder="Enter track details, mood, or credits..." rows={6} value={editDescription} onChange={(e) => setEditDescription(e.target.value)} />
+                      <textarea className="w-full bg-surface-container-lowest border border-outline-variant focus:border-primary rounded-lg px-4 py-4 font-body-lg text-on-surface placeholder:text-outline-variant outline-none transition-all resize-none" placeholder="Write a description, mood, or tracks credits..." rows={6} value={editDescription} onChange={(e) => setEditDescription(e.target.value)} />
                     </div>
                     <div className="flex justify-between items-center pt-2">
                       <div className="flex gap-4">
@@ -355,7 +355,7 @@ export default function DashboardPage() {
             ) : isUploading ? (
               <div className="space-y-3 p-8 border border-outline-variant rounded-xl bg-surface-container-lowest">
                 <div className="flex justify-between items-end font-label-caps text-label-caps uppercase tracking-wider text-on-surface-variant">
-                  <span>Uploading securely...</span>
+                  <span>Uploading tracks...</span>
                   <span className="text-primary">In Progress</span>
                 </div>
                 <div className="h-1 w-full bg-surface-container-high rounded-full overflow-hidden">

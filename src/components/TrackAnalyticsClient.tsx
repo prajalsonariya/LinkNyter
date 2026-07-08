@@ -137,7 +137,7 @@ export function TrackAnalyticsClient({ track, sessions: initialSessions, trackin
       return (
         <div className="bg-[#121214] border border-[#222226] rounded-lg p-3 shadow-xl backdrop-blur-md">
           <p className="text-[#cbc3d7] text-xs mb-1 font-label-caps">{label}</p>
-          <p className="text-[#d0bcff] font-bold">{payload[0].value} streams</p>
+          <p className="text-[#d0bcff] font-bold">{payload[0].value} plays</p>
         </div>
       );
     }
@@ -306,7 +306,7 @@ export function TrackAnalyticsClient({ track, sessions: initialSessions, trackin
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-12">
         <div className={`${glassCardClass} p-4 md:p-6 rounded-xl flex flex-col justify-between h-36 md:h-40`}>
           <div>
-            <span className="font-label-caps text-outline tracking-wider text-[10px]">TOTAL STREAMS</span>
+            <span className="font-label-caps text-outline tracking-wider text-[10px]">TOTAL PLAYS</span>
             <h3 className="font-headline-lg text-headline-lg mt-1">{totalOpens}</h3>
           </div>
           <div className="h-8 w-full flex items-end gap-1">
@@ -399,7 +399,7 @@ export function TrackAnalyticsClient({ track, sessions: initialSessions, trackin
         <div className={`lg:col-span-2 ${glassCardClass} rounded-2xl p-8 overflow-hidden relative min-h-[450px] flex flex-col`}>
           <div className="flex justify-between items-start mb-8 relative z-10">
             <div>
-              <h4 className="font-headline-md text-headline-md">Streams Over Time</h4>
+              <h4 className="font-headline-md text-headline-md">Plays Over Time</h4>
               <p className="font-body-sm text-outline">Listener engagement last 7 days</p>
             </div>
             <div className="flex gap-2">

@@ -186,7 +186,7 @@ export function PlaylistEditor({ playlist, allTracks, onUpdate, onDelete }: { pl
         <div className="flex justify-between items-end mb-6">
           <div>
             <h3 className="font-headline-md text-headline-md font-semibold text-on-surface">Playlist Tracks</h3>
-            <p className="text-sm text-on-surface-variant mt-1">Drag tracks from your library (Tracks tab) into this area, or reorder them below.</p>
+            <p className="text-sm text-on-surface-variant mt-1">Dragg tracks from your library here, or reorder the list below.</p>
           </div>
           <span className="text-primary font-label-caps text-label-caps tracking-widest">{playlistTracks.length} TRACKS</span>
         </div>
@@ -203,7 +203,7 @@ export function PlaylistEditor({ playlist, allTracks, onUpdate, onDelete }: { pl
             <div className="flex flex-col items-center justify-center h-full opacity-50 py-12">
               <ListMusic className="w-12 h-12 mb-4" />
               <p>No tracks added yet.</p>
-              <p className="text-sm mt-2">Drag tracks from your library into this area or add them below.</p>
+              <p className="text-sm mt-2">Drag tracks from your library here, or click &quot;Add Tracks&quot; below.</p>
             </div>
           )}
 
@@ -234,7 +234,7 @@ export function PlaylistEditor({ playlist, allTracks, onUpdate, onDelete }: { pl
                 {/* Picker header */}
                 <div className="flex items-center justify-between px-4 py-3 border-b border-white/5 bg-surface-container-high">
                   <span className="text-xs font-label-caps tracking-widest text-white/50">
-                    SELECT A TRACK TO ADD
+                    Select a track to add
                   </span>
                   <button
                     onClick={(e) => {
