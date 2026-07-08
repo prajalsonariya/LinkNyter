@@ -109,6 +109,31 @@ export default function DashboardPage() {
     }
   };
 
+  const handleCoverDrag = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === "dragenter" || e.type === "dragover") {
+      setIsCoverDragActive(true);
+    } else if (e.type === "dragleave") {
+      setIsCoverDragActive(false);
+    }
+  };
+
+  const handleCoverDrop = async (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsCoverDragActive(false);
+    
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      const file = e.dataTransfer.files[0];
+      if (file.type.startsWith('image/')) {
+        await handleCoverUploadDirect(file);
+      } else {
+        toast.error("Please drop an image file.");
+      }
+    }
+  };
+
   const handleCoverUploadDirect = async (file: File) => {
     if (!selectedTrack) return;
     setIsCoverUploading(true);
@@ -302,6 +327,10 @@ export default function DashboardPage() {
                     <h3 className="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest">Cover Art</h3>
                     <div 
                       onClick={() => !isCoverUploading && coverInputRef.current?.click()}
+                      onDragEnter={handleCoverDrag}
+                      onDragOver={handleCoverDrag}
+                      onDragLeave={handleCoverDrag}
+                      onDrop={handleCoverDrop}
                       className={`w-full aspect-square rounded-xl overflow-hidden shadow-2xl border ${isCoverDragActive ? 'border-primary border-2 scale-105' : 'border-outline-variant/30'} relative bg-surface-container-high flex items-center justify-center transition-all duration-300 ${isCoverUploading ? 'cursor-default' : 'group cursor-pointer'}`}
                     >
                       {editCoverUrl ? (
@@ -316,10 +345,45 @@ export default function DashboardPage() {
                         </div>
                       )}
 
+                      {!isCoverUploading && editCoverUrl && (
+                        <button 
+                          onClick={async (e) => {
+                            e.stopPropagation();
+                            try {
+                              setEditCoverUrl("");
+                              const saveRes = await fetch(`/api/track/${selectedTrack.id}`, { 
+                                method: "PUT", 
+                                headers: { "Content-Type": "application/json" }, 
+                                body: JSON.stringify({ cover_url: null }) 
+                              });
+                              if (saveRes.ok) {
+                                const saveData = await saveRes.json();
+                                setTracks(tracks.map(t => t.id === selectedTrack.id ? saveData.track : t));
+                                setSelectedTrack(saveData.track);
+                                toast.success("Cover art removed");
+                              }
+                            } catch (err: any) {
+                              toast.error("Failed to remove cover: " + err.message);
+                            }
+                          }}
+                          className="absolute top-3 right-3 p-2 bg-error hover:bg-error/90 active:scale-95 transition-all rounded-full cursor-pointer shadow-lg z-20 flex items-center justify-center opacity-0 group-hover:opacity-100"
+                          title="Delete Cover Art"
+                        >
+                          <Trash2 className="w-4 h-4 text-white" />
+                        </button>
+                      )}
+
                       {isCoverUploading && (
-                        <div className="absolute inset-0 bg-surface/60 backdrop-blur-sm flex flex-col items-center justify-center animate-fade-in z-10">
-                          <div className="w-16 h-16 border-4 border-primary/20 border-t-primary rounded-full animate-spin mb-4 shadow-lg"></div>
-                          <span className="font-label-caps text-label-caps text-on-surface animate-pulse tracking-widest drop-shadow-md">Uploading...</span>
+                        <div className="absolute inset-0 bg-black/70 backdrop-blur-md flex flex-col items-center justify-center animate-fade-in z-10">
+                          <div className="relative flex items-center justify-center">
+                            <div className="absolute w-14 h-14 bg-primary/20 rounded-full animate-ping duration-1000" />
+                            <div className="relative w-10 h-10 bg-primary rounded-full flex items-center justify-center shadow-lg shadow-primary/50 border border-white/10">
+                              <Upload className="w-5 h-5 text-white animate-pulse" />
+                            </div>
+                          </div>
+                          <span className="mt-4 font-label-caps text-[10px] md:text-[11px] text-primary-fixed-dim tracking-widest uppercase animate-pulse">
+                            Uploading...
+                          </span>
                         </div>
                       )}
                     </div>

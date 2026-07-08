@@ -1,12 +1,15 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession, signIn, signOut } from "next-auth/react";
-import { LayoutGrid, BarChart2, User, Shield, UploadCloud, LogOut, Link as LinkIcon, ListMusic } from "lucide-react";
+import { LayoutGrid, BarChart2, User, Shield, UploadCloud, LogOut, Link as LinkIcon, ListMusic, QrCode, MessageSquarePlus } from "lucide-react";
 import { DashboardProvider, useDashboard } from "@/contexts/DashboardContext";
+import { FeedbackModal } from "@/components/FeedbackModal";
 
 function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
+  const [showFeedback, setShowFeedback] = useState(false);
   const pathname = usePathname();
   const brandHref = pathname === '/dashboard' ? '/' : '/dashboard';
   const { data: session } = useSession();
@@ -86,6 +89,10 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
             <ListMusic className="w-5 h-5" />
             <span className="font-label-caps text-label-caps">Sync Lyrics</span>
           </Link>
+          <Link href="/qr-codes" className={`flex items-center gap-3 py-3 px-4 rounded transition-all w-full ${pathname === '/qr-codes' ? 'text-primary font-bold border-r-2 border-primary bg-surface-container-high active:scale-95 duration-100' : 'text-on-surface-variant font-body-sm hover:bg-surface-container-high'}`}>
+            <QrCode className="w-5 h-5" />
+            <span className="font-label-caps text-label-caps">QR Codes</span>
+          </Link>
           <Link href="/profile" className={`flex items-center gap-3 py-3 px-4 rounded transition-all w-full ${pathname === '/profile' ? 'text-primary font-bold border-r-2 border-primary bg-surface-container-high active:scale-95 duration-100' : 'text-on-surface-variant font-body-sm hover:bg-surface-container-high'}`}>
             <User className="w-5 h-5" />
             <span className="font-label-caps text-label-caps">Profile</span>
@@ -126,6 +133,13 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
           <input className="hidden" type="file" accept="audio/*" ref={inputRef} onChange={handleChange} />
 
           <div className="space-y-1">
+            <button 
+              onClick={() => setShowFeedback(true)}
+              className="flex items-center gap-3 py-2 px-4 text-on-surface-variant font-body-sm hover:text-primary transition-colors cursor-pointer w-full mb-2"
+            >
+              <MessageSquarePlus className="w-5 h-5" />
+              <span className="font-body-sm">Bug / Feature</span>
+            </button>
             <button className="flex items-center gap-3 py-2 px-4 text-on-surface-variant font-body-sm hover:text-error transition-colors cursor-pointer w-full" onClick={() => signOut()}>
               <LogOut className="w-5 h-5" />
               <span className="font-body-sm">Sign Out</span>
@@ -144,6 +158,8 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
 
       {/* Main Content Rendered Here */}
       {children}
+
+      {showFeedback && <FeedbackModal onClose={() => setShowFeedback(false)} />}
 
       {/* Mobile Bottom Navigation Bar */}
       <nav className="flex md:hidden fixed bottom-0 left-0 w-full z-50 justify-around items-center px-2 pb-safe h-20 bg-surface-container/90 backdrop-blur-xl border-t border-outline-variant/20 rounded-t-3xl">
@@ -166,6 +182,11 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
           <ListMusic className="w-6 h-6" />
           <span className="font-label-caps text-[10px] tracking-widest mt-1">Sync Lyrics</span>
           {pathname === '/lrc-sync' && <div className="absolute -bottom-1 w-1 h-1 bg-primary rounded-full shadow-[0_0_10px_#8B5CF6]"></div>}
+        </Link>
+        <Link href="/qr-codes" className={`flex flex-col items-center justify-center transition-colors active:scale-90 transition-transform duration-200 ${pathname === '/qr-codes' ? 'text-primary' : 'text-on-surface-variant hover:text-primary-fixed-dim'}`}>
+          <QrCode className="w-6 h-6" />
+          <span className="font-label-caps text-[10px] tracking-widest mt-1">QR Codes</span>
+          {pathname === '/qr-codes' && <div className="absolute -bottom-1 w-1 h-1 bg-primary rounded-full shadow-[0_0_10px_#8B5CF6]"></div>}
         </Link>
         <Link href="/profile" className={`flex flex-col items-center justify-center transition-colors active:scale-90 transition-transform duration-200 ${pathname === '/profile' ? 'text-primary' : 'text-on-surface-variant hover:text-primary-fixed-dim'}`}>
           <User className="w-6 h-6" />

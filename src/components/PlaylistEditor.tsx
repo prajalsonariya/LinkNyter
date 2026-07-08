@@ -39,9 +39,13 @@ export function PlaylistEditor({ playlist, allTracks, onUpdate, onDelete }: { pl
   const [playlistTracks, setPlaylistTracks] = useState<any[]>([]);
   const [originalTracks, setOriginalTracks] = useState<string[]>([]);
   const [editTitle, setEditTitle] = useState(playlist.title);
+  const [editCoverArtUrl, setEditCoverArtUrl] = useState(playlist.cover_art_url || "/playlist-cover.png");
   const [isSaving, setIsSaving] = useState(false);
+  const [isCoverUploading, setIsCoverUploading] = useState(false);
+  const [isCoverDragActive, setIsCoverDragActive] = useState(false);
   const [showAddPicker, setShowAddPicker] = useState(false);
   const pickerRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Close picker when clicking outside
   useEffect(() => {
@@ -65,6 +69,7 @@ export function PlaylistEditor({ playlist, allTracks, onUpdate, onDelete }: { pl
 
   useEffect(() => {
     setEditTitle(playlist.title);
+    setEditCoverArtUrl(playlist.cover_art_url || "/playlist-cover.png");
     fetchTracks();
   }, [playlist]);
 
@@ -106,26 +111,100 @@ export function PlaylistEditor({ playlist, allTracks, onUpdate, onDelete }: { pl
     }
   };
 
+  const handleCoverDrag = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === "dragenter" || e.type === "dragover") {
+      setIsCoverDragActive(true);
+    } else if (e.type === "dragleave") {
+      setIsCoverDragActive(false);
+    }
+  };
+
+  const handleCoverDrop = async (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsCoverDragActive(false);
+    
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      const file = e.dataTransfer.files[0];
+      if (file.type.startsWith('image/')) {
+        await handleCoverUploadDirect(file);
+      } else {
+        toast.error("Please drop an image file.");
+      }
+    }
+  };
+
+  const handleCoverUploadDirect = async (file: File) => {
+    setIsCoverUploading(true);
+    try {
+      const initRes = await fetch('/api/upload/init', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ type: 'cover art' }) });
+      if (!initRes.ok) throw new Error('Failed to initialize upload');
+      const { folderId, accessToken } = await initRes.json();
+
+      const driveInitRes = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json', 'X-Upload-Content-Type': file.type, 'X-Upload-Content-Length': file.size.toString() },
+        body: JSON.stringify({ name: file.name, parents: [folderId] })
+      });
+      if (!driveInitRes.ok) throw new Error('Failed to start upload');
+      const uploadUrl = driveInitRes.headers.get('Location');
+      
+      const driveRes = await fetch(uploadUrl!, { method: 'PUT', headers: { 'Content-Length': file.size.toString() }, body: file });
+      const driveData = await driveRes.json();
+
+      const res = await fetch("/api/upload-image", { method: "POST", headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ driveFileId: driveData.id }) });
+      const data = await res.json();
+      
+      if (res.ok && data.cover_url) {
+        setEditCoverArtUrl(data.cover_url);
+        const saveRes = await fetch(`/api/playlists/${playlist.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            cover_art_url: data.cover_url
+          })
+        });
+        if (saveRes.ok) {
+          onUpdate({ ...playlist, cover_art_url: data.cover_url });
+          toast.success("Cover art updated successfully!");
+        } else {
+          toast.success("Cover art uploaded! Click 'Save Playlist' to commit.");
+        }
+      } else {
+        throw new Error(data.error || 'Failed to process cover art');
+      }
+    } catch (err: any) {
+      toast.error("Upload failed: " + err.message);
+    } finally {
+      setIsCoverUploading(false);
+    }
+  };
+
   const tracksChanged = JSON.stringify(playlistTracks.map(t => t.id)) !== JSON.stringify(originalTracks);
   const titleChanged = editTitle !== playlist.title;
-  const hasChanges = titleChanged || tracksChanged;
+  const coverChanged = editCoverArtUrl !== (playlist.cover_art_url || "/playlist-cover.png");
+  const hasChanges = titleChanged || tracksChanged || coverChanged;
 
   const handleSave = async () => {
     setIsSaving(true);
     try {
       const trackIds = playlistTracks.map(t => t.id);
+      const savedCoverUrl = editCoverArtUrl === "/playlist-cover.png" ? null : editCoverArtUrl;
       const res = await fetch(`/api/playlists/${playlist.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           title: editTitle,
-          tracks: trackIds
+          tracks: trackIds,
+          cover_art_url: savedCoverUrl
         })
       });
       if (!res.ok) throw new Error("Failed to save playlist");
       toast.success("Playlist saved");
       setOriginalTracks(trackIds);
-      onUpdate({ ...playlist, title: editTitle });
+      onUpdate({ ...playlist, title: editTitle, cover_art_url: savedCoverUrl });
     } catch (e: any) {
       toast.error(e.message);
     } finally {
@@ -142,6 +221,83 @@ export function PlaylistEditor({ playlist, allTracks, onUpdate, onDelete }: { pl
     <div className="space-y-8 animate-fade-in" onDragOver={(e) => e.preventDefault()} onDrop={handleDropExternal}>
       <div className="flex flex-col md:flex-row gap-8">
         
+        {/* Playlist Cover Art Upload Section */}
+        <div className="flex flex-col items-center gap-4 shrink-0">
+          <div 
+            onDragEnter={handleCoverDrag}
+            onDragOver={handleCoverDrag}
+            onDragLeave={handleCoverDrag}
+            onDrop={handleCoverDrop}
+            className={`relative w-40 h-40 group rounded-2xl overflow-hidden border bg-surface-container-high shadow-lg transition-all duration-300 ${isCoverDragActive ? 'border-primary border-2 scale-105' : 'border-outline-variant/30'}`}
+          >
+            <img 
+              src={editCoverArtUrl} 
+              alt="Playlist Cover" 
+              className={`w-full h-full object-cover transition-all duration-300 ${isCoverUploading ? 'blur-sm scale-105' : 'group-hover:scale-105'}`} 
+            />
+            {!isCoverUploading && (
+              <div 
+                onClick={() => fileInputRef.current?.click()}
+                className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer"
+              >
+                <Upload className="w-8 h-8 text-white/90" />
+              </div>
+            )}
+
+            {!isCoverUploading && editCoverArtUrl !== "/playlist-cover.png" && (
+              <button 
+                onClick={async (e) => {
+                  e.stopPropagation();
+                  try {
+                    setEditCoverArtUrl("/playlist-cover.png");
+                    const saveRes = await fetch(`/api/playlists/${playlist.id}`, {
+                      method: 'PUT',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({
+                        cover_art_url: null
+                      })
+                    });
+                    if (saveRes.ok) {
+                      onUpdate({ ...playlist, cover_art_url: null });
+                      toast.success("Cover art removed successfully!");
+                    }
+                  } catch (err: any) {
+                    toast.error("Failed to remove cover: " + err.message);
+                  }
+                }}
+                className="absolute top-2 right-2 p-1.5 bg-error hover:bg-error/90 active:scale-95 transition-all rounded-full cursor-pointer shadow-lg z-20 flex items-center justify-center opacity-0 group-hover:opacity-100"
+                title="Remove Cover Art"
+              >
+                <Trash2 className="w-3.5 h-3.5 text-white" />
+              </button>
+            )}
+
+            {isCoverUploading && (
+              <div className="absolute inset-0 bg-black/70 backdrop-blur-md flex flex-col items-center justify-center animate-fade-in z-10">
+                <div className="relative flex items-center justify-center">
+                  <div className="absolute w-12 h-12 bg-primary/20 rounded-full animate-ping duration-1000" />
+                  <div className="relative w-8 h-8 bg-primary rounded-full flex items-center justify-center shadow-lg shadow-primary/50 border border-white/10">
+                    <Upload className="w-4 h-4 text-white animate-pulse" />
+                  </div>
+                </div>
+                <span className="mt-3 font-label-caps text-[9px] text-primary-fixed-dim tracking-widest uppercase animate-pulse">
+                  Uploading...
+                </span>
+              </div>
+            )}
+          </div>
+          <input 
+            type="file" 
+            ref={fileInputRef} 
+            className="hidden" 
+            accept="image/*" 
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) handleCoverUploadDirect(file);
+            }} 
+          />
+        </div>
+
         <div className="flex-1 space-y-6">
           <div className="space-y-2">
             <h3 className="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest">Playlist Title</h3>

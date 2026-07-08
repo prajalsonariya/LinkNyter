@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase-admin';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '../../auth/[...nextauth]/route';
+import { google } from 'googleapis';
 
 export async function PUT(req: Request, props: { params: Promise<{ id: string }> }) {
   try {
@@ -16,7 +17,7 @@ export async function PUT(req: Request, props: { params: Promise<{ id: string }>
     // Verify ownership
     const { data: playlist, error: fetchError } = await supabaseAdmin
       .from('playlists')
-      .select('user_email')
+      .select('user_email, cover_art_url')
       .eq('id', playlistId)
       .single();
 
@@ -47,6 +48,30 @@ export async function PUT(req: Request, props: { params: Promise<{ id: string }>
       }
       
       delete updates.tracks; // Remove from updates so we don't try to update playlist table with it
+    }
+
+    // Delete old cover art from Drive if it exists and is being changed
+    if (updates.cover_art_url !== undefined && updates.cover_art_url !== playlist.cover_art_url) {
+      if (playlist.cover_art_url) {
+        let coverId = null;
+        if (playlist.cover_art_url.includes('drive.google.com/uc?export=view&id=')) {
+          coverId = new URL(playlist.cover_art_url).searchParams.get('id');
+        } else if (playlist.cover_art_url.startsWith('/api/cover/')) {
+          coverId = playlist.cover_art_url.split('/api/cover/')[1];
+        }
+        
+        if (coverId) {
+          try {
+            const oauth2Client = new google.auth.OAuth2();
+            oauth2Client.setCredentials({ access_token: (session as any).accessToken as string });
+            const drive = google.drive({ version: 'v3', auth: oauth2Client });
+            
+            await drive.files.delete({ fileId: coverId });
+          } catch (e: any) {
+            console.error('Failed to delete old playlist cover from Drive:', e.message);
+          }
+        }
+      }
     }
 
     // If there are other updates (like title, cover)
