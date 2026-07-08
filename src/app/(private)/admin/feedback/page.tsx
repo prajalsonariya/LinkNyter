@@ -8,6 +8,7 @@ import { toast } from "sonner";
 export default function AdminFeedbackPage() {
   const [feedback, setFeedback] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchFeedback();
@@ -63,15 +64,19 @@ export default function AdminFeedbackPage() {
   };
 
   const deleteFeedback = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this feedback?")) return;
     try {
       const res = await fetch(`/api/admin/feedback/${id}`, { method: "DELETE" });
       if (res.ok) {
         setFeedback(feedback.filter(f => f.id !== id));
         toast.success("Feedback deleted");
+      } else {
+        toast.error("Failed to delete feedback");
       }
     } catch (err) {
       console.error(err);
+      toast.error("An error occurred while deleting");
+    } finally {
+      setDeleteId(null);
     }
   };
 
@@ -121,7 +126,7 @@ export default function AdminFeedbackPage() {
                     </button>
                   )}
                   <button 
-                    onClick={() => deleteFeedback(item.id)}
+                    onClick={() => setDeleteId(item.id)}
                     title="Delete Feedback"
                     className="p-1.5 hover:bg-error/20 text-error rounded transition-colors"
                   >
@@ -147,6 +152,31 @@ export default function AdminFeedbackPage() {
           ))
         )}
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {deleteId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-fade-in" onClick={() => setDeleteId(null)} />
+          <div className="relative w-full max-w-sm bg-surface-container rounded-3xl p-6 border border-outline-variant/20 shadow-2xl animate-slide-up">
+            <h3 className="font-display-sm text-xl font-bold text-on-surface mb-2">Delete Feedback?</h3>
+            <p className="text-on-surface-variant text-sm mb-6">Are you sure you want to delete this feedback? This action cannot be undone.</p>
+            <div className="flex gap-3 justify-end">
+              <button 
+                onClick={() => setDeleteId(null)}
+                className="px-4 py-2 rounded-full font-label-caps text-on-surface-variant hover:bg-surface-container-highest transition-colors"
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={() => deleteFeedback(deleteId)}
+                className="px-4 py-2 rounded-full font-label-caps bg-error text-white hover:bg-error/90 transition-colors"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }

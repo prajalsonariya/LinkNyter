@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { Users, Music, PlayCircle, Globe, Laptop, Smartphone, AlertCircle, Download, Eye, EyeOff, Activity, Monitor, Compass } from "lucide-react";
+import { Users, Music, PlayCircle, Globe, Laptop, Smartphone, AlertCircle, Download, Eye, EyeOff, Activity, Monitor, Compass, MessageSquare } from "lucide-react";
 import { toast } from "sonner";
 
 interface AnalyticsData {
@@ -186,13 +186,22 @@ export default function AdminDashboard() {
       
       <div className="max-w-6xl mx-auto px-4 md:px-12 py-8 md:py-16">
         
-        <header className="mb-12">
-          <h1 className="font-display-lg text-4xl font-bold text-primary tracking-tight mb-2">
-            Developer Analytics
-          </h1>
-          <p className="text-on-surface-variant font-body-lg">
-            Platform wide metrics, user adoption, and playback statistics.
-          </p>
+        <header className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
+          <div>
+            <h1 className="font-display-lg text-4xl font-bold text-primary tracking-tight mb-2">
+              Developer Analytics
+            </h1>
+            <p className="text-on-surface-variant font-body-lg">
+              Platform wide metrics, user adoption, and playback statistics.
+            </p>
+          </div>
+          <button 
+            onClick={() => router.push('/admin/feedback')}
+            className="flex items-center justify-center gap-2 px-6 py-3.5 bg-surface-container hover:bg-primary/10 text-on-surface-variant hover:text-primary rounded-2xl font-label-caps text-[11px] tracking-widest uppercase transition-all border border-outline-variant/30 hover:border-primary/30"
+          >
+            <MessageSquare className="w-4 h-4" />
+            View User Feedback
+          </button>
         </header>
 
         {/* Hero KPI Cards */}
