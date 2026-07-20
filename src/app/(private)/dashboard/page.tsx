@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { useSession } from "next-auth/react";
-import { Play, Pause, Trash2, Upload, Hourglass, Lock, FileUp, ArrowLeft, Plus, Music, ListMusic, ChevronDown, ChevronRight, Folder } from "lucide-react";
+import { Play, Pause, Trash2, Upload, Hourglass, Lock, FileUp, ArrowLeft, Plus, Music, ListMusic, ChevronDown, ChevronRight, Folder, Check } from "lucide-react";
 import { toast } from "sonner";
 import { useDashboard } from "@/contexts/DashboardContext";
 import { TrackItem } from "@/components/TrackItem";
@@ -65,7 +65,7 @@ export default function DashboardPage() {
     } catch (err) {}
   };
 
-
+  const [showSuccessBanner, setShowSuccessBanner] = useState(false);
 
   // Edit Mode States
   const [editTitle, setEditTitle] = useState("");
@@ -77,6 +77,9 @@ export default function DashboardPage() {
   const [isCoverUploading, setIsCoverUploading] = useState(false);
   const [isCoverDragActive, setIsCoverDragActive] = useState(false);
   const coverInputRef = useRef<HTMLInputElement>(null);
+  
+  const [isAudioReplacing, setIsAudioReplacing] = useState(false);
+  const audioReplaceRef = useRef<HTMLInputElement>(null);
 
   const [itemToDelete, setItemToDelete] = useState<{ id: string, type: 'track' | 'playlist', name: string } | null>(null);
 
@@ -131,6 +134,71 @@ export default function DashboardPage() {
       } else {
         toast.error("Please drop an image file.");
       }
+    }
+  };
+
+  const handleAudioReplace = async (file: File) => {
+    if (!selectedTrack) return;
+    if (!file.type.startsWith('audio/')) {
+      toast.error("Please select a valid audio file.");
+      return;
+    }
+    
+    setIsAudioReplacing(true);
+    toast.loading("Uploading new audio file...", { id: 'audio-replace' });
+    try {
+      // 1. Initialize upload session
+      const initRes = await fetch('/api/upload/init', { 
+        method: 'POST', 
+        headers: { 'Content-Type': 'application/json' }, 
+        body: JSON.stringify({ type: 'track audio' }) 
+      });
+      if (!initRes.ok) throw new Error('Failed to initialize upload');
+      const { folderId, accessToken } = await initRes.json();
+
+      // 2. Start resumable upload
+      const driveInitRes = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable', {
+        method: 'POST',
+        headers: { 
+          'Authorization': `Bearer ${accessToken}`, 
+          'Content-Type': 'application/json', 
+          'X-Upload-Content-Type': file.type, 
+          'X-Upload-Content-Length': file.size.toString() 
+        },
+        body: JSON.stringify({ name: file.name, parents: [folderId] })
+      });
+      if (!driveInitRes.ok) throw new Error('Failed to start upload');
+      const uploadUrl = driveInitRes.headers.get('Location');
+      
+      // 3. Upload bytes
+      const driveRes = await fetch(uploadUrl!, { 
+        method: 'PUT', 
+        headers: { 'Content-Length': file.size.toString() }, 
+        body: file 
+      });
+      const driveData = await driveRes.json();
+
+      // 4. Update the track in our database and delete old file
+      const res = await fetch(`/api/track/${selectedTrack.id}/replace`, { 
+        method: "PUT", 
+        headers: { 'Content-Type': 'application/json' }, 
+        body: JSON.stringify({ newDriveFileId: driveData.id }) 
+      });
+      const data = await res.json();
+      
+      if (res.ok && data.track) {
+        setTracks(tracks.map(t => t.id === selectedTrack.id ? data.track : t));
+        setSelectedTrack(data.track);
+        toast.dismiss('audio-replace');
+        setShowSuccessBanner(true);
+      } else {
+        throw new Error(data.error || "Failed to replace audio");
+      }
+    } catch (err: any) {
+      toast.error("Audio replacement failed: " + err.message, { id: 'audio-replace' });
+    } finally {
+      setIsAudioReplacing(false);
+      if (audioReplaceRef.current) audioReplaceRef.current.value = '';
     }
   };
 
@@ -408,9 +476,18 @@ export default function DashboardPage() {
                         <button onClick={handleSaveTrack} disabled={isSaving} className="px-6 py-2 font-label-caps text-label-caps rounded transition-all bg-primary-container text-on-primary-container hover:bg-primary hover:text-on-primary">
                           {isSaving ? 'Saving...' : 'Save Changes'}
                         </button>
+                        <button 
+                          onClick={() => !isAudioReplacing && audioReplaceRef.current?.click()} 
+                          disabled={isAudioReplacing} 
+                          className="px-6 py-2 font-label-caps text-label-caps rounded transition-all border border-outline-variant hover:border-primary text-on-surface hover:text-primary disabled:opacity-50 flex items-center gap-2"
+                        >
+                          {isAudioReplacing ? <Hourglass className="w-4 h-4 animate-spin" /> : <Music className="w-4 h-4" />}
+                          {isAudioReplacing ? 'Uploading...' : 'Change Audio File'}
+                        </button>
+                        <input className="hidden" type="file" accept="audio/*" ref={audioReplaceRef} onChange={(e) => e.target.files?.[0] && handleAudioReplace(e.target.files[0])} />
                       </div>
                       <button onClick={() => handleDeleteTrack()} disabled={isDeleting} className="p-2 text-on-surface-variant hover:text-error transition-colors flex items-center justify-center">
-                        {isDeleting ? <Hourglass className="w-6 h-6" /> : <Trash2 className="w-6 h-6" />}
+                        {isDeleting ? <Hourglass className="w-6 h-6 animate-spin" /> : <Trash2 className="w-6 h-6" />}
                       </button>
                     </div>
                   </div>
@@ -630,6 +707,33 @@ export default function DashboardPage() {
                 {isDeleting ? "Deleting..." : "Delete"}
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Success Banner Modal */}
+      {showSuccessBanner && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div 
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-fade-in" 
+            onClick={() => setShowSuccessBanner(false)}
+          />
+          <div className="relative w-full max-w-sm bg-surface-container rounded-3xl shadow-2xl overflow-hidden animate-slide-up border border-outline-variant/20 p-8 text-center">
+            <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-6 text-primary">
+              <Check className="w-8 h-8" />
+            </div>
+            <h2 className="font-display-sm text-2xl font-bold text-on-surface mb-2">
+              Audio Replaced
+            </h2>
+            <p className="text-on-surface-variant font-body-md mb-8">
+              Your audio track has been successfully updated. All your stats, lyrics, and metadata have been perfectly preserved.
+            </p>
+            <button
+              onClick={() => setShowSuccessBanner(false)}
+              className="w-full py-4 bg-primary text-on-primary font-bold rounded-xl hover:opacity-90 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+            >
+              Awesome!
+            </button>
           </div>
         </div>
       )}
