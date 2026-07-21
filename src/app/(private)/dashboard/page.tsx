@@ -81,6 +81,9 @@ export default function DashboardPage() {
   const [isAudioReplacing, setIsAudioReplacing] = useState(false);
   const audioReplaceRef = useRef<HTMLInputElement>(null);
 
+  const [isAddingYoutube, setIsAddingYoutube] = useState(false);
+  const [youtubeUrl, setYoutubeUrl] = useState("");
+
   const [itemToDelete, setItemToDelete] = useState<{ id: string, type: 'track' | 'playlist', name: string } | null>(null);
 
   useEffect(() => {
@@ -109,6 +112,31 @@ export default function DashboardPage() {
       }
     } catch (e: any) {
       toast.error(e.message);
+    }
+  };
+
+  const handleAddYoutube = async () => {
+    if (!youtubeUrl.trim()) return;
+    setIsAddingYoutube(true);
+    const loadingToast = toast.loading("Adding YouTube track...");
+    try {
+      const res = await fetch('/api/track/youtube', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ youtubeUrl })
+      });
+      const data = await res.json();
+      if (res.ok && data.track) {
+        setTracks([data.track, ...tracks]);
+        setYoutubeUrl("");
+        toast.success("YouTube track added!", { id: loadingToast });
+      } else {
+        throw new Error(data.error || "Failed to add YouTube track");
+      }
+    } catch (e: any) {
+      toast.error(e.message, { id: loadingToast });
+    } finally {
+      setIsAddingYoutube(false);
     }
   };
 
@@ -504,15 +532,38 @@ export default function DashboardPage() {
                 </div>
               </div>
             ) : (
-              <div className="relative group cursor-pointer border-2 border-dashed border-outline-variant hover:border-primary transition-colors rounded-xl p-12 text-center bg-surface-container-low" onClick={() => inputRef.current?.click()}>
-                <div className="flex flex-col items-center gap-4">
-                  <div className="w-16 h-16 rounded-full bg-surface-container-high flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
-                    <FileUp className="w-9 h-9" />
+              <div className="space-y-4">
+                <div className="relative group cursor-pointer border-2 border-dashed border-outline-variant hover:border-primary transition-colors rounded-xl p-12 text-center bg-surface-container-low" onClick={() => inputRef.current?.click()}>
+                  <div className="flex flex-col items-center gap-4">
+                    <div className="w-16 h-16 rounded-full bg-surface-container-high flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
+                      <FileUp className="w-9 h-9" />
+                    </div>
+                    <div className="space-y-1">
+                      <h3 className="font-headline-md text-headline-md text-on-surface">Drag &amp; drop track files</h3>
+                      <p className="text-on-surface-variant font-body-sm">WAV, FLAC, or MP3 up to 200MB</p>
+                    </div>
                   </div>
-                  <div className="space-y-1">
-                    <h3 className="font-headline-md text-headline-md text-on-surface">Drag &amp; drop track files</h3>
-                    <p className="text-on-surface-variant font-body-sm">WAV, FLAC, or MP3 up to 200MB</p>
+                </div>
+
+                {/* YouTube Add Area */}
+                <div className="flex items-center gap-4 p-4 bg-surface-container-low rounded-xl border border-outline-variant/50">
+                  <div className="flex-1">
+                    <input 
+                      type="text" 
+                      placeholder="Or paste a YouTube URL to add as a presentation video..." 
+                      value={youtubeUrl}
+                      onChange={(e) => setYoutubeUrl(e.target.value)}
+                      className="w-full bg-surface-container-lowest border border-outline-variant focus:border-primary rounded-lg px-4 py-3 font-body-md text-on-surface placeholder:text-outline-variant outline-none transition-all"
+                    />
                   </div>
+                  <button 
+                    onClick={handleAddYoutube}
+                    disabled={!youtubeUrl.trim() || isAddingYoutube}
+                    className="px-6 py-3 font-label-caps text-label-caps rounded-lg transition-all bg-primary text-on-primary hover:opacity-90 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 whitespace-nowrap"
+                  >
+                    {isAddingYoutube ? <Hourglass className="w-4 h-4 animate-spin" /> : <Play className="w-4 h-4" />}
+                    Add Video
+                  </button>
                 </div>
               </div>
             )}

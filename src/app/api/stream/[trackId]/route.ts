@@ -16,6 +16,10 @@ export async function GET(req: Request, props: { params: Promise<{ trackId: stri
     return NextResponse.json({ error: 'Track not found' }, { status: 404 });
   }
 
+  if (track.google_drive_file_id === 'youtube_video') {
+    return NextResponse.json({ error: 'Cannot stream youtube track' }, { status: 400 });
+  }
+
   const rangeHeader = req.headers.get('range');
   
   try {
