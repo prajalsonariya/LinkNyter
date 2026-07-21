@@ -36,7 +36,7 @@ export function BioDescription({ text, className = "" }: BioDescriptionProps) {
       >
         <p 
           ref={textRef}
-          className={`text-body-lg text-white/40 leading-relaxed font-light ${isExpanded ? '' : 'whitespace-nowrap'}`}
+          className={`text-body-lg text-white/40 leading-relaxed font-light ${isExpanded ? 'whitespace-pre-wrap' : 'whitespace-nowrap'}`}
         >
           {text}
         </p>
