@@ -15,7 +15,10 @@ export function BioDescription({ text, className = "" }: BioDescriptionProps) {
   useEffect(() => {
     const checkOverflow = () => {
       if (textRef.current) {
-        setIsOverflowing(textRef.current.scrollWidth > textRef.current.clientWidth);
+        setIsOverflowing(
+          textRef.current.scrollWidth > textRef.current.clientWidth || 
+          textRef.current.scrollHeight > textRef.current.clientHeight
+        );
       }
     };
     checkOverflow();
@@ -36,7 +39,7 @@ export function BioDescription({ text, className = "" }: BioDescriptionProps) {
       >
         <p 
           ref={textRef}
-          className={`text-body-lg text-white/40 leading-relaxed font-light ${isExpanded ? 'whitespace-pre-wrap' : 'whitespace-nowrap'}`}
+          className={`text-body-lg text-white/40 leading-relaxed font-light whitespace-pre-wrap ${isExpanded ? '' : 'line-clamp-1'}`}
         >
           {text}
         </p>
