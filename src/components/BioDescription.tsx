@@ -17,7 +17,7 @@ export function BioDescription({ text, className = "" }: BioDescriptionProps) {
       if (textRef.current) {
         setIsOverflowing(
           textRef.current.scrollWidth > textRef.current.clientWidth || 
-          textRef.current.scrollHeight > textRef.current.clientHeight
+          textRef.current.scrollHeight > 35
         );
       }
     };
@@ -39,7 +39,7 @@ export function BioDescription({ text, className = "" }: BioDescriptionProps) {
       >
         <p 
           ref={textRef}
-          className={`text-body-lg text-white/40 leading-relaxed font-light whitespace-pre-wrap ${isExpanded ? '' : 'line-clamp-1'}`}
+          className={`text-body-lg text-white/40 leading-relaxed font-light whitespace-pre-wrap`}
         >
           {text}
         </p>
